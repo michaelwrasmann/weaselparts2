@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeaselParts - Bauteil bearbeiten</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <a href="/" class="logo">
+        <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
+        </svg>
+        <h1>WeaselParts</h1>
+      </a>
+      <nav class="top-nav">
+        <div class="search-container">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Bauteile suchen" id="global-search">
+        </div>
+        <div class="nav-icons">
+          <button class="nav-btn" onclick="window.location.href='/'" title="Zurück zur Übersicht">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+          </button>
+          <button class="nav-btn" onclick="window.location.href='/add-component.html'" title="Neues Bauteil">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
+            </svg>
+          </button>
+          <button class="nav-btn" onclick="window.location.href='/manage-cabinets.html'" title="Schränke">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Bauteil bearbeiten</h1>
+      <p class="page-subtitle">Bearbeite die Details deines Bauteils</p>
+    </div>
+
+    <!-- Component Status Card -->
+    <div class="status-card">
+      <div class="status-header">
+        <div class="component-status">
+          <h2 id="component-title" class="component-title">Lädt...</h2>
+          <span id="component-status-badge" class="status-badge">Lädt...</span>
+        </div>
+        <div class="status-actions">
+          <button class="btn danger" id="delete-btn">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Löschen
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- Left Column: Form -->
+      <div class="form-container">
+        <form id="edit-component-form" enctype="multipart/form-data">
+          <input type="hidden" id="original-barcode" name="original-barcode">
+          
+          <!-- Barcode Section (Read-only) -->
+          <div class="form-group">
+            <label for="barcode">Barcode (nicht änderbar):</label>
+            <input type="text" id="barcode" name="barcode" readonly class="readonly-field">
+          </div>
+
+          <!-- Current Image Display -->
+          <div class="current-image-section">
+            <label>Aktuelles Bild:</label>
+            <div class="current-image-container" id="current-image-container">
+              <!-- Wird dynamisch gefüllt -->
+            </div>
+          </div>
+
+          <!-- Enhanced Image Upload with Camera Support -->
+          <div class="form-group">
+            <label>Neues Bild (optional):</label>
+            <div class="image-upload-container">
+              <!-- Tab Navigation -->
+              <div class="image-upload-tabs">
+                <button type="button" class="tab-button active" data-tab="upload">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                  </svg>
+                  Datei hochladen
+                </button>
+                <button type="button" class="tab-button" data-tab="camera">
+                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  Foto aufnehmen
+                </button>
+              </div>
+
+              <!-- Upload Tab Content -->
+              <div id="upload-tab" class="tab-content active">
+                <div class="image-upload-area" id="image-upload-area">
+                  <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <p>Neues Bild hochladen</p>
+                  <span>Klicken oder Datei hierher ziehen</span>
+                </div>
+                <input type="file" id="component-image" name="image" accept="image/*" style="display: none;">
+              </div>
+
+              <!-- Camera Tab Content -->
+              <div id="camera-tab" class="tab-content">
+                <div class="camera-container">
+                  <div class="camera-preview">
+                    <video id="camera-video" class="camera-video" autoplay muted playsinline></video>
+                    <div class="camera-placeholder">
+                      <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      <h4>Kamera bereit</h4>
+                      <p>Klicke auf "Kamera starten" um ein neues Foto aufzunehmen</p>
+                    </div>
+                    <div class="camera-status">
+                      <div class="camera-status-dot"></div>
+                      Kamera gestoppt
+                    </div>
+                  </div>
+                  <div class="camera-controls">
+                    <button type="button" class="camera-btn start" data-action="start">
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      Kamera starten
+                    </button>
+                    <button type="button" class="camera-btn capture" data-action="capture" disabled>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                      </svg>
+                      Foto aufnehmen
+                    </button>
+                    <button type="button" class="camera-btn stop" data-action="stop" disabled>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z"></path>
+                      </svg>
+                      Kamera stoppen
+                    </button>
+                    <button type="button" class="camera-btn switch" data-action="switch" disabled>
+                      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                      </svg>
+                      Kamera wechseln
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Image Preview (shared) -->
+              <div class="image-preview" id="image-preview"></div>
+            </div>
+          </div>
+
+          <!-- Form Grid -->
+          <div class="form-grid">
+            <!-- Linke Spalte -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="project">PROJECT*:</label>
+                <input type="text" id="project" name="project" required class="highlight-field">
+              </div>
+              
+              <div class="form-group">
+                <label for="identification_number">IDENTIFICATION NUMBER:</label>
+                <input type="text" id="identification_number" name="identification_number" class="highlight-field">
+              </div>
+            </div>
+            
+            <!-- Rechte Spalte -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="responsible_engineer">RESPONSIBLE ENGINEER*:</label>
+                <input type="text" id="responsible_engineer" name="responsible_engineer" required class="highlight-field">
+              </div>
+              
+              <div class="form-group">
+                <label for="equipment_name">EQUIPMENT NAME*:</label>
+                <input type="text" id="equipment_name" name="equipment_name" required class="highlight-field">
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional Fields -->
+          <div class="form-group">
+            <label for="name">Bauteil-Name:</label>
+            <input type="text" id="name" name="name">
+          </div>
+
+          <div class="form-group">
+            <label for="beschreibung">Beschreibung:</label>
+            <textarea id="beschreibung" name="beschreibung" rows="3"></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+              </svg>
+              Speichern
+            </button>
+            <button type="button" class="btn secondary" onclick="window.location.href='/'">Abbrechen</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Storage Info -->
+      <div class="storage-info-container">
+        <h3>
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+          </svg>
+          Lagerort
+        </h3>
+        <div class="storage-info" id="storage-info">
+          <!-- Wird dynamisch gefüllt -->
+        </div>
+
+        <!-- Historical Records Preview -->
+        <div class="historical-records-preview">
+          <h3>
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            Historical Records
+            <button class="icon-btn" id="view-all-records" title="Alle Historical Records anzeigen">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+              </svg>
+            </button>
+          </h3>
+          <div class="records-preview-list" id="records-preview">
+            <div class="loading-placeholder">Lade Historical Records...</div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h4>Schnellaktionen</h4>
+          <div class="action-buttons">
+            <button class="btn secondary" onclick="printComponentLabel()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+              </svg>
+              Barcode drucken
+            </button>
+            <button class="btn secondary" onclick="copyComponentInfo()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+              Info kopieren
+            </button>
+            <button class="btn secondary" onclick="exportComponentData()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Als CSV exportieren
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Confirmation Modal für Bauteile -->
+  <div id="component-delete-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
+    <div class="modal-content confirmation-content">
+      <div class="modal-header danger">
+        <h3>Bauteil löschen</h3>
+        <button class="close-modal" id="close-component-delete">&times;</button>
+      </div>
+      
+      <div class="confirmation-body">
+        <div class="warning-icon">
+          <svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+        </div>
+        
+        <div class="confirmation-text">
+          <p id="component-delete-message"></p>
+          <div class="component-delete-details" id="component-delete-details">
+            <!-- Wird dynamisch gefüllt -->
+          </div>
+          <div class="warning-note">
+            <strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.
+          </div>
+        </div>
+        
+        <div class="confirmation-actions">
+          <button class="btn danger" id="confirm-component-delete">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+            Ja, löschen
+          </button>
+          <button class="btn secondary" id="cancel-component-delete">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Storage Selection Modal -->
+  <div id="storage-selection-modal" class="modal">
+    <div class="modal-content storage-modal">
+      <div class="scanner-header">
+        <h2>Schrank für Einlagerung wählen</h2>
+        <button class="close-modal" id="close-storage-selection">&times;</button>
+      </div>
+      
+      <div class="storage-modal-content">
+        <div class="component-info-section">
+          <div class="scanned-card enhanced">
+            <div class="card-header">
+              <h3 id="storage-component-name">Komponente</h3>
+              <span class="status-badge unstored">Nicht eingelagert</span>
+            </div>
+            
+            <div class="card-content">
+              <div class="scanned-image" id="storage-component-image">
+                <div class="placeholder">📦</div>
+              </div>
+              
+              <div class="scanned-info" id="storage-component-info">
+                <!-- Wird dynamisch gefüllt -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="cabinet-selection-section">
+          <h3>Verfügbare Schränke:</h3>
+          <div class="cabinet-grid-optimized" id="storage-cabinet-grid">
+            <!-- Wird dynamisch gefüllt -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
+
+  <!-- SCRIPTS: Richtige Reihenfolge -->
+  <script src="/js/api.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/camera.js"></script>
+  <script src="/js/print-automation.js"></script>
+  
+  <script>
+    let currentComponent = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      console.log('📝 Edit Component wird initialisiert...');
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const barcode = urlParams.get('barcode');
+      
+      if (!barcode) {
+        showMessage('Kein Barcode angegeben', 'error');
+        setTimeout(() => { window.location.href = '/'; }, 2000);
+        return;
+      }
+      
+      await loadComponent(barcode);
+      setupEventListeners();
+      console.log('✅ Edit Component erfolgreich initialisiert');
+    });
+
+    function setupEventListeners() {
+      console.log('🔧 Event Listeners werden eingerichtet...');
+      
+      // Form Submission
+      const form = document.getElementById('edit-component-form');
+      if (form) {
+        form.addEventListener('submit', handleFormSubmit);
+      }
+      
+      // Image Upload (File)
+      const uploadArea = document.getElementById('image-upload-area');
+      const fileInput = document.getElementById('component-image');
+      
+      if (uploadArea && fileInput) {
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFileSelect);
+      }
+      
+      // Tab-Wechsel für Kamera
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const tab = e.target.dataset.tab;
+          switchTab(tab);
+        });
+      });
+      
+      // Delete Button - KRITISCH REPARIERT
+      const deleteBtn = document.getElementById('delete-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', () => {
+          if (currentComponent) {
+            showComponentDeleteModal(currentComponent.barcode, currentComponent.name || 'Unbenannt');
+          }
+        });
+      }
+      
+      // Modal Event Listeners
+      setupModalEventListeners();
+      
+      // Auto-fill name from equipment
+      const equipmentField = document.getElementById('equipment_name');
+      if (equipmentField) {
+        equipmentField.addEventListener('input', autoFillName);
+      }
+      
+      console.log('✅ Event Listeners eingerichtet');
+    }
+
+    function setupModalEventListeners() {
+      // Delete Modal Events
+      const closeDeleteBtn = document.getElementById('close-component-delete');
+      if (closeDeleteBtn) {
+        closeDeleteBtn.addEventListener('click', closeComponentDeleteModal);
+      }
+      
+      const confirmDeleteBtn = document.getElementById('confirm-component-delete');
+      if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', handleConfirmComponentDelete);
+      }
+      
+      const cancelDeleteBtn = document.getElementById('cancel-component-delete');
+      if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', closeComponentDeleteModal);
+      }
+      
+      // Storage Modal Events
+      const closeStorageBtn = document.getElementById('close-storage-selection');
+      if (closeStorageBtn) {
+        closeStorageBtn.addEventListener('click', closeStorageSelection);
+      }
+      
+      // Escape key to close modals
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeComponentDeleteModal();
+          closeStorageSelection();
+        }
+      });
+      
+      // Click outside to close modals
+      document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            closeComponentDeleteModal();
+            closeStorageSelection();
+          }
+        });
+      });
+    }
+
+    // KRITISCH REPARIERT: Delete Modal Funktionen direkt hier definiert
+    function showComponentDeleteModal(barcode, name) {
+      if (!barcode) {
+        showMessage('Fehler: Kein Barcode angegeben', 'error');
+        return;
+      }
+      
+      // Modal-Inhalt füllen
+      const messageEl = document.getElementById('component-delete-message');
+      const detailsEl = document.getElementById('component-delete-details');
+      
+      if (messageEl) {
+        messageEl.textContent = `Möchtest du das Bauteil "${name}" wirklich löschen?`;
+      }
+      
+      if (detailsEl && currentComponent) {
+        detailsEl.innerHTML = `
+          <div class="component-delete-info">
+            <p><strong>Barcode:</strong> ${currentComponent.barcode}</p>
+            <p><strong>Projekt:</strong> ${currentComponent.project || '-'}</p>
+            <p><strong>Verantwortlicher:</strong> ${currentComponent.responsible_engineer || '-'}</p>
+            ${currentComponent.schrank_name ? 
+              `<p class="warning-text"><strong>⚠️ Standort:</strong> ${currentComponent.schrank_name} (wird automatisch ausgelagert)</p>` :
+              '<p><strong>Standort:</strong> Nicht eingelagert</p>'
+            }
+          </div>
+        `;
+      }
+      
+      // Modal öffnen
+      openModal('component-delete-modal');
+    }
+
+    function closeComponentDeleteModal() {
+      closeModal('component-delete-modal');
+    }
+
+    async function handleConfirmComponentDelete() {
+      if (!currentComponent) {
+        showMessage('Fehler: Kein Bauteil zum Löschen ausgewählt', 'error');
+        return;
+      }
+      
+      try {
+        const submitBtn = document.getElementById('confirm-component-delete');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span class="spinner"></span> Wird gelöscht...';
+          submitBtn.disabled = true;
+        }
+        
+        await api.deleteComponent(currentComponent.barcode);
+        showMessage('Bauteil erfolgreich gelöscht!', 'success');
+        
+        closeComponentDeleteModal();
+        
+        // Zur Hauptseite navigieren
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 1500);
+        
+      } catch (error) {
+        console.error('Fehler beim Löschen:', error);
+        showMessage(`Fehler beim Löschen: ${error.message}`, 'error');
+        
+        // Button zurücksetzen
+        const submitBtn = document.getElementById('confirm-component-delete');
+        if (submitBtn) {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+      }
+    }
+
+    function switchTab(tabName) {
+      console.log('📑 Wechsle zu Tab:', tabName);
+      
+      // Tab-Buttons aktualisieren
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.tab === tabName) {
+          btn.classList.add('active');
+        }
+      });
+      
+      // Tab-Inhalte aktualisieren
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+        if (content.id === `${tabName}-tab`) {
+          content.classList.add('active');
+        }
+      });
+      
+      // Bei Wechsel weg von Kamera → Stream stoppen
+      if (tabName !== 'camera' && window.weaselCamera && window.weaselCamera.isActive) {
+        window.weaselCamera.stopCamera();
+      }
+    }
+
+    async function loadComponent(barcode) {
+      try {
+        console.log('🔍 Lade Bauteil mit Barcode:', barcode);
+        currentComponent = await api.getComponent(barcode);
+        console.log('✅ Bauteil geladen:', currentComponent);
+        fillForm(currentComponent);
+        displayStorageInfo(currentComponent);
+        updateComponentStatus(currentComponent);
+        await loadHistoricalRecordsPreview(barcode);
+      } catch (error) {
+        console.error('❌ Fehler beim Laden des Bauteils:', error);
+        showMessage(`Fehler beim Laden des Bauteils: ${error.message}`, 'error');
+        setTimeout(() => { window.location.href = '/'; }, 2000);
+      }
+    }
+
+    function fillForm(component) {
+      console.log('📝 Fülle Formular mit Daten:', component);
+      
+      // Titel und Status
+      const titleElement = document.getElementById('component-title');
+      if (titleElement) {
+        titleElement.textContent = component.name || component.barcode;
+      }
+      
+      // Formularfelder füllen
+      const fields = {
+        'original-barcode': component.barcode,
+        'barcode': component.barcode,
+        'name': component.name || '',
+        'beschreibung': component.beschreibung || '',
+        'project': component.project || '',
+        'responsible_engineer': component.responsible_engineer || '',
+        'equipment_name': component.equipment_name || '',
+        'identification_number': component.identification_number || ''
+      };
+      
+      Object.entries(fields).forEach(([fieldId, value]) => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+          field.value = value;
+        }
+      });
+      
+      // Aktuelles Bild anzeigen
+      displayCurrentImage(component);
+    }
+
+    function displayCurrentImage(component) {
+      const currentImageContainer = document.getElementById('current-image-container');
+      if (!currentImageContainer) return;
+      
+      if (component.image_url) {
+        currentImageContainer.innerHTML = `
+          <div class="current-image-display">
+            <img src="${component.image_url}" alt="Aktuelles Bild" class="current-image">
+            <button type="button" class="remove-current-image" onclick="removeCurrentImage()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+            </button>
+          </div>
+        `;
+      } else {
+        currentImageContainer.innerHTML = '<p class="no-current-image">Kein Bild vorhanden</p>';
+      }
+    }
+
+    function displayStorageInfo(component) {
+      const storageInfo = document.getElementById('storage-info');
+      if (!storageInfo) return;
+      
+      if (component.schrank_name) {
+        storageInfo.innerHTML = `
+          <div class="storage-status stored">
+            <div class="storage-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+            </div>
+            <div class="storage-details">
+              <h4>Eingelagert</h4>
+              <p><strong>Schrank:</strong> ${component.schrank_name}</p>
+              <button class="btn small warning" onclick="removeFromStorage()">
+                Auslagern
+              </button>
+            </div>
+          </div>
+        `;
+      } else {
+        storageInfo.innerHTML = `
+          <div class="storage-status unstored">
+            <div class="storage-icon">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div class="storage-details">
+              <h4>Nicht eingelagert</h4>
+              <p>Bauteil ist derzeit nicht in einem Schrank eingelagert.</p>
+              <button class="btn small primary" onclick="showStorageOptions()">
+                Einlagern
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    function updateComponentStatus(component) {
+      const statusBadge = document.getElementById('component-status-badge');
+      if (!statusBadge) return;
+      
+      if (component.schrank_name) {
+        statusBadge.textContent = `Eingelagert in ${component.schrank_name}`;
+        statusBadge.className = 'status-badge stored';
+      } else {
+        statusBadge.textContent = 'Nicht eingelagert';
+        statusBadge.className = 'status-badge unstored';
+      }
+    }
+
+    function autoFillName() {
+      const equipmentName = document.getElementById('equipment_name');
+      const nameField = document.getElementById('name');
+      
+      if (equipmentName && nameField) {
+        if (!nameField.value || nameField.value === nameField.defaultValue) {
+          nameField.value = equipmentName.value;
+        }
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(e.target);
+      const originalBarcode = formData.get('original-barcode');
+      
+      const componentData = {
+        name: formData.get('name'),
+        beschreibung: formData.get('beschreibung'),
+        project: formData.get('project'),
+        responsible_engineer: formData.get('responsible_engineer'),
+        equipment_name: formData.get('equipment_name'),
+        identification_number: formData.get('identification_number')
+      };
+      
+      // Validierung
+      if (!componentData.project || !componentData.responsible_engineer || !componentData.equipment_name) {
+        showMessage('Bitte fülle alle Pflichtfelder aus.', 'warning');
+        return;
+      }
+      
+      try {
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span class="spinner"></span> Speichert...';
+          submitBtn.disabled = true;
+        }
+        
+        await api.updateComponent(originalBarcode, componentData);
+        
+        const imageFile = formData.get('image');
+        if (imageFile && imageFile.size > 0) {
+          try {
+            await api.uploadComponentImage(originalBarcode, imageFile);
+          } catch (imageError) {
+            console.warn('Bild-Update fehlgeschlagen:', imageError);
+            showMessage('Bauteil aktualisiert, aber Bild-Update fehlgeschlagen.', 'warning');
+          }
+        }
+        
+        showMessage('Bauteil erfolgreich aktualisiert!', 'success');
+        
+        if (submitBtn) {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+        
+        // Automatische Navigation zur Hauptseite nach Update
+        setTimeout(() => {
+          console.log('🔄 Navigiere zur Hauptseite nach Update...');
+          window.location.href = '/';
+        }, 1500);
+        
+      } catch (error) {
+        showMessage(`Fehler beim Aktualisieren: ${error.message}`, 'error');
+        
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        if (submitBtn) {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+      }
+    }
+
+    // KRITISCHE FUNKTION: Sichere Modal-Steuerung
+    function openModal(modalId) {
+      console.log('📖 Öffne Modal:', modalId);
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        setTimeout(() => {
+          modal.style.opacity = '1';
+          modal.style.visibility = 'visible';
+        }, 10);
+      }
+    }
+
+    function closeModal(modalId) {
+      console.log('📕 Schließe Modal:', modalId);
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.classList.remove('active');
+        modal.style.opacity = '0';
+        modal.style.visibility = 'hidden';
+        setTimeout(() => {
+          modal.style.display = 'none';
+        }, 300);
+      }
+    }
+
+    // Storage-Funktionen
+    async function removeFromStorage() {
+      if (!currentComponent) return;
+      
+      if (confirm('Bauteil aus dem Schrank auslagern?')) {
+        try {
+          await api.removeComponent(currentComponent.barcode);
+          showMessage('Bauteil erfolgreich ausgelagert!', 'success');
+          
+          setTimeout(() => {
+            window.location.reload();
+          }, 1500);
+          
+        } catch (error) {
+          showMessage(`Fehler beim Auslagern: ${error.message}`, 'error');
+        }
+      }
+    }
+
+    async function showStorageOptions() {
+      console.log('📦 Zeige Einlagerungs-Optionen für:', currentComponent);
+      
+      if (!currentComponent) {
+        showMessage('Fehler: Kein Bauteil geladen', 'error');
+        return;
+      }
+      
+      try {
+        // Komponenten-Info im Modal anzeigen
+        fillStorageModalComponent(currentComponent);
+        
+        // Verfügbare Schränke laden
+        const cabinets = await api.getCabinets();
+        displayAvailableCabinets(cabinets);
+        
+        // Modal öffnen
+        openModal('storage-selection-modal');
+        
+      } catch (error) {
+        console.error('❌ Fehler beim Laden der Schränke:', error);
+        showMessage(`Fehler beim Laden der Schränke: ${error.message}`, 'error');
+      }
+    }
+
+    function fillStorageModalComponent(component) {
+      const nameEl = document.getElementById('storage-component-name');
+      const imageEl = document.getElementById('storage-component-image');
+      const infoEl = document.getElementById('storage-component-info');
+      
+      if (nameEl) {
+        nameEl.textContent = component.name || 'Unbenannt';
+      }
+      
+      if (imageEl) {
+        if (component.image_url) {
+          imageEl.innerHTML = `<img src="${component.image_url}" alt="${component.name}">`;
+        } else {
+          imageEl.innerHTML = '<div class="placeholder">📦</div>';
+        }
+      }
+      
+      if (infoEl) {
+        infoEl.innerHTML = `
+          <p><strong>Barcode:</strong> ${component.barcode}</p>
+          <p><strong>Projekt:</strong> ${component.project || '-'}</p>
+          <p><strong>Verantwortlicher:</strong> ${component.responsible_engineer || '-'}</p>
+        `;
+      }
+    }
+
+    function displayAvailableCabinets(cabinets) {
+      const gridEl = document.getElementById('storage-cabinet-grid');
+      if (!gridEl) return;
+      
+      gridEl.innerHTML = '';
+      
+      if (cabinets.length === 0) {
+        gridEl.innerHTML = `
+          <div class="no-cabinets-available">
+            <p>Keine Schränke verfügbar</p>
+            <button class="btn primary" onclick="window.location.href='/manage-cabinets.html'">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
+              </svg>
+              Schrank erstellen
+            </button>
+          </div>
+        `;
+        return;
+      }
+      
+      cabinets.forEach(cabinet => {
+        const cabinetCard = document.createElement('button');
+        cabinetCard.className = 'cabinet-card-optimized';
+        cabinetCard.onclick = () => storeComponentInCabinet(currentComponent.barcode, cabinet.id, cabinet.name);
+        
+        cabinetCard.innerHTML = `
+          <div class="cabinet-icon-container">
+            <svg class="cabinet-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </div>
+          <div class="cabinet-info">
+            <span class="cabinet-name">${cabinet.name}</span>
+            <small class="cabinet-count">${cabinet.component_count || 0} Bauteile</small>
+          </div>
+        `;
+        
+        gridEl.appendChild(cabinetCard);
+      });
+    }
+
+    async function storeComponentInCabinet(barcode, cabinetId, cabinetName) {
+      console.log(`📥 Lagere Bauteil ${barcode} in Schrank ${cabinetName} ein`);
+      
+      try {
+        await api.storeComponent(barcode, cabinetId);
+        console.log('✅ Einlagern erfolgreich');
+        
+        showMessage(`Bauteil erfolgreich in "${cabinetName}" eingelagert!`, 'success');
+        
+        closeStorageSelection();
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        
+      } catch (error) {
+        console.error('❌ Fehler beim Einlagern:', error);
+        showMessage(`Fehler beim Einlagern: ${error.message}`, 'error');
+      }
+    }
+
+    function closeStorageSelection() {
+      closeModal('storage-selection-modal');
+    }
+
+    // Image handling functions
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.currentTarget.classList.remove('drag-over');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    }
+
+    function handleFileSelect(e) {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    }
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) {
+        showMessage('Bitte wähle eine Bilddatei aus.', 'warning');
+        return;
+      }
+      
+      if (file.size > 5 * 1024 * 1024) {
+        showMessage('Datei ist zu groß (Maximum: 5MB)', 'warning');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const preview = document.getElementById('image-preview');
+        if (preview) {
+          preview.innerHTML = `
+            <div class="preview-container">
+              <img src="${e.target.result}" alt="Vorschau" class="preview-image">
+              <div class="preview-info">
+                <span class="file-name">${file.name}</span>
+                <button type="button" class="remove-image" onclick="removeImage()">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeImage() {
+      const fileInput = document.getElementById('component-image');
+      const preview = document.getElementById('image-preview');
+      
+      if (fileInput) fileInput.value = '';
+      if (preview) preview.innerHTML = '';
+    }
+
+    function removeCurrentImage() {
+      if (confirm('Aktuelles Bild wirklich entfernen?')) {
+        const currentImageContainer = document.getElementById('current-image-container');
+        if (currentImageContainer) {
+          currentImageContainer.innerHTML = '<p class="no-current-image">Kein Bild vorhanden</p>';
+        }
+        showMessage('Bild entfernt. Speichere das Formular um die Änderung zu übernehmen.', 'info');
+      }
+    }
+
+    // Quick actions
+function printComponentLabel() {
+  if (!currentComponent) return;
+  
+  // Neue automatisierte Print-Funktion verwenden
+  autoPrintBarcode(
+    currentComponent.barcode, 
+    currentComponent.name || 'Unbenannt'
+  );
+}
+
+    async function copyComponentInfo() {
+      if (!currentComponent) return;
+      
+      const info = `
+Barcode: ${currentComponent.barcode}
+Name: ${currentComponent.name || 'Unbenannt'}
+Projekt: ${currentComponent.project || '-'}
+Verantwortlicher: ${currentComponent.responsible_engineer || '-'}
+Gerätebezeichnung: ${currentComponent.equipment_name || '-'}
+ID-Nummer: ${currentComponent.identification_number || '-'}
+Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
+      `.trim();
+      
+      try {
+        await navigator.clipboard.writeText(info);
+        showMessage('Bauteil-Informationen in Zwischenablage kopiert!', 'success');
+      } catch (error) {
+        showMessage('Kopieren fehlgeschlagen', 'error');
+      }
+    }
+
+    function exportComponentData() {
+      if (!currentComponent) return;
+      
+      const data = [{
+        'Barcode': currentComponent.barcode,
+        'Name': currentComponent.name || 'Unbenannt',
+        'Projekt': currentComponent.project || '-',
+        'Verantwortlicher': currentComponent.responsible_engineer || '-',
+        'Gerätebezeichnung': currentComponent.equipment_name || '-',
+        'ID-Nummer': currentComponent.identification_number || '-',
+        'Schrank': currentComponent.schrank_name || 'Nicht eingelagert',
+        'Beschreibung': currentComponent.beschreibung || '-'
+      }];
+      
+      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+      
+      if (typeof exportToCSV === 'function') {
+        exportToCSV(data, `weaselparts_${currentComponent.barcode}_${timestamp}.csv`);
+      } else {
+        console.error('exportToCSV Funktion nicht verfügbar');
+        showMessage('Export-Funktion nicht verfügbar', 'error');
+      }
+    }
+
+    // Globale Funktionen verfügbar machen
+    window.removeImage = removeImage;
+    window.removeCurrentImage = removeCurrentImage;
+    window.storeComponentInCabinet = storeComponentInCabinet;
+    window.showStorageOptions = showStorageOptions;
+    window.removeFromStorage = removeFromStorage;
+    window.printComponentLabel = printComponentLabel;
+    window.copyComponentInfo = copyComponentInfo;
+    window.exportComponentData = exportComponentData;
+    
+    // Error Handling
+    window.addEventListener('error', function(e) {
+      console.error('❌ Globaler Fehler:', e);
+      if (e.message && e.message.includes('null')) {
+        showMessage('Ein Element konnte nicht gefunden werden. Bitte lade die Seite neu.', 'warning');
+      }
+    });
+    // Historical Records Preview Functions
+    async function loadHistoricalRecordsPreview(barcode) {
+      const previewContainer = document.getElementById('records-preview');
+      if (!previewContainer) return;
+      
+      try {
+        const records = await api.getActivityRecords(barcode);
+        displayRecordsPreview(records);
+        setupHistoricalRecordsEventListeners(barcode);
+      } catch (error) {
+        console.error('Fehler beim Laden der Historical Records:', error);
+        previewContainer.innerHTML = '<div class="no-records">Historical Records konnten nicht geladen werden</div>';
+      }
+    }
+
+    function displayRecordsPreview(records) {
+      const previewContainer = document.getElementById('records-preview');
+      if (!previewContainer) return;
+      
+      if (!records || records.length === 0) {
+        previewContainer.innerHTML = '<div class="no-records">Noch keine Historical Records vorhanden</div>';
+        return;
+      }
+      
+      // Nur die letzten 3 Records anzeigen
+      const recentRecords = records.slice(0, 3);
+      
+      previewContainer.innerHTML = recentRecords.map((record, index) => {
+        const activities = getActivityNames(record);
+        const formattedDate = record.date ? new Date(record.date).toLocaleDateString('de-DE') : 'Ohne Datum';
+        // Die Nummerierung sollte vom neuesten (1) zum ältesten gehen
+        const recordNumber = records.length - index;
+        
+        return `
+          <div class="record-preview-item" onclick="openHistoricalRecords()">
+            <div class="record-number">#${recordNumber}</div>
+            <div class="record-info">
+              <div class="record-date">${formattedDate}</div>
+              <div class="record-activities">${activities}</div>
+            </div>
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getActivityNames(record) {
+      const activities = [];
+      if (record.activity_assy) activities.push('ASSY');
+      if (record.activity_disassy) activities.push('DISASSY');
+      if (record.activity_test) activities.push('TEST');
+      if (record.activity_shpf) activities.push('SHPF');
+      if (record.activity_insp) activities.push('INSP');
+      if (record.activity_cln) activities.push('CLN');
+      if (record.activity_smpl) activities.push('SMPL');
+      if (record.activity_cal) activities.push('CAL');
+      if (record.activity_hndl) activities.push('HNDL');
+      if (record.activity_stor) activities.push('STOR');
+      if (record.activity_de_stor) activities.push('DE-STOR');
+      
+      return activities.length > 0 ? activities.join(', ') : 'Keine Aktivitäten';
+    }
+
+    function setupHistoricalRecordsEventListeners(barcode) {
+      const viewAllBtn = document.getElementById('view-all-records');
+      if (viewAllBtn) {
+        viewAllBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          openHistoricalRecords();
+        });
+      }
+    }
+
+    function openHistoricalRecords() {
+      if (currentComponent && currentComponent.barcode) {
+        window.location.href = `/historical-record.html?barcode=${encodeURIComponent(currentComponent.barcode)}`;
+      }
+    }
+
+  </script>
+
+  <style>
+    /* Zusätzliche Styles für component-delete-modal */
+    .component-delete-info {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      border-left: 4px solid var(--accent-red);
+    }
+
+    .component-delete-info p {
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .component-delete-info .warning-text {
+      color: var(--accent-red);
+      font-weight: 600;
+    }
+
+    /* Spinner Animation */
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      display: inline-block;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Modal Fixes */
+    .modal {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+    }
+
+    .modal.active {
+      display: flex !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+  </style>
+</body>
+</html>

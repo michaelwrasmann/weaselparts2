@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  # WeaselParts Application (ohne lokale DB)
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=129.247.232.14
+      - DB_USER=advaiv
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=test
+      - DB_PORT=3306
+      - PORT=3000
+    volumes:
+      - uploads:/app/public/uploads
+      - .:/app
+      - /app/node_modules
+    restart: unless-stopped
+    depends_on:
+      - db-healthcheck
+    networks:
+      - weaselparts-network
+
+  # Health Check Service für externe DB
+  db-healthcheck:
+    image: mysql:8.0
+    command: >
+      sh -c "
+        echo 'Teste Verbindung zur externen MySQL-Datenbank...' &&
+        mysqladmin ping 
+          -h 129.247.232.14 
+          -P 3306 
+          -u advaiv 
+          -p'${DB_PASSWORD}' 
+          --connect-timeout=10 &&
+        echo 'Externe MySQL-Datenbank ist erreichbar!' &&
+        sleep infinity
+      "
+    networks:
+      - weaselparts-network
+    restart: "no"
+
+  # Optionale lokale MySQL für Development (falls externe DB nicht verfügbar)
+  mysql-backup:
+    image: mysql:8.0
+    profiles: ["backup", "local-dev"]
+    environment:
+      MYSQL_ROOT_PASSWORD: weaselparts_root_password
+      MYSQL_DATABASE: weaselparts_local
+      MYSQL_USER: weaselparts
+      MYSQL_PASSWORD: weaselparts_password
+    ports:
+      - "3307:3306"  # Anderer Port um Konflikte zu vermeiden
+    volumes:
+      - mysql_backup_data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - weaselparts-network
+
+volumes:
+  uploads:
+  mysql_backup_data:
+
+networks:
+  weaselparts-network:
+    driver: bridge
+
+# Verwendung:
+# Normale Verwendung (externe DB): docker-compose up
+# Mit lokaler Backup-DB: docker-compose --profile local-dev up
