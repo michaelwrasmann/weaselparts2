@@ -1398,7 +1398,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     page.drawText('Kundenname:', {
       x: 70,
       y: currentY,
-      size: 10,
+      size: 12,
       font: helveticaFont,
     });
     
@@ -1427,10 +1427,10 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     
     // Frage 1
     currentY -= 30;
-    page.drawText('1. Wie bewerten Sie die Qualität unserer Produkte?', {
+    page.drawText('1. Subsystem-Name:', {
       x: 70,
       y: currentY,
-      size: 10,
+      size: 12,
       font: helveticaBoldFont,
     });
     
@@ -1451,10 +1451,10 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     
     // Frage 2
     currentY -= 80;
-    page.drawText('2. Wie zufrieden sind Sie mit unserem Service?', {
+    page.drawText('2. Mechanical Interface Information:', {
       x: 70,
       y: currentY,
-      size: 10,
+      size: 12,
       font: helveticaBoldFont,
     });
     
@@ -1475,10 +1475,10 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     
     // Frage 3
     currentY -= 80;
-    page.drawText('3. Welche Verbesserungen würden Sie sich wünschen?', {
+    page.drawText('3. Electrical Interface Information:', {
       x: 70,
       y: currentY,
-      size: 10,
+      size: 12,
       font: helveticaBoldFont,
     });
     
@@ -1497,40 +1497,84 @@ app.get('/api/icd/download-pdf', async (req, res) => {
       backgroundColor: rgb(0.98, 0.98, 0.98),
     });
     
+    // Frage 4 (neu hinzugefügt)
+    currentY -= 80;
+    page.drawText('4. Thermal Interface Information:', {
+      x: 70,
+      y: currentY,
+      size: 12,
+      font: helveticaBoldFont,
+    });
+    
+    currentY -= 20;
+    const answer4Field = form.createTextField('question_4');
+    answer4Field.setText('');
+    answer4Field.enableMultiline();
+    // Font size will be controlled by PDF viewer
+    answer4Field.addToPage(page, {
+      x: 70,
+      y: currentY - 40,
+      width: 450,
+      height: 35,
+      borderColor: rgb(0.5, 0.5, 0.5),
+      borderWidth: 0.5,
+      backgroundColor: rgb(0.98, 0.98, 0.98),
+    });
+
     // === FOOTER SECTION ===
+    currentY -= 100;
+    
+    // Foxit-Hinweis
+    page.drawText('WICHTIG: Verwenden Sie Foxit PDF Reader zum Ausfüllen dieses Formulars!', {
+      x: 50,
+      y: currentY,
+      size: 12,
+      font: helveticaBoldFont,
+      color: rgb(0.8, 0.2, 0.2), // Rot
+    });
+    
+    currentY -= 20;
     // Trennlinie
     page.drawLine({
-      start: { x: 50, y: 120 },
-      end: { x: width - 50, y: 120 },
+      start: { x: 50, y: currentY },
+      end: { x: width - 50, y: currentY },
       thickness: 1,
       color: rgb(0.7, 0.7, 0.7),
     });
     
+    currentY -= 10;
     page.drawText('Anweisungen:', {
       x: 50,
-      y: 100,
-      size: 9,
+      y: currentY,
+      size: 12,
       font: helveticaBoldFont,
     });
     
-    page.drawText('1. Füllen Sie alle Felder vollständig aus', {
+    page.drawText('1. Verwenden Sie Foxit PDF Reader (nicht den Browser)', {
       x: 70,
-      y: 85,
-      size: 8,
+      y: currentY - 15,
+      size: 10,
       font: helveticaFont,
     });
     
-    page.drawText('2. Speichern Sie das PDF nach dem Ausfüllen', {
+    page.drawText('2. Füllen Sie alle 4 Interface-Information-Felder aus', {
       x: 70,
-      y: 75,
+      y: currentY - 30,
       font: helveticaFont,
-      size: 8,
+      size: 10,
     });
     
-    page.drawText('3. Laden Sie es über die WeaselParts ICD-Seite hoch', {
+    page.drawText('3. Speichern Sie das PDF nach dem Ausfüllen', {
       x: 70,
-      y: 65,
-      size: 8,
+      y: currentY - 45,
+      size: 10,
+      font: helveticaFont,
+    });
+    
+    page.drawText('4. Laden Sie es über die WeaselParts ICD-Seite hoch', {
+      x: 70,
+      y: currentY - 60,
+      size: 10,
       font: helveticaFont,
     });
     
@@ -1603,6 +1647,7 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
     let answer1 = '';
     let answer2 = '';
     let answer3 = '';
+    let answer4 = '';
     
     // Strategie 1: Versuche PDF-Formularfelder zu lesen (Mac-Style)
     try {
@@ -1710,6 +1755,15 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
               answer3 = cleanValue;
               console.log(`  ✅ Antwort 3 erkannt: ${cleanValue.substring(0, 50)}...`);
             }
+            // Frage 4
+            else if (lowerName.includes('frage4') || 
+                     lowerName.includes('question4') || 
+                     lowerName.includes('frage_4') ||
+                     lowerName.includes('question_4') ||
+                     name === 'question_4') {
+              answer4 = cleanValue;
+              console.log(`  ✅ Antwort 4 erkannt: ${cleanValue.substring(0, 50)}...`);
+            }
             // Fallback: Numerische Reihenfolge für unbenannte Felder
             else if (index === 0 && !customerName) {
               customerName = cleanValue;
@@ -1723,6 +1777,9 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
             } else if (index === 3 && !answer3) {
               answer3 = cleanValue;
               console.log(`  ✅ Antwort 3 via Index erkannt: ${cleanValue.substring(0, 50)}...`);
+            } else if (index === 4 && !answer4) {
+              answer4 = cleanValue;
+              console.log(`  ✅ Antwort 4 via Index erkannt: ${cleanValue.substring(0, 50)}...`);
             } else {
               console.log(`  ⚠️ Unbekanntes Feld: "${name}" = "${cleanValue.substring(0, 50)}..."`);
             }
@@ -1733,7 +1790,7 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
         }
       });
       
-      console.log('✅ Formularfelder gelesen:', { customerName, answer1: answer1.substring(0, 50), answer2: answer2.substring(0, 50), answer3: answer3.substring(0, 50) });
+      console.log('✅ Formularfelder gelesen:', { customerName, answer1: answer1.substring(0, 50), answer2: answer2.substring(0, 50), answer3: answer3.substring(0, 50), answer4: answer4.substring(0, 50) });
       
     } catch (formError) {
       console.log('⚠️ Keine Formularfelder gefunden, versuche Text-Extraktion:', formError.message);
@@ -1790,7 +1847,7 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
             new RegExp(`${questionNumber}[^\\n]*?(?:Produkte|Service|Verbesserungen)[^\\n]*\\n([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
             
             // Firefox Windows: Text zwischen Nummern ohne spezielle Marker
-            new RegExp(`\\b${questionNumber}\\b[\\s\\S]{0,50}?([a-zA-ZäöüÄÖÜß][\\s\\S]*?)(?=\\b(?:${questionNumber + 1}|Ende|Kundenname)\\b|$)`, 'i'),
+            new RegExp(`\\b${questionNumber}\\b[\\s\\S]{0,50}?([a-zA-ZäöüÄÖÜß][\\s\\S]*?)(?=\\b(?:${questionNumber + 1}|${questionNumber === 4 ? 'Ende|Anweisungen' : questionNumber + 1}|Kundenname)\\b|$)`, 'i'),
           ];
           
           for (const pattern of patterns) {
@@ -1813,6 +1870,7 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
         if (!answer1) answer1 = extractAnswer(text, 1);
         if (!answer2) answer2 = extractAnswer(text, 2);
         if (!answer3) answer3 = extractAnswer(text, 3);
+        if (!answer4) answer4 = extractAnswer(text, 4);
         
         console.log('✅ Text-Extraktion abgeschlossen');
       } catch (textError) {
@@ -1872,6 +1930,10 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
                   answer3 = foundValues[3];
                   console.log(`  ✅ Firefox-Binär Antwort 3: ${answer3.substring(0, 50)}`);
                 }
+                if (foundValues.length >= 5 && !answer4) {
+                  answer4 = foundValues[4];
+                  console.log(`  ✅ Firefox-Binär Antwort 4: ${answer4.substring(0, 50)}`);
+                }
                 
                 if (foundValues.length > 0) break; // Erfolgreich, stoppe weitere Encoding-Versuche
               }
@@ -1886,49 +1948,43 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
     }
     
     // Erweiterte Validierung mit Windows-spezifischen Hinweisen
-    if (customerName === 'Unbekannt' && !answer1 && !answer2 && !answer3) {
+    if (customerName === 'Unbekannt' && !answer1 && !answer2 && !answer3 && !answer4) {
       const userAgent = req.headers['user-agent'] || '';
       const isWindows = userAgent.includes('Windows');
       
       let errorMessage = 'Keine verwertbaren Daten im PDF gefunden. ';
       const isFirefox = userAgent.includes('Firefox');
       
+      errorMessage += 'Verwenden Sie FOXIT PDF READER zum Ausfüllen des Formulars. ';
+      
       if (isWindows && isFirefox) {
-        errorMessage += 'Firefox Windows-Tipp: Nach dem Ausfüllen verwenden Sie STRG+S zum Speichern, dann die gespeicherte Datei hochladen. ';
-        errorMessage += 'Oder verwenden Sie das Drucker-Symbol und "Als PDF speichern".';
+        errorMessage += 'Firefox Windows: Nach dem Ausfüllen STRG+S drücken und gespeicherte Datei hochladen.';
       } else if (isWindows) {
-        errorMessage += 'Windows-Tipp: Versuchen Sie, die PDF mit Adobe Reader zu öffnen, auszufüllen und zu speichern. ';
-        errorMessage += 'Oder nutzen Sie "Drucken als PDF" nach dem Ausfüllen im Browser.';
+        errorMessage += 'Windows: Foxit PDF Reader herunterladen, PDF öffnen, ausfüllen und speichern.';
       } else {
-        errorMessage += 'Bitte stellen Sie sicher, dass das PDF-Formular korrekt ausgefüllt wurde.';
+        errorMessage += 'Foxit PDF Reader verwenden und nach dem Ausfüllen speichern.';
       }
       
       return res.status(400).json({ 
         error: errorMessage,
         platform: isWindows ? 'Windows' : 'Other',
-        suggestions: isWindows && isFirefox ? [
-          'Firefox: STRG+S nach dem Ausfüllen drücken',
-          'Gespeicherte Datei (nicht Browser-Tab) hochladen',
-          'Alternativ: Drucker-Symbol → "Als PDF speichern"',
-          'Sicherstellen dass alle Felder ausgefüllt sind'
-        ] : isWindows ? [
-          'PDF mit Adobe Reader öffnen und ausfüllen',
-          'Nach Ausfüllen "Drucken als PDF" verwenden', 
-          'Sicherstellen dass Formularfelder nicht nur visual gefüllt sind'
-        ] : [
-          'PDF-Formular korrekt ausfüllen',
-          'Speichern nach dem Ausfüllen nicht vergessen'
+        suggestions: [
+          'Foxit PDF Reader herunterladen und installieren',
+          'PDF mit Foxit Reader öffnen (nicht im Browser)',
+          'Alle 4 Interface-Information-Felder ausfüllen',
+          'Datei speichern und die gespeicherte Datei hochladen',
+          'NICHT den Browser-PDF-Viewer verwenden'
         ]
       });
     }
     
-    console.log('💾 Speichere in Datenbank:', { customerName, hasAnswer1: !!answer1, hasAnswer2: !!answer2, hasAnswer3: !!answer3 });
+    console.log('💾 Speichere in Datenbank:', { customerName, hasAnswer1: !!answer1, hasAnswer2: !!answer2, hasAnswer3: !!answer3, hasAnswer4: !!answer4 });
     
     // In Datenbank speichern
     const [result] = await pool.execute(`
-      INSERT INTO icd_entries (customer_name, question_1, question_2, question_3, pdf_filename)
-      VALUES (?, ?, ?, ?, ?)
-    `, [customerName, answer1, answer2, answer3, req.file.filename]);
+      INSERT INTO icd_entries (customer_name, question_1, question_2, question_3, question_4, pdf_filename)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `, [customerName, answer1, answer2, answer3, answer4, req.file.filename]);
     
     res.json({
       id: result.insertId,
