@@ -228,6 +228,7 @@ async function initializeDatabase() {
         question_1 TEXT,
         question_2 TEXT,
         question_3 TEXT,
+        question_4 TEXT,
         pdf_filename VARCHAR(255),
         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -237,6 +238,21 @@ async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('✅ Tabelle "icd_entries" erstellt/geprüft');
+    
+    // Spalte question_4 hinzufügen falls sie noch nicht existiert
+    try {
+      await pool.execute(`
+        ALTER TABLE icd_entries 
+        ADD COLUMN question_4 TEXT
+      `);
+      console.log('✅ Spalte "question_4" hinzugefügt');
+    } catch (alterError) {
+      if (alterError.message.includes('Duplicate column')) {
+        console.log('Spalte question_4 existiert bereits');
+      } else {
+        console.log('Info: question_4 Spalten-Update:', alterError.message);
+      }
+    }
     
     console.log('✅ MySQL-Datenbank erfolgreich initialisiert');
     
@@ -1403,7 +1419,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     });
     
     const customerNameField = form.createTextField('customer_name');
-    customerNameField.setText('');
+    customerNameField.setText(''); 
     customerNameField.addToPage(page, {
       x: 150,
       y: currentY - 5,
@@ -1489,9 +1505,9 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     // Font size will be controlled by PDF viewer
     answer3Field.addToPage(page, {
       x: 70,
-      y: currentY - 50,
+      y: currentY - 40,
       width: 450,
-      height: 45, // Etwas größer für längere Antworten
+      height: 35,
       borderColor: rgb(0.5, 0.5, 0.5),
       borderWidth: 0.5,
       backgroundColor: rgb(0.98, 0.98, 0.98),
@@ -1657,6 +1673,7 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
       const fields = form.getFields();
       
       console.log(`📋 ${fields.length} Formularfelder gefunden`);
+      console.log(`📝 Alle Feldnamen: ${fields.map(f => f.getName()).join(', ')}`);
       
       fields.forEach((field, index) => {
         const name = field.getName();
