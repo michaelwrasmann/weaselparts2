@@ -1404,6 +1404,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     
     const customerNameField = form.createTextField('customer_name');
     customerNameField.setText('');
+    customerNameField.setFontSize(9); // Kleinere Schriftgröße
     customerNameField.addToPage(page, {
       x: 150,
       y: currentY - 5,
@@ -1438,6 +1439,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     const answer1Field = form.createTextField('question_1');
     answer1Field.setText('');
     answer1Field.enableMultiline();
+    answer1Field.setFontSize(9); // Kleinere Schriftgröße
     answer1Field.addToPage(page, {
       x: 70,
       y: currentY - 40,
@@ -1461,6 +1463,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     const answer2Field = form.createTextField('question_2');
     answer2Field.setText('');
     answer2Field.enableMultiline();
+    answer2Field.setFontSize(9); // Kleinere Schriftgröße
     answer2Field.addToPage(page, {
       x: 70,
       y: currentY - 40,
@@ -1484,6 +1487,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     const answer3Field = form.createTextField('question_3');
     answer3Field.setText('');
     answer3Field.enableMultiline();
+    answer3Field.setFontSize(9); // Kleinere Schriftgröße
     answer3Field.addToPage(page, {
       x: 70,
       y: currentY - 50,
@@ -1584,36 +1588,84 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
       
       console.log(`📋 ${fields.length} Formularfelder gefunden`);
       
-      fields.forEach(field => {
+      fields.forEach((field, index) => {
         const name = field.getName();
-        console.log(`📝 Feld: ${name}`);
+        console.log(`📝 Feld ${index}: ${name} (Type: ${field.constructor.name})`);
         
         try {
+          let value = '';
+          
+          // Verschiedene Feldtypen unterstützen
           if (field.constructor.name === 'PDFTextField') {
-            const value = field.getText() || '';
-            console.log(`  Wert: "${value}"`);
+            value = field.getText() || '';
+          } else if (field.constructor.name === 'PDFTextBoxField') {
+            value = field.getText() || '';
+          } else if (typeof field.getValue === 'function') {
+            value = field.getValue() || '';
+          } else if (typeof field.getDefaultValue === 'function') {
+            value = field.getDefaultValue() || '';
+          }
+          
+          console.log(`  Wert: "${value}"`);
+          
+          if (value && value.trim()) {
+            // Erweiterte Feldname-Erkennung
+            const lowerName = name.toLowerCase();
+            const cleanValue = value.trim();
             
-            // Feldname-Mapping
-            if (name.toLowerCase().includes('kunde') || name.toLowerCase().includes('name')) {
-              customerName = value.trim();
-            } else if (name.toLowerCase().includes('frage1') || name.toLowerCase().includes('question1') || name === 'question_1') {
-              answer1 = value.trim();
-            } else if (name.toLowerCase().includes('frage2') || name.toLowerCase().includes('question2') || name === 'question_2') {
-              answer2 = value.trim();
-            } else if (name.toLowerCase().includes('frage3') || name.toLowerCase().includes('question3') || name === 'question_3') {
-              answer3 = value.trim();
+            // Kunde/Name-Felder
+            if (lowerName.includes('kunde') || 
+                lowerName.includes('name') || 
+                lowerName.includes('customer') ||
+                name === 'customer_name') {
+              customerName = cleanValue;
+              console.log(`  ✅ Kundenname erkannt: ${cleanValue}`);
             }
-            // Fallback: Numerische Reihenfolge
-            else if (fields.indexOf(field) === 0 && !customerName) {
-              customerName = value.trim();
-            } else if (fields.indexOf(field) === 1 && !answer1) {
-              answer1 = value.trim();
-            } else if (fields.indexOf(field) === 2 && !answer2) {
-              answer2 = value.trim();
-            } else if (fields.indexOf(field) === 3 && !answer3) {
-              answer3 = value.trim();
+            // Frage 1
+            else if (lowerName.includes('frage1') || 
+                     lowerName.includes('question1') || 
+                     lowerName.includes('frage_1') ||
+                     lowerName.includes('question_1') ||
+                     name === 'question_1') {
+              answer1 = cleanValue;
+              console.log(`  ✅ Antwort 1 erkannt: ${cleanValue.substring(0, 50)}...`);
+            }
+            // Frage 2
+            else if (lowerName.includes('frage2') || 
+                     lowerName.includes('question2') || 
+                     lowerName.includes('frage_2') ||
+                     lowerName.includes('question_2') ||
+                     name === 'question_2') {
+              answer2 = cleanValue;
+              console.log(`  ✅ Antwort 2 erkannt: ${cleanValue.substring(0, 50)}...`);
+            }
+            // Frage 3
+            else if (lowerName.includes('frage3') || 
+                     lowerName.includes('question3') || 
+                     lowerName.includes('frage_3') ||
+                     lowerName.includes('question_3') ||
+                     name === 'question_3') {
+              answer3 = cleanValue;
+              console.log(`  ✅ Antwort 3 erkannt: ${cleanValue.substring(0, 50)}...`);
+            }
+            // Fallback: Numerische Reihenfolge für unbenannte Felder
+            else if (index === 0 && !customerName) {
+              customerName = cleanValue;
+              console.log(`  ✅ Kundenname via Index erkannt: ${cleanValue}`);
+            } else if (index === 1 && !answer1) {
+              answer1 = cleanValue;
+              console.log(`  ✅ Antwort 1 via Index erkannt: ${cleanValue.substring(0, 50)}...`);
+            } else if (index === 2 && !answer2) {
+              answer2 = cleanValue;
+              console.log(`  ✅ Antwort 2 via Index erkannt: ${cleanValue.substring(0, 50)}...`);
+            } else if (index === 3 && !answer3) {
+              answer3 = cleanValue;
+              console.log(`  ✅ Antwort 3 via Index erkannt: ${cleanValue.substring(0, 50)}...`);
+            } else {
+              console.log(`  ⚠️ Unbekanntes Feld: "${name}" = "${cleanValue.substring(0, 50)}..."`);
             }
           }
+          
         } catch (fieldError) {
           console.log(`⚠️ Fehler beim Lesen des Felds ${name}:`, fieldError.message);
         }
@@ -1636,18 +1688,35 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
           customerName = customerMatch[1].trim();
         }
         
-        // Antworten extrahieren
+        // Erweiterte Antworten-Extraktion für verschiedene PDF-Formate
         const extractAnswer = (text, questionNumber) => {
           const patterns = [
+            // Original-Muster
             new RegExp(`Frage ${questionNumber}:.*?Antwort:\\s*([^\\n]*(?:\\n[^\\n]*)*?)(?=Frage|$)`, 'i'),
             new RegExp(`${questionNumber}\\..*?([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
-            new RegExp(`Frage ${questionNumber}.*?([\\s\\S]*?)(?=Frage|$)`, 'i')
+            new RegExp(`Frage ${questionNumber}.*?([\\s\\S]*?)(?=Frage|$)`, 'i'),
+            
+            // Browser-PDF Muster
+            new RegExp(`${questionNumber}\\. .*?\\n\\s*([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
+            new RegExp(`Question ${questionNumber}.*?\\n\\s*([\\s\\S]*?)(?=Question|$)`, 'i'),
+            
+            // Noch flexiblere Muster für Browser-bearbeitete PDFs
+            new RegExp(`(?:Frage|Question)\\s*${questionNumber}[^\\n]*\\n([\\s\\S]*?)(?=(?:Frage|Question)\\s*\\d+|$)`, 'i'),
+            new RegExp(`${questionNumber}[^\\n]*?(?:Produkte|Service|Verbesserungen)[^\\n]*\\n([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
           ];
           
           for (const pattern of patterns) {
             const match = text.match(pattern);
             if (match && match[1]) {
-              return match[1].trim().replace(/_{3,}/g, '').replace(/\\n\\s*\\n/g, '\\n').trim();
+              let answer = match[1].trim()
+                .replace(/_{3,}/g, '')  // Unterstriche entfernen
+                .replace(/\n\s*\n/g, '\n')  // Doppelte Zeilenumbrüche
+                .replace(/^\s*[\-\*\•]\s*/, '')  // Aufzählungszeichen am Anfang
+                .trim();
+              
+              if (answer.length > 5) {  // Mindestens 5 Zeichen für gültige Antwort
+                return answer;
+              }
             }
           }
           return '';
