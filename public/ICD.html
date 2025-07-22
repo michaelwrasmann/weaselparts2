@@ -46,12 +46,75 @@
 
 <main class="main-content">
   <div class="page-header">
-    <h1 class="page-title">ICD</h1>
-    <p class="page-subtitle">Interface Control Document</p>
+    <h1 class="page-title">ICD Interface Control Document</h1>
+    <p class="page-subtitle">Fragebogen-Management mit PDF-Upload/Download</p>
   </div>
   
-  <div class="content-wrapper">
-    <!-- Hier kann der ICD-Inhalt eingefügt werden -->
+  <!-- PDF-Funktionen -->
+  <div class="icd-actions">
+    <div class="action-card">
+      <h3>PDF-Fragebogen herunterladen</h3>
+      <p>Laden Sie den leeren Fragebogen herunter, füllen Sie ihn aus und laden Sie ihn wieder hoch.</p>
+      <button class="btn primary" id="download-pdf-btn">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+        </svg>
+        PDF herunterladen
+      </button>
+    </div>
+    
+    <div class="action-card">
+      <h3>Ausgefüllten PDF hochladen</h3>
+      <p>Laden Sie Ihren ausgefüllten Fragebogen hoch. Die Antworten werden automatisch erkannt.</p>
+      <div class="file-upload-area" id="pdf-upload-area">
+        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+        </svg>
+        <p>PDF-Datei hierher ziehen oder klicken zum Auswählen</p>
+        <input type="file" id="pdf-file-input" accept=".pdf" style="display: none;">
+      </div>
+    </div>
+  </div>
+  
+  <!-- Manueller Fragebogen -->
+  <div class="icd-form-section">
+    <h2>Fragebogen direkt ausfüllen</h2>
+    <form id="icd-form">
+      <div class="form-group">
+        <label for="customer-name">Kundenname:</label>
+        <input type="text" id="customer-name" name="customer_name" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="question-1">Frage 1: Wie bewerten Sie die Qualität unserer Produkte?</label>
+        <textarea id="question-1" name="question_1" rows="4" placeholder="Ihre Antwort..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="question-2">Frage 2: Wie zufrieden sind Sie mit unserem Service?</label>
+        <textarea id="question-2" name="question_2" rows="4" placeholder="Ihre Antwort..."></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="question-3">Frage 3: Welche Verbesserungen würden Sie sich wünschen?</label>
+        <textarea id="question-3" name="question_3" rows="4" placeholder="Ihre Antwort..."></textarea>
+      </div>
+      
+      <button type="submit" class="btn success">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Antworten speichern
+      </button>
+    </form>
+  </div>
+  
+  <!-- Gespeicherte Einträge -->
+  <div class="icd-entries-section">
+    <h2>Gespeicherte ICD-Einträge</h2>
+    <div class="entries-grid" id="entries-grid">
+      <!-- Wird dynamisch geladen -->
+    </div>
   </div>
 </main>
 
@@ -63,8 +126,26 @@
 <script src="/js/fixes.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Navigation Event Listeners
+let icdEntries = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('📋 ICD.html wird initialisiert...');
+  
+  try {
+    await loadIcdEntries();
+    setupEventListeners();
+    console.log('✅ ICD.html erfolgreich initialisiert');
+  } catch (error) {
+    console.error('❌ Initialisierungsfehler:', error);
+    showMessage('Fehler beim Laden der Seite. Seite wird neu geladen...', 'error');
+    setTimeout(() => window.location.reload(), 3000);
+  }
+});
+
+function setupEventListeners() {
+  console.log('🔧 Event Listeners werden eingerichtet...');
+  
+  // Navigation Buttons
   const addBtn = document.getElementById('add-component-nav-btn');
   if (addBtn) {
     addBtn.addEventListener('click', () => {
@@ -88,7 +169,285 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-});
+  
+  // PDF Download
+  const downloadBtn = document.getElementById('download-pdf-btn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', downloadPdf);
+  }
+  
+  // PDF Upload
+  const uploadArea = document.getElementById('pdf-upload-area');
+  const fileInput = document.getElementById('pdf-file-input');
+  
+  if (uploadArea && fileInput) {
+    uploadArea.addEventListener('click', () => fileInput.click());
+    uploadArea.addEventListener('dragover', handleDragOver);
+    uploadArea.addEventListener('drop', handleDrop);
+    fileInput.addEventListener('change', handleFileSelect);
+  }
+  
+  // Form Submit
+  const form = document.getElementById('icd-form');
+  if (form) {
+    form.addEventListener('submit', handleFormSubmit);
+  }
+  
+  console.log('✅ Event Listeners eingerichtet');
+}
+
+async function loadIcdEntries() {
+  try {
+    console.log('📋 Lade ICD-Einträge...');
+    
+    const response = await fetch('/api/icd');
+    console.log('📋 Response Status:', response.status, response.statusText);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ Server Error Response:', errorText);
+      throw new Error(`Server Error: ${response.status} - ${errorText}`);
+    }
+    
+    const responseText = await response.text();
+    console.log('📋 Raw Response:', responseText.substring(0, 200) + '...');
+    
+    // Versuche JSON zu parsen
+    try {
+      icdEntries = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('❌ JSON Parse Error:', parseError);
+      console.error('❌ Response Text:', responseText);
+      throw new Error('Ungültige JSON-Antwort vom Server');
+    }
+    
+    renderEntries();
+    console.log(`✅ ${icdEntries.length} ICD-Einträge geladen`);
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der ICD-Einträge:', error);
+    showMessage(`Fehler beim Laden der ICD-Einträge: ${error.message}`, 'error');
+    
+    icdEntries = [];
+    renderEntries();
+  }
+}
+
+function renderEntries() {
+  const grid = document.getElementById('entries-grid');
+  if (!grid) {
+    console.error('❌ Entries Grid nicht gefunden');
+    return;
+  }
+  
+  grid.innerHTML = '';
+  
+  if (icdEntries.length === 0) {
+    grid.innerHTML = '<div class="no-entries">Keine ICD-Einträge vorhanden</div>';
+    return;
+  }
+  
+  icdEntries.forEach(entry => {
+    const entryCard = createEntryCard(entry);
+    grid.appendChild(entryCard);
+  });
+}
+
+function createEntryCard(entry) {
+  const card = document.createElement('div');
+  card.className = 'entry-card';
+  
+  const uploadDate = new Date(entry.upload_date).toLocaleDateString('de-DE');
+  
+  card.innerHTML = `
+    <div class="entry-header">
+      <h3 class="customer-name">${entry.customer_name}</h3>
+      <span class="upload-date">${uploadDate}</span>
+    </div>
+    <div class="entry-content">
+      <div class="answer-preview">
+        <strong>Frage 1:</strong> ${entry.question_1 ? entry.question_1.substring(0, 100) + (entry.question_1.length > 100 ? '...' : '') : 'Keine Antwort'}
+      </div>
+      <div class="answer-preview">
+        <strong>Frage 2:</strong> ${entry.question_2 ? entry.question_2.substring(0, 100) + (entry.question_2.length > 100 ? '...' : '') : 'Keine Antwort'}
+      </div>
+      <div class="answer-preview">
+        <strong>Frage 3:</strong> ${entry.question_3 ? entry.question_3.substring(0, 100) + (entry.question_3.length > 100 ? '...' : '') : 'Keine Antwort'}
+      </div>
+    </div>
+    <div class="entry-actions">
+      <button class="action-btn view" onclick="viewEntry(${entry.id})" title="Details anzeigen">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+      </button>
+      <button class="action-btn delete" onclick="deleteEntry(${entry.id})" title="Löschen">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+      </button>
+    </div>
+  `;
+  
+  return card;
+}
+
+async function downloadPdf() {
+  try {
+    const response = await fetch('/api/icd/download-pdf');
+    if (!response.ok) {
+      throw new Error('Fehler beim Herunterladen des PDFs');
+    }
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = 'ICD_Fragebogen.pdf';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    showMessage('PDF-Fragebogen erfolgreich heruntergeladen!', 'success');
+  } catch (error) {
+    console.error('Fehler beim PDF-Download:', error);
+    showMessage(`Fehler beim Herunterladen: ${error.message}`, 'error');
+  }
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.currentTarget.classList.add('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    handlePdfUpload(files[0]);
+  }
+}
+
+function handleFileSelect(e) {
+  const files = e.target.files;
+  if (files.length > 0) {
+    handlePdfUpload(files[0]);
+  }
+}
+
+async function handlePdfUpload(file) {
+  if (!file) {
+    showMessage('Keine Datei ausgewählt', 'error');
+    return;
+  }
+  
+  if (file.type !== 'application/pdf') {
+    showMessage('Bitte nur PDF-Dateien hochladen', 'error');
+    return;
+  }
+  
+  try {
+    showMessage('PDF wird verarbeitet...', 'info');
+    
+    const formData = new FormData();
+    formData.append('pdf', file);
+    
+    const response = await fetch('/api/icd/upload-pdf', {
+      method: 'POST',
+      body: formData
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Fehler beim Upload');
+    }
+    
+    const result = await response.json();
+    
+    showMessage('PDF erfolgreich verarbeitet und gespeichert!', 'success');
+    await loadIcdEntries();
+    
+    // Formular zurücksetzen
+    document.getElementById('pdf-file-input').value = '';
+    
+  } catch (error) {
+    console.error('Fehler beim PDF-Upload:', error);
+    showMessage(`Fehler beim Verarbeiten der PDF: ${error.message}`, 'error');
+  }
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData);
+  
+  if (!data.customer_name.trim()) {
+    showMessage('Bitte geben Sie einen Kundennamen ein', 'error');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/icd', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Fehler beim Speichern');
+    }
+    
+    showMessage('ICD-Eintrag erfolgreich gespeichert!', 'success');
+    await loadIcdEntries();
+    
+    // Formular zurücksetzen
+    e.target.reset();
+    
+  } catch (error) {
+    console.error('Fehler beim Speichern:', error);
+    showMessage(`Fehler beim Speichern: ${error.message}`, 'error');
+  }
+}
+
+// Globale Funktionen
+window.viewEntry = function(id) {
+  const entry = icdEntries.find(e => e.id === id);
+  if (entry) {
+    // Detailansicht in einem Modal oder neuer Seite
+    alert(`Details für ${entry.customer_name}:\n\nFrage 1: ${entry.question_1}\n\nFrage 2: ${entry.question_2}\n\nFrage 3: ${entry.question_3}`);
+  }
+};
+
+window.deleteEntry = async function(id) {
+  if (!confirm('Möchten Sie diesen ICD-Eintrag wirklich löschen?')) {
+    return;
+  }
+  
+  try {
+    const response = await fetch(`/api/icd/${id}`, {
+      method: 'DELETE'
+    });
+    
+    if (!response.ok) {
+      throw new Error('Fehler beim Löschen');
+    }
+    
+    showMessage('ICD-Eintrag erfolgreich gelöscht!', 'success');
+    await loadIcdEntries();
+    
+  } catch (error) {
+    console.error('Fehler beim Löschen:', error);
+    showMessage(`Fehler beim Löschen: ${error.message}`, 'error');
+  }
+};
 </script>
 
 <style>
@@ -103,6 +462,204 @@ document.addEventListener('DOMContentLoaded', () => {
   .nav-btn.active {
     background: var(--primary-color);
     color: white;
+  }
+  
+  .icd-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+  
+  .action-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+  }
+  
+  .action-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: var(--primary-color);
+  }
+  
+  .action-card p {
+    margin: 0 0 1rem 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+  
+  .file-upload-area {
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--bg-light);
+  }
+  
+  .file-upload-area:hover,
+  .file-upload-area.drag-over {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+  }
+  
+  .file-upload-area svg {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+  }
+  
+  .icd-form-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .icd-form-section h2 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+  }
+  
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+  
+  .icd-entries-section {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .icd-entries-section h2 {
+    margin: 0 0 1.5rem 0;
+    color: var(--text-primary);
+  }
+  
+  .entries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .entry-card {
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .entry-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .customer-name {
+    margin: 0;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+  }
+  
+  .upload-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+  }
+  
+  .entry-content {
+    margin-bottom: 1rem;
+  }
+  
+  .answer-preview {
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .answer-preview strong {
+    color: var(--text-primary);
+  }
+  
+  .entry-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+  
+  .action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .action-btn.view {
+    background: var(--info-color);
+    color: white;
+  }
+  
+  .action-btn.view:hover {
+    background: var(--info-dark);
+  }
+  
+  .action-btn.delete {
+    background: var(--danger-color);
+    color: white;
+  }
+  
+  .action-btn.delete:hover {
+    background: var(--danger-dark);
+  }
+  
+  .no-entries {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-style: italic;
   }
 </style>
 

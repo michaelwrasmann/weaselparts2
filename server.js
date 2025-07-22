@@ -7,6 +7,9 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
+const PDFDocument = require('pdfkit');
+const pdfParse = require('pdf-parse');
+const { PDFDocument: PDFLib, rgb } = require('pdf-lib');
 
 // Express-Anwendung initialisieren
 const app = express();
@@ -51,8 +54,12 @@ app.use((req, res, next) => {
 
 // Upload-Ordner erstellen falls nicht vorhanden
 const uploadsDir = path.join(__dirname, 'public/uploads/components');
+const icdUploadsDir = path.join(__dirname, 'public/uploads/icd');
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
+}
+if (!fs.existsSync(icdUploadsDir)) {
+  fs.mkdirSync(icdUploadsDir, { recursive: true });
 }
 
 // Multer für Datei-Uploads konfigurieren
@@ -78,6 +85,33 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error('Nur Bilddateien sind erlaubt!'), false);
+    }
+  }
+});
+
+// PDF-Upload für ICD konfigurieren
+const icdPdfStorage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, icdUploadsDir);
+  },
+  filename: function(req, file, cb) {
+    const timestamp = Date.now();
+    const extension = path.extname(file.originalname);
+    cb(null, `icd_${timestamp}${extension}`);
+  }
+});
+
+const uploadPdf = multer({
+  storage: icdPdfStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit für PDFs
+  },
+  fileFilter: function(req, file, cb) {
+    // Nur PDFs erlauben
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Nur PDF-Dateien sind erlaubt!'), false);
     }
   }
 });
@@ -185,6 +219,24 @@ async function initializeDatabase() {
       // Ignoriere Fehler wenn Spalte bereits existiert
       console.log('Spalte image_url existiert bereits');
     });
+    
+    // ICD-Einträge Tabelle erstellen
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS icd_entries (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        customer_name VARCHAR(255) NOT NULL,
+        question_1 TEXT,
+        question_2 TEXT,
+        question_3 TEXT,
+        pdf_filename VARCHAR(255),
+        upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_icd_customer_name (customer_name),
+        INDEX idx_icd_upload_date (upload_date)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log('✅ Tabelle "icd_entries" erstellt/geprüft');
     
     console.log('✅ MySQL-Datenbank erfolgreich initialisiert');
     
@@ -1172,6 +1224,476 @@ app.use((error, req, res, next) => {
 });
 
 // Fallback für alle anderen Routen - Client-Routing
+// === ICD API ENDPUNKTE ===
+
+// Alle ICD-Einträge abrufen
+app.get('/api/icd', async (req, res) => {
+  try {
+    console.log('📋 API /api/icd aufgerufen - Lade ICD-Einträge...');
+    
+    if (!pool) {
+      console.error('❌ Kein Datenbankpool verfügbar');
+      return res.status(500).json({ error: 'Datenbankverbindung nicht verfügbar' });
+    }
+    
+    const [rows] = await pool.execute(`
+      SELECT * FROM icd_entries 
+      ORDER BY upload_date DESC
+    `);
+    
+    console.log(`✅ ${rows.length} ICD-Einträge gefunden`);
+    res.json(rows);
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Abrufen der ICD-Einträge:', error);
+    
+    // Prüfen ob Tabelle existiert
+    if (error.code === 'ER_NO_SUCH_TABLE') {
+      console.log('⚠️ ICD-Tabelle existiert nicht, erstelle sie...');
+      try {
+        await pool.execute(`
+          CREATE TABLE IF NOT EXISTS icd_entries (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            customer_name VARCHAR(255) NOT NULL,
+            question_1 TEXT,
+            question_2 TEXT,
+            question_3 TEXT,
+            pdf_filename VARCHAR(255),
+            upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX idx_icd_customer_name (customer_name),
+            INDEX idx_icd_upload_date (upload_date)
+          ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+        console.log('✅ ICD-Tabelle erstellt');
+        
+        // Nochmal versuchen
+        const [rows] = await pool.execute(`
+          SELECT * FROM icd_entries 
+          ORDER BY upload_date DESC
+        `);
+        return res.json(rows);
+        
+      } catch (createError) {
+        console.error('❌ Fehler beim Erstellen der ICD-Tabelle:', createError);
+        return res.status(500).json({ error: 'Fehler beim Erstellen der Datenbanktabelle' });
+      }
+    }
+    
+    res.status(500).json({ error: `Fehler beim Abrufen der ICD-Einträge: ${error.message}` });
+  }
+});
+
+// Neuen ICD-Eintrag erstellen
+app.post('/api/icd', async (req, res) => {
+  try {
+    const { customer_name, question_1, question_2, question_3 } = req.body;
+    
+    if (!customer_name) {
+      return res.status(400).json({ error: 'Kundenname ist erforderlich' });
+    }
+    
+    const [result] = await pool.execute(`
+      INSERT INTO icd_entries (customer_name, question_1, question_2, question_3)
+      VALUES (?, ?, ?, ?)
+    `, [customer_name, question_1, question_2, question_3]);
+    
+    res.json({ 
+      id: result.insertId,
+      message: 'ICD-Eintrag erfolgreich erstellt'
+    });
+  } catch (error) {
+    console.error('Fehler beim Erstellen des ICD-Eintrags:', error);
+    res.status(500).json({ error: 'Fehler beim Erstellen des ICD-Eintrags' });
+  }
+});
+
+// ICD-Eintrag aktualisieren
+app.put('/api/icd/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { customer_name, question_1, question_2, question_3 } = req.body;
+    
+    await pool.execute(`
+      UPDATE icd_entries 
+      SET customer_name = ?, question_1 = ?, question_2 = ?, question_3 = ?
+      WHERE id = ?
+    `, [customer_name, question_1, question_2, question_3, id]);
+    
+    res.json({ message: 'ICD-Eintrag erfolgreich aktualisiert' });
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren des ICD-Eintrags:', error);
+    res.status(500).json({ error: 'Fehler beim Aktualisieren des ICD-Eintrags' });
+  }
+});
+
+// ICD-Eintrag löschen
+app.delete('/api/icd/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    await pool.execute('DELETE FROM icd_entries WHERE id = ?', [id]);
+    
+    res.json({ message: 'ICD-Eintrag erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('Fehler beim Löschen des ICD-Eintrags:', error);
+    res.status(500).json({ error: 'Fehler beim Löschen des ICD-Eintrags' });
+  }
+});
+
+// PDF-Download für ICD-Fragebogen (mit echten Formularfeldern)
+app.get('/api/icd/download-pdf', async (req, res) => {
+  try {
+    console.log('📄 Erstelle PDF mit Formularfeldern...');
+    
+    // Erstelle PDF mit pdf-lib für echte Formularfelder
+    const pdfDoc = await PDFLib.create();
+    const page = pdfDoc.addPage([595.28, 841.89]); // A4 size
+    const form = pdfDoc.getForm();
+    
+    const { width, height } = page.getSize();
+    
+    // Standard-Fonts
+    const helveticaFont = await pdfDoc.embedFont('Helvetica');
+    const helveticaBoldFont = await pdfDoc.embedFont('Helvetica-Bold');
+    
+    // === HEADER SECTION ===
+    // Titel mit schönerer Gestaltung
+    page.drawText('WeaselParts', {
+      x: 50,
+      y: height - 60,
+      size: 18,
+      font: helveticaBoldFont,
+      color: rgb(0.2, 0.4, 0.8), // Blau
+    });
+    
+    page.drawText('Interface Control Document (ICD)', {
+      x: 50,
+      y: height - 85,
+      size: 14,
+      font: helveticaBoldFont,
+    });
+    
+    // Trennlinie
+    page.drawLine({
+      start: { x: 50, y: height - 100 },
+      end: { x: width - 50, y: height - 100 },
+      thickness: 1,
+      color: rgb(0.7, 0.7, 0.7),
+    });
+    
+    // === KUNDENINFO SECTION ===
+    let currentY = height - 140;
+    
+    page.drawText('Kundeninformation', {
+      x: 50,
+      y: currentY,
+      size: 12,
+      font: helveticaBoldFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+    
+    currentY -= 25;
+    page.drawText('Kundenname:', {
+      x: 70,
+      y: currentY,
+      size: 10,
+      font: helveticaFont,
+    });
+    
+    const customerNameField = form.createTextField('customer_name');
+    customerNameField.setText('');
+    customerNameField.addToPage(page, {
+      x: 150,
+      y: currentY - 5,
+      width: 300,
+      height: 16,
+      borderColor: rgb(0.5, 0.5, 0.5),
+      borderWidth: 0.5,
+      backgroundColor: rgb(0.98, 0.98, 0.98),
+    });
+    
+    // === FRAGEN SECTION ===
+    currentY -= 50;
+    
+    page.drawText('Fragebogen', {
+      x: 50,
+      y: currentY,
+      size: 12,
+      font: helveticaBoldFont,
+      color: rgb(0.2, 0.2, 0.2),
+    });
+    
+    // Frage 1
+    currentY -= 30;
+    page.drawText('1. Wie bewerten Sie die Qualität unserer Produkte?', {
+      x: 70,
+      y: currentY,
+      size: 10,
+      font: helveticaBoldFont,
+    });
+    
+    currentY -= 20;
+    const answer1Field = form.createTextField('question_1');
+    answer1Field.setText('');
+    answer1Field.enableMultiline();
+    answer1Field.addToPage(page, {
+      x: 70,
+      y: currentY - 40,
+      width: 450,
+      height: 35,
+      borderColor: rgb(0.5, 0.5, 0.5),
+      borderWidth: 0.5,
+      backgroundColor: rgb(0.98, 0.98, 0.98),
+    });
+    
+    // Frage 2
+    currentY -= 80;
+    page.drawText('2. Wie zufrieden sind Sie mit unserem Service?', {
+      x: 70,
+      y: currentY,
+      size: 10,
+      font: helveticaBoldFont,
+    });
+    
+    currentY -= 20;
+    const answer2Field = form.createTextField('question_2');
+    answer2Field.setText('');
+    answer2Field.enableMultiline();
+    answer2Field.addToPage(page, {
+      x: 70,
+      y: currentY - 40,
+      width: 450,
+      height: 35,
+      borderColor: rgb(0.5, 0.5, 0.5),
+      borderWidth: 0.5,
+      backgroundColor: rgb(0.98, 0.98, 0.98),
+    });
+    
+    // Frage 3
+    currentY -= 80;
+    page.drawText('3. Welche Verbesserungen würden Sie sich wünschen?', {
+      x: 70,
+      y: currentY,
+      size: 10,
+      font: helveticaBoldFont,
+    });
+    
+    currentY -= 20;
+    const answer3Field = form.createTextField('question_3');
+    answer3Field.setText('');
+    answer3Field.enableMultiline();
+    answer3Field.addToPage(page, {
+      x: 70,
+      y: currentY - 50,
+      width: 450,
+      height: 45, // Etwas größer für längere Antworten
+      borderColor: rgb(0.5, 0.5, 0.5),
+      borderWidth: 0.5,
+      backgroundColor: rgb(0.98, 0.98, 0.98),
+    });
+    
+    // === FOOTER SECTION ===
+    // Trennlinie
+    page.drawLine({
+      start: { x: 50, y: 120 },
+      end: { x: width - 50, y: 120 },
+      thickness: 1,
+      color: rgb(0.7, 0.7, 0.7),
+    });
+    
+    page.drawText('Anweisungen:', {
+      x: 50,
+      y: 100,
+      size: 9,
+      font: helveticaBoldFont,
+    });
+    
+    page.drawText('1. Füllen Sie alle Felder vollständig aus', {
+      x: 70,
+      y: 85,
+      size: 8,
+      font: helveticaFont,
+    });
+    
+    page.drawText('2. Speichern Sie das PDF nach dem Ausfüllen', {
+      x: 70,
+      y: 75,
+      font: helveticaFont,
+      size: 8,
+    });
+    
+    page.drawText('3. Laden Sie es über die WeaselParts ICD-Seite hoch', {
+      x: 70,
+      y: 65,
+      size: 8,
+      font: helveticaFont,
+    });
+    
+    page.drawText('© WeaselParts - Interface Control Document', {
+      x: 50,
+      y: 40,
+      size: 7,
+      font: helveticaFont,
+      color: rgb(0.5, 0.5, 0.5),
+    });
+    
+    // PDF serialisieren
+    const pdfBytes = await pdfDoc.save();
+    
+    // Response headers setzen
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename="ICD_Fragebogen.pdf"');
+    res.setHeader('Content-Length', pdfBytes.length);
+    
+    // PDF senden
+    res.end(Buffer.from(pdfBytes));
+    
+    console.log('✅ PDF mit verbessertem Design erstellt');
+    
+  } catch (error) {
+    console.error('❌ Fehler bei PDF-Generierung:', error);
+    res.status(500).json({ error: 'Fehler bei der PDF-Generierung' });
+  }
+});
+
+// PDF-Upload und Parser für ICD
+app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Keine PDF-Datei hochgeladen' });
+    }
+    
+    console.log('📄 PDF-Upload gestartet:', req.file.filename);
+    
+    const filePath = req.file.path;
+    const dataBuffer = fs.readFileSync(filePath);
+    
+    let customerName = 'Unbekannt';
+    let answer1 = '';
+    let answer2 = '';
+    let answer3 = '';
+    
+    // Strategie 1: Versuche PDF-Formularfelder zu lesen (Mac-Style)
+    try {
+      console.log('🔍 Versuche Formularfelder zu lesen...');
+      const pdfDoc = await PDFLib.load(dataBuffer);
+      const form = pdfDoc.getForm();
+      const fields = form.getFields();
+      
+      console.log(`📋 ${fields.length} Formularfelder gefunden`);
+      
+      fields.forEach(field => {
+        const name = field.getName();
+        console.log(`📝 Feld: ${name}`);
+        
+        try {
+          if (field.constructor.name === 'PDFTextField') {
+            const value = field.getText() || '';
+            console.log(`  Wert: "${value}"`);
+            
+            // Feldname-Mapping
+            if (name.toLowerCase().includes('kunde') || name.toLowerCase().includes('name')) {
+              customerName = value.trim();
+            } else if (name.toLowerCase().includes('frage1') || name.toLowerCase().includes('question1') || name === 'question_1') {
+              answer1 = value.trim();
+            } else if (name.toLowerCase().includes('frage2') || name.toLowerCase().includes('question2') || name === 'question_2') {
+              answer2 = value.trim();
+            } else if (name.toLowerCase().includes('frage3') || name.toLowerCase().includes('question3') || name === 'question_3') {
+              answer3 = value.trim();
+            }
+            // Fallback: Numerische Reihenfolge
+            else if (fields.indexOf(field) === 0 && !customerName) {
+              customerName = value.trim();
+            } else if (fields.indexOf(field) === 1 && !answer1) {
+              answer1 = value.trim();
+            } else if (fields.indexOf(field) === 2 && !answer2) {
+              answer2 = value.trim();
+            } else if (fields.indexOf(field) === 3 && !answer3) {
+              answer3 = value.trim();
+            }
+          }
+        } catch (fieldError) {
+          console.log(`⚠️ Fehler beim Lesen des Felds ${name}:`, fieldError.message);
+        }
+      });
+      
+      console.log('✅ Formularfelder gelesen:', { customerName, answer1: answer1.substring(0, 50), answer2: answer2.substring(0, 50), answer3: answer3.substring(0, 50) });
+      
+    } catch (formError) {
+      console.log('⚠️ Keine Formularfelder gefunden, versuche Text-Extraktion:', formError.message);
+      
+      // Strategie 2: Fallback auf Text-Extraktion
+      try {
+        const data = await pdfParse(dataBuffer);
+        const text = data.text;
+        console.log('📄 Extrahierter Text:', text.substring(0, 200) + '...');
+        
+        // Kundenname extrahieren
+        const customerMatch = text.match(/Kundenname:\\s*([^\\n_]+)/i);
+        if (customerMatch && customerMatch[1].trim()) {
+          customerName = customerMatch[1].trim();
+        }
+        
+        // Antworten extrahieren
+        const extractAnswer = (text, questionNumber) => {
+          const patterns = [
+            new RegExp(`Frage ${questionNumber}:.*?Antwort:\\s*([^\\n]*(?:\\n[^\\n]*)*?)(?=Frage|$)`, 'i'),
+            new RegExp(`${questionNumber}\\..*?([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
+            new RegExp(`Frage ${questionNumber}.*?([\\s\\S]*?)(?=Frage|$)`, 'i')
+          ];
+          
+          for (const pattern of patterns) {
+            const match = text.match(pattern);
+            if (match && match[1]) {
+              return match[1].trim().replace(/_{3,}/g, '').replace(/\\n\\s*\\n/g, '\\n').trim();
+            }
+          }
+          return '';
+        };
+        
+        if (!answer1) answer1 = extractAnswer(text, 1);
+        if (!answer2) answer2 = extractAnswer(text, 2);
+        if (!answer3) answer3 = extractAnswer(text, 3);
+        
+        console.log('✅ Text-Extraktion abgeschlossen');
+      } catch (textError) {
+        console.error('❌ Auch Text-Extraktion fehlgeschlagen:', textError);
+      }
+    }
+    
+    // Validierung
+    if (customerName === 'Unbekannt' && !answer1 && !answer2 && !answer3) {
+      return res.status(400).json({ 
+        error: 'Keine verwertbaren Daten im PDF gefunden. Bitte stellen Sie sicher, dass das PDF-Formular korrekt ausgefüllt wurde.' 
+      });
+    }
+    
+    console.log('💾 Speichere in Datenbank:', { customerName, hasAnswer1: !!answer1, hasAnswer2: !!answer2, hasAnswer3: !!answer3 });
+    
+    // In Datenbank speichern
+    const [result] = await pool.execute(`
+      INSERT INTO icd_entries (customer_name, question_1, question_2, question_3, pdf_filename)
+      VALUES (?, ?, ?, ?, ?)
+    `, [customerName, answer1, answer2, answer3, req.file.filename]);
+    
+    res.json({
+      id: result.insertId,
+      customer_name: customerName,
+      question_1: answer1,
+      question_2: answer2,
+      question_3: answer3,
+      pdf_filename: req.file.filename,
+      message: 'PDF erfolgreich verarbeitet und gespeichert'
+    });
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Verarbeiten der PDF:', error);
+    res.status(500).json({ error: 'Fehler beim Verarbeiten der PDF-Datei' });
+  }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
