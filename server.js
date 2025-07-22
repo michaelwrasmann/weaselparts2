@@ -1571,6 +1571,9 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
     console.log('📄 PDF-Upload gestartet:', req.file.filename);
     console.log('📁 Dateigröße:', req.file.size, 'Bytes');
     console.log('🖥️ User-Agent:', req.headers['user-agent'] || 'Unbekannt');
+    console.log('🔧 MIME-Type:', req.file.mimetype);
+    console.log('📂 Original Name:', req.file.originalname);
+    console.log('🕐 Upload Zeit:', new Date().toISOString());
     
     const filePath = req.file.path;
     
@@ -1938,8 +1941,55 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
     });
     
   } catch (error) {
-    console.error('❌ Fehler beim Verarbeiten der PDF:', error);
-    res.status(500).json({ error: 'Fehler beim Verarbeiten der PDF-Datei' });
+    console.error('❌ Fehler beim PDF-Upload:', error);
+    console.error('❌ Error Stack:', error.stack);
+    console.error('❌ Error Details:', {
+      name: error.name,
+      message: error.message,
+      code: error.code
+    });
+    
+    // Datei-Info für Debug
+    if (req.file) {
+      console.error('📄 Fehlgeschlagene Datei:', {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        path: req.file.path
+      });
+    }
+    
+    // Temporäre Datei löschen
+    if (req.file && req.file.path) {
+      try {
+        fs.unlinkSync(req.file.path);
+        console.log('🗑️ Temporäre Datei gelöscht:', req.file.path);
+      } catch (unlinkError) {
+        console.error('❌ Fehler beim Löschen der temporären Datei:', unlinkError);
+      }
+    }
+    
+    const userAgent = req.headers['user-agent'] || '';
+    const isWindows = userAgent.includes('Windows');
+    const isFirefox = userAgent.includes('Firefox');
+    
+    let errorMessage = 'Fehler beim Verarbeiten der PDF. ';
+    
+    if (isWindows && isFirefox) {
+      errorMessage += 'Firefox Windows: Versuchen Sie, nach dem Ausfüllen STRG+S zu drücken und die gespeicherte Datei hochzuladen (nicht den Browser-Tab).';
+    } else if (error.message && error.message.includes('PDF')) {
+      errorMessage += 'Möglicherweise ist die PDF-Datei beschädigt oder wurde nicht korrekt gespeichert.';
+    } else {
+      errorMessage += 'Bitte versuchen Sie es erneut oder verwenden Sie ein anderes PDF-Programm.';
+    }
+    
+    res.status(500).json({ 
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      platform: isWindows ? 'Windows' : 'Other',
+      browser: isFirefox ? 'Firefox' : 'Other'
+    });
   }
 });
 
