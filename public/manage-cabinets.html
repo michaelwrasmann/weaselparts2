@@ -23,16 +23,21 @@
           <input type="text" placeholder="Bauteile suchen" id="global-search">
         </div>
         <div class="nav-icons">
-          <button class="nav-btn" onclick="window.location.href='/'" title="Zurück zur Übersicht">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-            </svg>
-          </button>
-          <button class="nav-btn" onclick="window.location.href='/add-component.html'" title="Neues Bauteil">
+          <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
             </svg>
           </button>
+          <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            </svg>
+          </button>
+          <a href="/ICD.html" class="nav-btn" title="ICD">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </a>
         </div>
       </nav>
     </div>
@@ -312,6 +317,27 @@
 
     function setupEventListeners() {
       console.log('🔧 Event Listeners werden eingerichtet...');
+      
+      // Navigation Buttons
+      const addBtn = document.getElementById('add-component-nav-btn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          window.location.href = '/add-component.html';
+        });
+      }
+
+      const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
+      if (manageCabinetsBtn) {
+        manageCabinetsBtn.addEventListener('click', () => {
+          window.location.href = '/manage-cabinets.html';
+        });
+      }
+      
+      // Global Search
+      const globalSearch = document.getElementById('global-search');
+      if (globalSearch) {
+        globalSearch.addEventListener('input', handleGlobalSearch);
+      }
       
       // Formular für neuen Schrank
       const form = document.getElementById('new-cabinet-form');
@@ -1043,6 +1069,19 @@
       } catch (error) {
         console.error('Fehler beim Exportieren:', error);
         showMessage(`Fehler beim Exportieren: ${error.message}`, 'error');
+      }
+    }
+
+    // Global search handler
+    function handleGlobalSearch() {
+      const searchInput = document.getElementById('global-search');
+      if (!searchInput) return;
+      
+      const query = searchInput.value.toLowerCase().trim();
+      
+      if (query) {
+        // Redirect to index with search query
+        window.location.href = `/?search=${encodeURIComponent(query)}`;
       }
     }
 

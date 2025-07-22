@@ -23,21 +23,21 @@
           <input type="text" placeholder="Bauteile suchen" id="global-search">
         </div>
         <div class="nav-icons">
-          <button class="nav-btn" onclick="window.location.href='/'" title="Zurück zur Übersicht">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-            </svg>
-          </button>
-          <button class="nav-btn" onclick="window.location.href='/add-component.html'" title="Neues Bauteil">
+          <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
             </svg>
           </button>
-          <button class="nav-btn" onclick="window.location.href='/manage-cabinets.html'" title="Schränke">
+          <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
             </svg>
           </button>
+          <a href="/ICD.html" class="nav-btn" title="ICD">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+          </a>
         </div>
       </nav>
     </div>
@@ -360,6 +360,45 @@
     </div>
   </div>
 
+  <!-- Remove From Storage Modal -->
+  <div id="remove-storage-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
+    <div class="modal-content confirmation-content">
+      <div class="modal-header warning">
+        <h3>Bauteil auslagern</h3>
+        <button class="close-modal" id="close-remove-storage">&times;</button>
+      </div>
+      
+      <div class="confirmation-body">
+        <div class="warning-icon">
+          <svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7.34066V16.6593C20 17.4245 20 17.8071 19.9239 18.1474C19.8529 18.4648 19.7404 18.7698 19.5898 19.0532C19.4211 19.3713 19.1803 19.6197 18.5 20.1165L15.5608 22.2573C14.7565 22.8382 14.2924 23 13.7961 23C13.3245 23 12.868 22.8688 12.2039 22.3941L5.5 17.5816C4.81968 17.0849 4.47953 16.8365 4.21012 16.5118C3.96835 16.2215 3.7736 15.8892 3.63478 15.5289C3.47508 15.1149 3.40524 14.6593 3.26556 13.7481L2.36443 8.14067C2.14552 6.71682 2.03607 6.0049 2.24792 5.36221C2.43474 4.79574 2.79574 4.43474 3.36221 4.24792C4.00476 4.03608 4.71537 4.14537 6.13544 4.36358L11 5.07107"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 5L17.5 3.5M17.5 3.5L16 2M17.5 3.5L16 5M17.5 3.5L19 2"></path>
+          </svg>
+        </div>
+        
+        <div class="confirmation-text">
+          <p id="remove-storage-message">Möchtest du dieses Bauteil wirklich aus dem Schrank auslagern?</p>
+          <div class="component-delete-details" id="remove-storage-details">
+            <!-- Wird dynamisch gefüllt -->
+          </div>
+          <div class="info-note">
+            <strong>Info:</strong> Das Bauteil bleibt im System erhalten und kann jederzeit wieder eingelagert werden.
+          </div>
+        </div>
+        
+        <div class="confirmation-actions">
+          <button class="btn warning" id="confirm-remove-storage">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7.34066V16.6593C20 17.4245 20 17.8071 19.9239 18.1474C19.8529 18.4648 19.7404 18.7698 19.5898 19.0532C19.4211 19.3713 19.1803 19.6197 18.5 20.1165L15.5608 22.2573C14.7565 22.8382 14.2924 23 13.7961 23C13.3245 23 12.868 22.8688 12.2039 22.3941L5.5 17.5816C4.81968 17.0849 4.47953 16.8365 4.21012 16.5118C3.96835 16.2215 3.7736 15.8892 3.63478 15.5289C3.47508 15.1149 3.40524 14.6593 3.26556 13.7481L2.36443 8.14067C2.14552 6.71682 2.03607 6.0049 2.24792 5.36221C2.43474 4.79574 2.79574 4.43474 3.36221 4.24792C4.00476 4.03608 4.71537 4.14537 6.13544 4.36358L11 5.07107"></path>
+            </svg>
+            Ja, auslagern
+          </button>
+          <button class="btn secondary" id="cancel-remove-storage">Abbrechen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div id="toast-container"></div>
 
@@ -389,8 +428,92 @@
       console.log('✅ Edit Component erfolgreich initialisiert');
     });
 
+    // Neue Funktion: Remove Storage Modal anzeigen
+    function showRemoveStorageModal() {
+      if (!currentComponent) {
+        showMessage('Fehler: Kein Bauteil geladen', 'error');
+        return;
+      }
+      
+      // Modal-Inhalt füllen
+      const detailsEl = document.getElementById('remove-storage-details');
+      if (detailsEl) {
+        detailsEl.innerHTML = `
+          <div class="component-delete-info">
+            <p><strong>Bauteil:</strong> ${currentComponent.name || 'Unbenannt'}</p>
+            <p><strong>Barcode:</strong> ${currentComponent.barcode}</p>
+            <p><strong>Aktueller Standort:</strong> ${currentComponent.schrank_name || 'Nicht eingelagert'}</p>
+          </div>
+        `;
+      }
+      
+      // Modal öffnen
+      openModal('remove-storage-modal');
+    }
+    
+    // Neue Funktion: Remove Storage bestätigen
+    async function confirmRemoveStorage() {
+      if (!currentComponent) return;
+      
+      try {
+        const submitBtn = document.getElementById('confirm-remove-storage');
+        const originalText = submitBtn ? submitBtn.innerHTML : '';
+        
+        if (submitBtn) {
+          submitBtn.innerHTML = '<span class="spinner"></span> Wird ausgelagert...';
+          submitBtn.disabled = true;
+        }
+        
+        await api.removeComponent(currentComponent.barcode);
+        showMessage('Bauteil erfolgreich ausgelagert!', 'success');
+        
+        // Modal schließen
+        closeModal('remove-storage-modal');
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+        
+      } catch (error) {
+        console.error('Fehler beim Auslagern:', error);
+        showMessage(`Fehler beim Auslagern: ${error.message}`, 'error');
+        
+        // Button zurücksetzen
+        const submitBtn = document.getElementById('confirm-remove-storage');
+        if (submitBtn) {
+          submitBtn.innerHTML = originalText;
+          submitBtn.disabled = false;
+        }
+      }
+    }
+
     function setupEventListeners() {
       console.log('🔧 Event Listeners werden eingerichtet...');
+      
+      // Navigation Buttons
+      const addBtn = document.getElementById('add-component-nav-btn');
+      if (addBtn) {
+        addBtn.addEventListener('click', () => {
+          window.location.href = '/add-component.html';
+        });
+      }
+
+      const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
+      if (manageCabinetsBtn) {
+        manageCabinetsBtn.addEventListener('click', () => {
+          window.location.href = '/manage-cabinets.html';
+        });
+      }
+      
+      // Global Search
+      const globalSearch = document.getElementById('global-search');
+      if (globalSearch) {
+        globalSearch.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && e.target.value.trim()) {
+            window.location.href = `/index.html?search=${encodeURIComponent(e.target.value)}`;
+          }
+        });
+      }
       
       // Form Submission
       const form = document.getElementById('edit-component-form');
@@ -454,6 +577,22 @@
       const cancelDeleteBtn = document.getElementById('cancel-component-delete');
       if (cancelDeleteBtn) {
         cancelDeleteBtn.addEventListener('click', closeComponentDeleteModal);
+      }
+      
+      // Remove Storage Modal Events
+      const closeRemoveStorageBtn = document.getElementById('close-remove-storage');
+      if (closeRemoveStorageBtn) {
+        closeRemoveStorageBtn.addEventListener('click', () => closeModal('remove-storage-modal'));
+      }
+      
+      const confirmRemoveStorageBtn = document.getElementById('confirm-remove-storage');
+      if (confirmRemoveStorageBtn) {
+        confirmRemoveStorageBtn.addEventListener('click', confirmRemoveStorage);
+      }
+      
+      const cancelRemoveStorageBtn = document.getElementById('cancel-remove-storage');
+      if (cancelRemoveStorageBtn) {
+        cancelRemoveStorageBtn.addEventListener('click', () => closeModal('remove-storage-modal'));
       }
       
       // Storage Modal Events
@@ -811,19 +950,8 @@
     async function removeFromStorage() {
       if (!currentComponent) return;
       
-      if (confirm('Bauteil aus dem Schrank auslagern?')) {
-        try {
-          await api.removeComponent(currentComponent.barcode);
-          showMessage('Bauteil erfolgreich ausgelagert!', 'success');
-          
-          setTimeout(() => {
-            window.location.reload();
-          }, 1500);
-          
-        } catch (error) {
-          showMessage(`Fehler beim Auslagern: ${error.message}`, 'error');
-        }
-      }
+      // Modal öffnen statt confirm
+      showRemoveStorageModal();
     }
 
     async function showStorageOptions() {
@@ -1221,6 +1349,30 @@ Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
       display: flex !important;
       opacity: 1 !important;
       visibility: visible !important;
+    }
+    /* Warning Modal Styles */
+    .modal-header.warning {
+      background: #FB923C;
+      color: white;
+    }
+    
+    .btn.warning {
+      background: #FB923C;
+      color: white;
+    }
+    
+    .btn.warning:hover {
+      background: #F97316;
+      transform: translateY(-1px);
+    }
+    
+    .info-note {
+      background: #DBEAFE;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.875rem;
+      color: #1E40AF;
     }
   </style>
 </body>

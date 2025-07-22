@@ -39,6 +39,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Setup event listeners
 function setupEventListeners() {
+  // Navigation Buttons
+  const addBtn = document.getElementById('add-component-nav-btn');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      window.location.href = '/add-component.html';
+    });
+  }
+
+  const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
+  if (manageCabinetsBtn) {
+    manageCabinetsBtn.addEventListener('click', () => {
+      window.location.href = '/manage-cabinets.html';
+    });
+  }
+  
+  // Global Search
+  const globalSearch = document.getElementById('global-search');
+  if (globalSearch) {
+    globalSearch.addEventListener('input', handleGlobalSearch);
+  }
+
   // Add activity buttons
   document.getElementById('add-activity-btn')?.addEventListener('click', () => showActivityModal());
   document.getElementById('add-first-activity')?.addEventListener('click', () => showActivityModal());
@@ -743,4 +764,17 @@ function downloadCSV(csv, filename) {
   a.click();
   window.URL.revokeObjectURL(url);
   document.body.removeChild(a);
+}
+
+// Global search handler
+function handleGlobalSearch() {
+  const searchInput = document.getElementById('global-search');
+  if (!searchInput) return;
+  
+  const query = searchInput.value.toLowerCase().trim();
+  
+  if (query) {
+    // Redirect to index with search query
+    window.location.href = `/?search=${encodeURIComponent(query)}`;
+  }
 }
