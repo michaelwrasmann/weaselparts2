@@ -340,6 +340,11 @@ document.addEventListener('DOMContentLoaded', async () => {
               ${component.schrank_name || 'Nicht eingelagert'}
             </span>
             <div class="component-actions">
+              <button class="action-btn activity" onclick="event.stopPropagation(); viewHistoricalRecord('${safeBarcode}')" title="Historical Record">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                </svg>
+              </button>
               <button class="action-btn edit" onclick="event.stopPropagation(); editComponent('${safeBarcode}')" title="Bearbeiten">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
@@ -426,6 +431,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.editComponent = function(barcode) {
       if (barcode) {
         window.location.href = `/edit-component.html?barcode=${encodeURIComponent(barcode)}`;
+      }
+    };
+
+    window.viewHistoricalRecord = function(barcode) {
+      if (barcode) {
+        window.location.href = `/historical-record.html?barcode=${encodeURIComponent(barcode)}`;
       }
     };
 

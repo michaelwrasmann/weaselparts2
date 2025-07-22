@@ -16,11 +16,11 @@ let pool;
 
 function createMySQLPool() {
   pool = mysql.createPool({
-    host: process.env.DB_HOST || '129.247.232.14',
+    host: process.env.DB_HOST || 'mysql-backup',
     port: process.env.DB_PORT || 3306,
-    user: process.env.DB_USER || 'advaiv',
-    password: process.env.DB_PASSWORD || 'hier_gebe_ich_später_das_passwort_ein',
-    database: process.env.DB_DATABASE || 'test',
+    user: process.env.DB_USER || 'weaselparts',
+    password: process.env.DB_PASSWORD || 'weaselparts_password',
+    database: process.env.DB_DATABASE || 'weaselparts_local',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
@@ -31,7 +31,7 @@ function createMySQLPool() {
     ssl: false // Deaktiviert für lokale/interne Verbindungen
   });
   
-  console.log('🔗 MySQL Pool erstellt für:', process.env.DB_HOST || '129.247.232.14');
+  console.log('🔗 MySQL Pool erstellt für:', process.env.DB_HOST || 'mysql-backup');
   return pool;
 }
 
@@ -203,7 +203,7 @@ app.get('/api/test', (req, res) => {
     message: 'WeaselParts MySQL API funktioniert!',
     timestamp: new Date().toISOString(),
     version: '2.0.0-mysql',
-    database: 'MySQL auf ' + (process.env.DB_HOST || '129.247.232.14')
+    database: 'MySQL auf ' + (process.env.DB_HOST || 'mysql-backup')
   });
 });
 
@@ -713,6 +713,18 @@ app.post('/api/bauteil/:barcode/einlagern/:schrankId', async (req, res) => {
       [schrankId, barcode]
     );
     
+    // Automatischen Activity Record für STOR erstellen
+    try {
+      await pool.execute(`
+        INSERT INTO activity_records (
+          bauteil_barcode, activity_stor, date, created_at
+        ) VALUES (?, TRUE, CURDATE(), NOW())
+      `, [barcode]);
+      console.log(`✅ STOR Activity Record erstellt für Bauteil ${barcode}`);
+    } catch (activityError) {
+      console.warn(`⚠️ Fehler beim Erstellen des STOR Activity Records für ${barcode}:`, activityError);
+    }
+    
     res.json({ 
       message: 'Bauteil erfolgreich eingelagert',
       previousSchrank: previousSchrank,
@@ -746,6 +758,18 @@ app.post('/api/bauteil/:barcode/auslagern', async (req, res) => {
       'UPDATE bauteile SET schrank_id = NULL WHERE barcode = ?',
       [barcode]
     );
+    
+    // Automatischen Activity Record für DE-STOR erstellen
+    try {
+      await pool.execute(`
+        INSERT INTO activity_records (
+          bauteil_barcode, activity_de_stor, date, created_at
+        ) VALUES (?, TRUE, CURDATE(), NOW())
+      `, [barcode]);
+      console.log(`✅ DE-STOR Activity Record erstellt für Bauteil ${barcode}`);
+    } catch (activityError) {
+      console.warn(`⚠️ Fehler beim Erstellen des DE-STOR Activity Records für ${barcode}:`, activityError);
+    }
     
     res.json({ 
       message: 'Bauteil erfolgreich ausgelagert',
@@ -810,193 +834,7 @@ app.post('/api/bauteil/:barcode/bild', upload.single('image'), async (req, res) 
   }
 });
 
-// === STATISTIK-ENDPUNKTE ===
-
-// Dashboard-Statistiken
-app.get('/api/statistiken', async (req, res) => {
-  try {
-    // Gesamtanzahl Schränke
-    const [totalCabinetsResult] = await pool.execute('SELECT COUNT(*) as count FROM schraenke');
-    const totalCabinets = parseInt(totalCabinetsResult[0].count);
-    
-    // Gesamtanzahl Bauteile
-    const [totalComponentsResult] = await pool.execute('SELECT COUNT(*) as count FROM bauteile');
-    const totalComponents = parseInt(totalComponentsResult[0].count);
-    
-    // Eingelagerte Bauteile
-    const [storedComponentsResult] = await pool.execute('SELECT COUNT(*) as count FROM bauteile WHERE schrank_id IS NOT NULL');
-    const storedComponents = parseInt(storedComponentsResult[0].count);
-    
-    // Nicht eingelagerte Bauteile
-    const unstoredComponents = totalComponents - storedComponents;
-    
-    // Leere Schränke
-    const [emptyCabinetsResult] = await pool.execute(`
-      SELECT COUNT(*) as count 
-      FROM schraenke s 
-      WHERE NOT EXISTS (
-        SELECT 1 FROM bauteile b WHERE b.schrank_id = s.id
-      )
-    `);
-    const emptyCabinets = parseInt(emptyCabinetsResult[0].count);
-    
-    // Top 5 Projekte
-    const [topProjectsResult] = await pool.execute(`
-      SELECT project as project_name, COUNT(*) as count 
-      FROM bauteile 
-      WHERE project IS NOT NULL 
-      GROUP BY project 
-      ORDER BY count DESC 
-      LIMIT 5
-    `);
-    
-    // Auslastung der Schränke
-    const [cabinetUtilizationResult] = await pool.execute(`
-      SELECT s.name, COUNT(b.barcode) as component_count 
-      FROM schraenke s 
-      LEFT JOIN bauteile b ON s.id = b.schrank_id 
-      GROUP BY s.id, s.name 
-      ORDER BY component_count DESC
-    `);
-    
-    res.json({
-      totalCabinets,
-      totalComponents,
-      storedComponents,
-      unstoredComponents,
-      emptyCabinets,
-      topProjects: topProjectsResult,
-      cabinetUtilization: cabinetUtilizationResult
-    });
-  } catch (error) {
-    console.error('Fehler beim Abrufen der Statistiken:', error);
-    res.status(500).json({ error: 'Datenbankfehler beim Laden der Statistiken' });
-  }
-});
-
-// Debug-Endpoint zum Prüfen der Tabellenstruktur
-app.get('/api/debug/table-structure', async (req, res) => {
-  try {
-    const [result] = await pool.execute(`
-      SELECT COLUMN_NAME as column_name, DATA_TYPE as data_type, 
-             IS_NULLABLE as is_nullable, COLUMN_DEFAULT as column_default
-      FROM INFORMATION_SCHEMA.COLUMNS
-      WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bauteile'
-      ORDER BY ORDINAL_POSITION
-    `, [process.env.DB_DATABASE || 'test']);
-    
-    res.json({
-      columns: result,
-      message: 'MySQL-Tabellenstruktur für bauteile'
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Migration-Endpunkt zum Hinzufügen der image_url Spalte für Schränke
-app.get('/api/migrate/add-cabinet-image', async (req, res) => {
-  try {
-    // Spalte für Schrank-Bilder hinzufügen
-    await pool.execute(`
-      ALTER TABLE schraenke 
-      ADD COLUMN IF NOT EXISTS image_url LONGTEXT
-    `).catch(() => {
-      // Ignoriere Fehler wenn Spalte bereits existiert
-      console.log('Spalte image_url existiert bereits oder Fehler beim Hinzufügen');
-    });
-    
-    res.json({ 
-      message: 'Datenbank-Migration erfolgreich: image_url Spalte hinzugefügt',
-      status: 'success'
-    });
-    
-  } catch (error) {
-    console.error('Fehler bei der Datenbank-Migration:', error);
-    res.status(500).json({ error: 'Fehler bei der Datenbank-Migration' });
-  }
-});
-
-// Fehlerbehandlung für Datei-Uploads
-app.use((error, req, res, next) => {
-  if (error instanceof multer.MulterError) {
-    if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'Datei ist zu groß (Maximum: 5MB)' });
-    }
-    if (error.code === 'LIMIT_UNEXPECTED_FILE') {
-      return res.status(400).json({ error: 'Unerwartetes Dateifeld' });
-    }
-  }
-  
-  if (error.message && error.message.includes('Nur Bilddateien')) {
-    return res.status(400).json({ error: error.message });
-  }
-  
-  console.error('Unerwarteter Fehler:', error);
-  res.status(500).json({ error: 'Interner Serverfehler' });
-});
-
-// Fallback für alle anderen Routen - Client-Routing
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Graceful Shutdown
-process.on('SIGINT', async () => {
-  console.log('\n🛑 Server wird heruntergefahren...');
-  if (pool) {
-    await pool.end();
-  }
-  process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-  console.log('\n🛑 Server wird heruntergefahren...');
-  if (pool) {
-    await pool.end();
-  }
-  process.exit(0);
-});
-
-// Server starten
-const PORT = process.env.PORT || 3000;
-
-async function startServer() {
-  try {
-    // MySQL-Pool initialisieren
-    createMySQLPool();
-    
-    // Datenbank initialisieren
-    await initializeDatabase();
-    
-    // Server starten
-    app.listen(PORT, () => {
-      console.log('🐾 =======================================');
-      console.log('🚀 WeaselParts Server erfolgreich gestartet!');
-      console.log(`📡 Server läuft auf Port ${PORT}`);
-      console.log(`🌐 URL: http://localhost:${PORT}`);
-      console.log(`🗄️  MySQL-Datenbank: ${process.env.DB_HOST || '129.247.232.14'}:${process.env.DB_PORT || 3306}`);
-      console.log(`📊 Datenbank: ${process.env.DB_DATABASE || 'test'}`);
-      console.log('🐾 =======================================');
-      console.log('📝 API-Endpunkte:');
-      console.log('   GET  /api/test                        - API-Test');
-      console.log('   GET  /api/schraenke                   - Alle Schränke');
-      console.log('   POST /api/schraenke                   - Neuer Schrank');
-      console.log('   PUT  /api/schraenke/:id               - Schrank aktualisieren');
-      console.log('   POST /api/schraenke/:id/bild          - Schrank-Bild hochladen');
-      console.log('   GET  /api/bauteile                    - Alle Bauteile');
-      console.log('   POST /api/bauteile                    - Neues Bauteil');
-      console.log('   GET  /api/bauteil/:barcode            - Bauteil-Details');
-      console.log('   POST /api/bauteil/:barcode/bild       - Bild hochladen');
-      console.log('🐾 =======================================');
-    });
-  } catch (error) {
-    console.error('❌ Fehler beim Starten des Servers:', error);
-    process.exit(1);
-  }
-}
-
-// === HISTORICAL RECORDS / ACTIVITY ENDPUNKTE ===
+// === ACTIVITY RECORDS ENDPUNKTE ===
 
 // Alle Activity Records für ein Bauteil abrufen
 app.get('/api/bauteil/:barcode/activities', async (req, res) => {
@@ -1206,5 +1044,191 @@ app.delete('/api/activities/:id', async (req, res) => {
     res.status(500).json({ error: 'Datenbankfehler beim Löschen des Activity Records' });
   }
 });
+
+// === STATISTIK-ENDPUNKTE ===
+
+// Dashboard-Statistiken
+app.get('/api/statistiken', async (req, res) => {
+  try {
+    // Gesamtanzahl Schränke
+    const [totalCabinetsResult] = await pool.execute('SELECT COUNT(*) as count FROM schraenke');
+    const totalCabinets = parseInt(totalCabinetsResult[0].count);
+    
+    // Gesamtanzahl Bauteile
+    const [totalComponentsResult] = await pool.execute('SELECT COUNT(*) as count FROM bauteile');
+    const totalComponents = parseInt(totalComponentsResult[0].count);
+    
+    // Eingelagerte Bauteile
+    const [storedComponentsResult] = await pool.execute('SELECT COUNT(*) as count FROM bauteile WHERE schrank_id IS NOT NULL');
+    const storedComponents = parseInt(storedComponentsResult[0].count);
+    
+    // Nicht eingelagerte Bauteile
+    const unstoredComponents = totalComponents - storedComponents;
+    
+    // Leere Schränke
+    const [emptyCabinetsResult] = await pool.execute(`
+      SELECT COUNT(*) as count 
+      FROM schraenke s 
+      WHERE NOT EXISTS (
+        SELECT 1 FROM bauteile b WHERE b.schrank_id = s.id
+      )
+    `);
+    const emptyCabinets = parseInt(emptyCabinetsResult[0].count);
+    
+    // Top 5 Projekte
+    const [topProjectsResult] = await pool.execute(`
+      SELECT project as project_name, COUNT(*) as count 
+      FROM bauteile 
+      WHERE project IS NOT NULL 
+      GROUP BY project 
+      ORDER BY count DESC 
+      LIMIT 5
+    `);
+    
+    // Auslastung der Schränke
+    const [cabinetUtilizationResult] = await pool.execute(`
+      SELECT s.name, COUNT(b.barcode) as component_count 
+      FROM schraenke s 
+      LEFT JOIN bauteile b ON s.id = b.schrank_id 
+      GROUP BY s.id, s.name 
+      ORDER BY component_count DESC
+    `);
+    
+    res.json({
+      totalCabinets,
+      totalComponents,
+      storedComponents,
+      unstoredComponents,
+      emptyCabinets,
+      topProjects: topProjectsResult,
+      cabinetUtilization: cabinetUtilizationResult
+    });
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Statistiken:', error);
+    res.status(500).json({ error: 'Datenbankfehler beim Laden der Statistiken' });
+  }
+});
+
+// Debug-Endpoint zum Prüfen der Tabellenstruktur
+app.get('/api/debug/table-structure', async (req, res) => {
+  try {
+    const [result] = await pool.execute(`
+      SELECT COLUMN_NAME as column_name, DATA_TYPE as data_type, 
+             IS_NULLABLE as is_nullable, COLUMN_DEFAULT as column_default
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'bauteile'
+      ORDER BY ORDINAL_POSITION
+    `, [process.env.DB_DATABASE || 'test']);
+    
+    res.json({
+      columns: result,
+      message: 'MySQL-Tabellenstruktur für bauteile'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Migration-Endpunkt zum Hinzufügen der image_url Spalte für Schränke
+app.get('/api/migrate/add-cabinet-image', async (req, res) => {
+  try {
+    // Spalte für Schrank-Bilder hinzufügen
+    await pool.execute(`
+      ALTER TABLE schraenke 
+      ADD COLUMN IF NOT EXISTS image_url LONGTEXT
+    `).catch(() => {
+      // Ignoriere Fehler wenn Spalte bereits existiert
+      console.log('Spalte image_url existiert bereits oder Fehler beim Hinzufügen');
+    });
+    
+    res.json({ 
+      message: 'Datenbank-Migration erfolgreich: image_url Spalte hinzugefügt',
+      status: 'success'
+    });
+    
+  } catch (error) {
+    console.error('Fehler bei der Datenbank-Migration:', error);
+    res.status(500).json({ error: 'Fehler bei der Datenbank-Migration' });
+  }
+});
+
+// Fehlerbehandlung für Datei-Uploads
+app.use((error, req, res, next) => {
+  if (error instanceof multer.MulterError) {
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ error: 'Datei ist zu groß (Maximum: 5MB)' });
+    }
+    if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({ error: 'Unerwartetes Dateifeld' });
+    }
+  }
+  
+  if (error.message && error.message.includes('Nur Bilddateien')) {
+    return res.status(400).json({ error: error.message });
+  }
+  
+  console.error('Unerwarteter Fehler:', error);
+  res.status(500).json({ error: 'Interner Serverfehler' });
+});
+
+// Fallback für alle anderen Routen - Client-Routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Graceful Shutdown
+process.on('SIGINT', async () => {
+  console.log('\n🛑 Server wird heruntergefahren...');
+  if (pool) {
+    await pool.end();
+  }
+  process.exit(0);
+});
+
+process.on('SIGTERM', async () => {
+  console.log('\n🛑 Server wird heruntergefahren...');
+  if (pool) {
+    await pool.end();
+  }
+  process.exit(0);
+});
+
+// Server starten
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
+  try {
+    // MySQL-Pool initialisieren
+    createMySQLPool();
+    
+    // Datenbank initialisieren
+    await initializeDatabase();
+    
+    // Server starten
+    app.listen(PORT, () => {
+      console.log('🐾 =======================================');
+      console.log('🚀 WeaselParts Server erfolgreich gestartet!');
+      console.log(`📡 Server läuft auf Port ${PORT}`);
+      console.log(`🌐 URL: http://localhost:${PORT}`);
+      console.log(`🗄️  MySQL-Datenbank: ${process.env.DB_HOST || 'mysql-backup'}:${process.env.DB_PORT || 3306}`);
+      console.log(`📊 Datenbank: ${process.env.DB_DATABASE || 'weaselparts_local'}`);
+      console.log('🐾 =======================================');
+      console.log('📝 API-Endpunkte:');
+      console.log('   GET  /api/test                        - API-Test');
+      console.log('   GET  /api/schraenke                   - Alle Schränke');
+      console.log('   POST /api/schraenke                   - Neuer Schrank');
+      console.log('   PUT  /api/schraenke/:id               - Schrank aktualisieren');
+      console.log('   POST /api/schraenke/:id/bild          - Schrank-Bild hochladen');
+      console.log('   GET  /api/bauteile                    - Alle Bauteile');
+      console.log('   POST /api/bauteile                    - Neues Bauteil');
+      console.log('   GET  /api/bauteil/:barcode            - Bauteil-Details');
+      console.log('   POST /api/bauteil/:barcode/bild       - Bild hochladen');
+      console.log('🐾 =======================================');
+    });
+  } catch (error) {
+    console.error('❌ Fehler beim Starten des Servers:', error);
+    process.exit(1);
+  }
+}
 
 startServer();
