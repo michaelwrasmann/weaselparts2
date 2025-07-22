@@ -11,8 +11,51 @@ const PDFDocument = require('pdfkit');
 const pdfParse = require('pdf-parse');
 const { PDFDocument: PDFLib, rgb } = require('pdf-lib');
 
+// PostgreSQL für Temperatur/Feuchtigkeit
+const { Pool } = require('pg');
+require('dotenv').config();
+
 // Express-Anwendung initialisieren
 const app = express();
+
+// Entwicklungsmodus erkennen
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
+// Mock-Daten für lokale Entwicklung
+const mockSensorData = {
+  temperature: { 
+    timedate: new Date().toISOString(), 
+    temperature: 21.7 + (Math.random() * 2 - 1) // 20.7 - 22.7°C
+  },
+  humidity: { 
+    timedate: new Date().toISOString(), 
+    humidity: 65.2 + (Math.random() * 10 - 5) // 60.2 - 70.2%
+  }
+};
+
+// PostgreSQL-Konfiguration (nur in Produktion)
+let pgPool = null;
+if (!isDevelopment && process.env.DB_HOST) {
+  const pgConfig = {
+    host: process.env.DB_HOST || '129.247.232.65',
+    port: process.env.DB_PORT || 5432,
+    database: process.env.DB_NAME || 'fms01',
+    user: process.env.DB_USER || 'monitor',
+    password: process.env.DB_PASSWORD,
+    ssl: false,
+    connectionTimeoutMillis: 5000,
+    query_timeout: 5000
+  };
+  
+  try {
+    pgPool = new Pool(pgConfig);
+    console.log('🌡️ PostgreSQL-Pool für Sensordaten erstellt');
+  } catch (error) {
+    console.log('⚠️ PostgreSQL nicht verfügbar - verwende Mock-Daten');
+  }
+} else {
+  console.log('🔧 Entwicklungsmodus - Mock-Sensordaten werden verwendet');
+}
 
 // MySQL-Verbindungspool mit deinen Datenbankdaten
 let pool;
@@ -2066,6 +2109,123 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
   }
 });
 
+// =====================================================
+// PostgreSQL Sensor-Daten API
+// =====================================================
+
+// Aktuelle Sensor-Werte
+app.get('/api/sensors/current', async (req, res) => {
+  try {
+    if (isDevelopment || !pgPool) {
+      // Mock-Daten im Entwicklungsmodus
+      res.json({
+        temperature: {
+          timedate: new Date().toISOString(),
+          temperature: Math.round((21.7 + (Math.random() * 2 - 1)) * 10) / 10
+        },
+        humidity: {
+          timedate: new Date().toISOString(),
+          humidity: Math.round((65.2 + (Math.random() * 10 - 5)) * 10) / 10
+        },
+        timestamp: new Date(),
+        source: 'mock'
+      });
+      return;
+    }
+
+    // Echte Daten aus PostgreSQL
+    const tempResult = await pgPool.query(`
+      SELECT "timedate", "Value" as temperature 
+      FROM temp_ssa 
+      ORDER BY "timedate" DESC 
+      LIMIT 1
+    `);
+    
+    const humidityResult = await pgPool.query(`
+      SELECT "timedate", "Value" as humidity 
+      FROM rh_ssa 
+      ORDER BY "timedate" DESC 
+      LIMIT 1
+    `);
+    
+    res.json({
+      temperature: tempResult.rows[0] || { timedate: new Date(), temperature: null },
+      humidity: humidityResult.rows[0] || { timedate: new Date(), humidity: null },
+      timestamp: new Date(),
+      source: 'database'
+    });
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Abrufen der Sensordaten:', error);
+    // Fallback zu Mock-Daten bei Fehler
+    res.json({
+      temperature: {
+        timedate: new Date().toISOString(),
+        temperature: 21.7
+      },
+      humidity: {
+        timedate: new Date().toISOString(),
+        humidity: 65.2
+      },
+      timestamp: new Date(),
+      source: 'mock',
+      error: true
+    });
+  }
+});
+
+// Historische Sensor-Daten
+app.get('/api/sensors/history/:hours', async (req, res) => {
+  const hours = parseInt(req.params.hours) || 24;
+  
+  try {
+    if (isDevelopment || !pgPool) {
+      // Mock-Daten für Historie
+      const mockHistory = [];
+      const now = new Date();
+      for (let i = 0; i < hours * 4; i++) { // Alle 15 Minuten ein Datenpunkt
+        const time = new Date(now.getTime() - (i * 15 * 60 * 1000));
+        mockHistory.push({
+          timedate: time.toISOString(),
+          temperature: 21.7 + Math.sin(i / 10) * 2,
+          humidity: 65.2 + Math.cos(i / 10) * 5
+        });
+      }
+      res.json({
+        temperature: mockHistory,
+        humidity: mockHistory,
+        source: 'mock'
+      });
+      return;
+    }
+
+    // Echte Daten aus PostgreSQL
+    const tempData = await pgPool.query(`
+      SELECT "timedate", "Value" as temperature
+      FROM temp_ssa 
+      WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
+      ORDER BY "timedate" ASC
+    `);
+    
+    const humidityData = await pgPool.query(`
+      SELECT "timedate", "Value" as humidity
+      FROM rh_ssa 
+      WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
+      ORDER BY "timedate" ASC
+    `);
+    
+    res.json({
+      temperature: tempData.rows,
+      humidity: humidityData.rows,
+      source: 'database'
+    });
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Abrufen der historischen Daten:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der historischen Daten' });
+  }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -2076,6 +2236,10 @@ process.on('SIGINT', async () => {
   if (pool) {
     await pool.end();
   }
+  if (pgPool) {
+    await pgPool.end();
+    console.log('🌡️ PostgreSQL-Verbindung geschlossen');
+  }
   process.exit(0);
 });
 
@@ -2083,6 +2247,10 @@ process.on('SIGTERM', async () => {
   console.log('\n🛑 Server wird heruntergefahren...');
   if (pool) {
     await pool.end();
+  }
+  if (pgPool) {
+    await pgPool.end();
+    console.log('🌡️ PostgreSQL-Verbindung geschlossen');
   }
   process.exit(0);
 });

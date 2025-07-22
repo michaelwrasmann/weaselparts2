@@ -72,6 +72,43 @@
       </div>
     </div>
 
+    <!-- Sensor Dashboard -->
+    <div class="sensor-dashboard">
+      <h2 class="section-title">Umgebungsdaten</h2>
+      <div class="sensors-grid">
+        <div class="sensor-card temperature">
+          <div class="sensor-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2"></path>
+            </svg>
+          </div>
+          <div class="sensor-content">
+            <h3>Temperatur</h3>
+            <div class="sensor-value" id="temperature-value">--°C</div>
+            <div class="sensor-time" id="temperature-time">--</div>
+          </div>
+        </div>
+        
+        <div class="sensor-card humidity">
+          <div class="sensor-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17a4 4 0 004 4h6a4 4 0 004-4v-6a4 4 0 00-4-4H7a4 4 0 00-4 4v6z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4"></path>
+            </svg>
+          </div>
+          <div class="sensor-content">
+            <h3>Luftfeuchtigkeit</h3>
+            <div class="sensor-value" id="humidity-value">--%</div>
+            <div class="sensor-time" id="humidity-time">--</div>
+          </div>
+        </div>
+      </div>
+      <div class="sensor-status" id="sensor-status">
+        <span class="status-indicator" id="status-indicator">●</span>
+        <span id="status-text">Verbindung wird hergestellt...</span>
+      </div>
+    </div>
+
     <!-- Hauptinhalt - Bauteile Grid -->
     <div class="components-container">
       <div class="section-header">
@@ -171,6 +208,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     setupEventListeners();
     await updateStats();
+    await loadSensorData();
+    startSensorRefresh();
     console.log('✅ Index.html erfolgreich initialisiert');
   } catch (error) {
     console.error('❌ Initialisierungsfehler:', error);
@@ -594,6 +633,75 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
+    // Sensor Data Functions
+    async function loadSensorData() {
+      try {
+        console.log('🌡️ Lade Sensordaten...');
+        
+        const response = await fetch('/api/sensors/current');
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const sensorData = await response.json();
+        updateSensorDisplay(sensorData);
+        
+        console.log('✅ Sensordaten geladen');
+      } catch (error) {
+        console.error('❌ Fehler beim Laden der Sensordaten:', error);
+        updateSensorStatus('error', 'Verbindungsfehler');
+      }
+    }
+    
+    function updateSensorDisplay(data) {
+      try {
+        // Temperature
+        const tempValue = document.getElementById('temperature-value');
+        const tempTime = document.getElementById('temperature-time');
+        
+        if (data.temperature && tempValue && tempTime) {
+          tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+          tempTime.textContent = new Date(data.temperature.timedate).toLocaleString('de-DE');
+        }
+        
+        // Humidity
+        const humValue = document.getElementById('humidity-value');
+        const humTime = document.getElementById('humidity-time');
+        
+        if (data.humidity && humValue && humTime) {
+          humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+          humTime.textContent = new Date(data.humidity.timedate).toLocaleString('de-DE');
+        }
+        
+        // Status
+        const statusText = data.source === 'mock' ? 
+          'Entwicklungsmodus (Mock-Daten)' : 
+          'Live-Daten von PostgreSQL';
+        updateSensorStatus('connected', statusText);
+        
+      } catch (error) {
+        console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+        updateSensorStatus('error', 'Darstellungsfehler');
+      }
+    }
+    
+    function updateSensorStatus(status, message) {
+      const statusIndicator = document.getElementById('status-indicator');
+      const statusText = document.getElementById('status-text');
+      
+      if (statusIndicator && statusText) {
+        statusIndicator.className = `status-indicator ${status}`;
+        statusText.textContent = message;
+      }
+    }
+    
+    function startSensorRefresh() {
+      // Refresh every 30 seconds
+      setInterval(async () => {
+        await loadSensorData();
+      }, 30000);
+    }
+
     // Globale Funktionen verfügbar machen
     window.showComponentDeleteModal = showComponentDeleteModal;
     window.closeComponentDeleteModal = closeComponentDeleteModal;
@@ -643,6 +751,150 @@ document.addEventListener('DOMContentLoaded', async () => {
     
     .component-card:hover::before {
       opacity: 1;
+    }
+    
+    /* Sensor Dashboard Styles */
+    .sensor-dashboard {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--border-color);
+    }
+    
+    .sensor-dashboard .section-title {
+      margin: 0 0 1.5rem 0;
+      color: var(--text-primary);
+      font-size: 1.5rem;
+    }
+    
+    .sensors-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .sensor-card {
+      background: var(--bg-light);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .sensor-card.temperature {
+      border-left: 4px solid #ff6b6b;
+    }
+    
+    .sensor-card.humidity {
+      border-left: 4px solid #4ecdc4;
+    }
+    
+    .sensor-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .sensor-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary-color);
+      flex-shrink: 0;
+    }
+    
+    .sensor-card.temperature .sensor-icon {
+      background: rgba(255, 107, 107, 0.1);
+      color: #ff6b6b;
+    }
+    
+    .sensor-card.humidity .sensor-icon {
+      background: rgba(78, 205, 196, 0.1);
+      color: #4ecdc4;
+    }
+    
+    .sensor-content {
+      flex-grow: 1;
+    }
+    
+    .sensor-content h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    
+    .sensor-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary-color);
+      margin-bottom: 0.25rem;
+    }
+    
+    .sensor-time {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+    
+    .sensor-status {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-light);
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+    
+    .status-indicator {
+      font-size: 0.8rem;
+      line-height: 1;
+    }
+    
+    .status-indicator.connected {
+      color: #10b981;
+    }
+    
+    .status-indicator.error {
+      color: #ef4444;
+    }
+    
+    .status-indicator.loading {
+      color: #f59e0b;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sensors-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .sensor-card {
+        padding: 1rem;
+      }
+      
+      .sensor-value {
+        font-size: 1.5rem;
+      }
     }
   </style>
 </body>
