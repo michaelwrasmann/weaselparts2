@@ -1617,15 +1617,52 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
         try {
           let value = '';
           
-          // Verschiedene Feldtypen unterstützen
+          // Verschiedene Feldtypen unterstützen (inkl. Firefox Windows)
           if (field.constructor.name === 'PDFTextField') {
             value = field.getText() || '';
+            
+            // Firefox Windows: Versuche auch Alternative-Methoden
+            if (!value && typeof field.getPartialName === 'function') {
+              try {
+                const partialName = field.getPartialName();
+                console.log(`  🔄 Firefox-Fallback für Feld: ${partialName}`);
+              } catch (e) {}
+            }
+            
+            // Firefox Windows: Prüfe annotations
+            if (!value && field.acroField && field.acroField.getDefaultValue) {
+              try {
+                value = field.acroField.getDefaultValue() || '';
+              } catch (e) {}
+            }
+            
           } else if (field.constructor.name === 'PDFTextBoxField') {
             value = field.getText() || '';
           } else if (typeof field.getValue === 'function') {
             value = field.getValue() || '';
           } else if (typeof field.getDefaultValue === 'function') {
             value = field.getDefaultValue() || '';
+          }
+          
+          // Firefox Windows: Zusätzliche Wert-Extraktions-Versuche
+          if (!value && field.ref) {
+            try {
+              // Direkte Annotation-Referenz prüfen
+              const pdfRef = field.ref;
+              const annotation = pdfDoc.context.lookup(pdfRef);
+              if (annotation && annotation.get && annotation.get('V')) {
+                const rawValue = annotation.get('V');
+                if (typeof rawValue === 'string') {
+                  value = rawValue;
+                  console.log(`  ✅ Firefox-Annotation-Wert: ${value.substring(0, 50)}`);
+                } else if (rawValue && rawValue.decodeText) {
+                  value = rawValue.decodeText();
+                  console.log(`  ✅ Firefox-Decoded-Wert: ${value.substring(0, 50)}`);
+                }
+              }
+            } catch (annotationError) {
+              console.log(`  ⚠️ Annotation-Fehler für ${name}:`, annotationError.message);
+            }
           }
           
           console.log(`  Wert: "${value}"`);
@@ -1728,7 +1765,7 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
           customerName = customerMatch[1].trim();
         }
         
-        // Erweiterte Antworten-Extraktion für verschiedene PDF-Formate
+        // Erweiterte Antworten-Extraktion für verschiedene PDF-Formate (inkl. Firefox Windows)
         const extractAnswer = (text, questionNumber) => {
           const patterns = [
             // Original-Muster
@@ -1740,9 +1777,17 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
             new RegExp(`${questionNumber}\\. .*?\\n\\s*([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
             new RegExp(`Question ${questionNumber}.*?\\n\\s*([\\s\\S]*?)(?=Question|$)`, 'i'),
             
+            // Firefox Windows spezifische Muster
+            new RegExp(`${questionNumber}\\)\\s*([\\s\\S]*?)(?=\\d+\\)|$)`, 'i'), // "1) Antwort"
+            new RegExp(`\\b${questionNumber}\\b[^\\n]*\\n\\s*([^\\n]*(?:\\n[^\\d]*)*?)(?=\\b\\d+\\b|$)`, 'gi'), // Nummerierte Listen
+            new RegExp(`${questionNumber}[\\s\\S]{0,20}?:\\s*([\\s\\S]*?)(?=\\d+[\\s\\S]{0,20}?:|$)`, 'i'), // "1: Antwort"
+            
             // Noch flexiblere Muster für Browser-bearbeitete PDFs
             new RegExp(`(?:Frage|Question)\\s*${questionNumber}[^\\n]*\\n([\\s\\S]*?)(?=(?:Frage|Question)\\s*\\d+|$)`, 'i'),
             new RegExp(`${questionNumber}[^\\n]*?(?:Produkte|Service|Verbesserungen)[^\\n]*\\n([\\s\\S]*?)(?=\\d+\\.|$)`, 'i'),
+            
+            // Firefox Windows: Text zwischen Nummern ohne spezielle Marker
+            new RegExp(`\\b${questionNumber}\\b[\\s\\S]{0,50}?([a-zA-ZäöüÄÖÜß][\\s\\S]*?)(?=\\b(?:${questionNumber + 1}|Ende|Kundenname)\\b|$)`, 'i'),
           ];
           
           for (const pattern of patterns) {
@@ -1774,18 +1819,65 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
           stack: textError.stack?.substring(0, 200)
         });
         
-        // Letzter Versuch: Binäre Suche nach Text-Patterns  
+        // Letzter Versuch: Binäre Suche nach Text-Patterns (Firefox Windows)
         try {
-          console.log('🔄 Versuche binäre Pattern-Erkennung...');
-          const bufferString = dataBuffer.toString('latin1');
+          console.log('🔄 Versuche binäre Pattern-Erkennung für Firefox Windows...');
           
-          // Suche nach typischen PDF-Text-Markern
-          const textMatches = bufferString.match(/\(([^)]{10,})\)/g);
-          if (textMatches && textMatches.length > 0) {
-            console.log('📝 Gefundene Text-Fragmente:', textMatches.slice(0, 5).map(m => m.substring(0, 50)));
+          // Mehrere Encoding-Versuche für Windows Firefox
+          const encodings = ['latin1', 'utf8', 'ascii', 'binary'];
+          
+          for (const encoding of encodings) {
+            try {
+              const bufferString = dataBuffer.toString(encoding);
+              
+              // Firefox Windows: Suche nach Input-Werten in PDF-Stream
+              const inputPatterns = [
+                /\/V\s*\(([^)]{3,})\)/g,  // Standard PDF-Werte
+                /\/FT\s*\/Tx[^(]*\(([^)]{3,})\)/g,  // Text-Felder
+                /BT[^ET]*\(([^)]{5,})\)[^ET]*ET/g,  // Text-Objekte
+                />\s*([a-zA-ZäöüÄÖÜß][^<]{10,})\s*</g  // XML-ähnliche Struktur
+              ];
+              
+              let foundValues = [];
+              inputPatterns.forEach(pattern => {
+                let match;
+                while ((match = pattern.exec(bufferString)) !== null) {
+                  const value = match[1].trim();
+                  if (value.length > 3 && !value.match(/^[0-9\s.]+$/) && !foundValues.includes(value)) {
+                    foundValues.push(value);
+                  }
+                }
+              });
+              
+              if (foundValues.length > 0) {
+                console.log(`📝 Firefox ${encoding} Text-Fragmente:`, foundValues.slice(0, 5).map(v => v.substring(0, 50)));
+                
+                // Versuche intelligente Zuordnung der gefundenen Werte
+                if (foundValues.length >= 1 && !customerName) {
+                  customerName = foundValues[0];
+                  console.log(`  ✅ Firefox-Binär Kundenname: ${customerName}`);
+                }
+                if (foundValues.length >= 2 && !answer1) {
+                  answer1 = foundValues[1];
+                  console.log(`  ✅ Firefox-Binär Antwort 1: ${answer1.substring(0, 50)}`);
+                }
+                if (foundValues.length >= 3 && !answer2) {
+                  answer2 = foundValues[2];
+                  console.log(`  ✅ Firefox-Binär Antwort 2: ${answer2.substring(0, 50)}`);
+                }
+                if (foundValues.length >= 4 && !answer3) {
+                  answer3 = foundValues[3];
+                  console.log(`  ✅ Firefox-Binär Antwort 3: ${answer3.substring(0, 50)}`);
+                }
+                
+                if (foundValues.length > 0) break; // Erfolgreich, stoppe weitere Encoding-Versuche
+              }
+            } catch (encodingError) {
+              console.log(`⚠️ Encoding ${encoding} fehlgeschlagen:`, encodingError.message);
+            }
           }
         } catch (binaryError) {
-          console.error('❌ Auch binäre Pattern-Erkennung fehlgeschlagen:', binaryError.message);
+          console.error('❌ Auch Firefox-binäre Pattern-Erkennung fehlgeschlagen:', binaryError.message);
         }
       }
     }
@@ -1796,8 +1888,12 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
       const isWindows = userAgent.includes('Windows');
       
       let errorMessage = 'Keine verwertbaren Daten im PDF gefunden. ';
+      const isFirefox = userAgent.includes('Firefox');
       
-      if (isWindows) {
+      if (isWindows && isFirefox) {
+        errorMessage += 'Firefox Windows-Tipp: Nach dem Ausfüllen verwenden Sie STRG+S zum Speichern, dann die gespeicherte Datei hochladen. ';
+        errorMessage += 'Oder verwenden Sie das Drucker-Symbol und "Als PDF speichern".';
+      } else if (isWindows) {
         errorMessage += 'Windows-Tipp: Versuchen Sie, die PDF mit Adobe Reader zu öffnen, auszufüllen und zu speichern. ';
         errorMessage += 'Oder nutzen Sie "Drucken als PDF" nach dem Ausfüllen im Browser.';
       } else {
@@ -1807,7 +1903,12 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
       return res.status(400).json({ 
         error: errorMessage,
         platform: isWindows ? 'Windows' : 'Other',
-        suggestions: isWindows ? [
+        suggestions: isWindows && isFirefox ? [
+          'Firefox: STRG+S nach dem Ausfüllen drücken',
+          'Gespeicherte Datei (nicht Browser-Tab) hochladen',
+          'Alternativ: Drucker-Symbol → "Als PDF speichern"',
+          'Sicherstellen dass alle Felder ausgefüllt sind'
+        ] : isWindows ? [
           'PDF mit Adobe Reader öffnen und ausfüllen',
           'Nach Ausfüllen "Drucken als PDF" verwenden', 
           'Sicherstellen dass Formularfelder nicht nur visual gefüllt sind'
