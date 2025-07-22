@@ -35,13 +35,13 @@ const mockSensorData = {
 
 // PostgreSQL-Konfiguration (nur in Produktion)
 let pgPool = null;
-if (!isDevelopment && process.env.DB_HOST) {
+if (!isDevelopment && process.env.POSTGRES_HOST) {
   const pgConfig = {
-    host: process.env.DB_HOST || '129.247.232.65',
-    port: process.env.DB_PORT || 5432,
-    database: process.env.DB_NAME || 'fms01',
-    user: process.env.DB_USER || 'monitor',
-    password: process.env.DB_PASSWORD,
+    host: process.env.POSTGRES_HOST || '129.247.232.65',
+    port: process.env.POSTGRES_PORT || 5432,
+    database: process.env.POSTGRES_NAME || 'fms01',
+    user: process.env.POSTGRES_USER || 'monitor',
+    password: process.env.POSTGRES_PASSWORD,
     ssl: false,
     connectionTimeoutMillis: 5000,
     query_timeout: 5000
