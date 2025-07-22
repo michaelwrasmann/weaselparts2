@@ -1569,9 +1569,32 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
     }
     
     console.log('📄 PDF-Upload gestartet:', req.file.filename);
+    console.log('📁 Dateigröße:', req.file.size, 'Bytes');
+    console.log('🖥️ User-Agent:', req.headers['user-agent'] || 'Unbekannt');
     
     const filePath = req.file.path;
-    const dataBuffer = fs.readFileSync(filePath);
+    
+    // Robustere Datei-Behandlung für Windows
+    let dataBuffer;
+    try {
+      dataBuffer = fs.readFileSync(filePath);
+      console.log('✅ PDF-Datei erfolgreich gelesen, Größe:', dataBuffer.length, 'Bytes');
+      
+      // Überprüfe PDF-Header
+      const pdfHeader = dataBuffer.slice(0, 8).toString('ascii');
+      console.log('📋 PDF-Header:', pdfHeader);
+      
+      if (!pdfHeader.startsWith('%PDF-')) {
+        throw new Error('Ungültiges PDF-Format - kein PDF-Header gefunden');
+      }
+      
+    } catch (fileError) {
+      console.error('❌ Fehler beim Lesen der PDF-Datei:', fileError);
+      return res.status(400).json({ 
+        error: 'PDF-Datei konnte nicht gelesen werden. Möglicherweise ist die Datei beschädigt.',
+        details: process.env.NODE_ENV === 'development' ? fileError.message : undefined
+      });
+    }
     
     let customerName = 'Unbekannt';
     let answer1 = '';
@@ -1675,11 +1698,29 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
     } catch (formError) {
       console.log('⚠️ Keine Formularfelder gefunden, versuche Text-Extraktion:', formError.message);
       
-      // Strategie 2: Fallback auf Text-Extraktion
+      // Strategie 2: Fallback auf Text-Extraktion mit Windows-Unterstützung
       try {
-        const data = await pdfParse(dataBuffer);
+        console.log('🔄 Starte Text-Extraktion...');
+        
+        // Mehrere Optionen für bessere Windows-Kompatibilität
+        const parseOptions = {
+          max: 0, // Keine Begrenzung der Seiten
+          version: 'v1.10.100', // Explicit version für Konsistenz
+          // Encoding-Unterstützung für Windows
+          normalizeWhitespace: true,
+          disableCombineTextItems: false
+        };
+        
+        const data = await pdfParse(dataBuffer, parseOptions);
         const text = data.text;
-        console.log('📄 Extrahierter Text:', text.substring(0, 200) + '...');
+        
+        console.log('📄 Text-Extraktion erfolgreich, Länge:', text.length, 'Zeichen');
+        console.log('📄 Extrahierter Text (Beginn):', text.substring(0, 200) + '...');
+        
+        // Prüfung auf typische Windows-Encoding-Probleme
+        if (text.includes('â€™') || text.includes('Ã¤') || text.includes('Ã¼')) {
+          console.log('⚠️ Mögliches Encoding-Problem erkannt');
+        }
         
         // Kundenname extrahieren
         const customerMatch = text.match(/Kundenname:\\s*([^\\n_]+)/i);
@@ -1727,14 +1768,53 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
         
         console.log('✅ Text-Extraktion abgeschlossen');
       } catch (textError) {
-        console.error('❌ Auch Text-Extraktion fehlgeschlagen:', textError);
+        console.error('❌ Text-Extraktion fehlgeschlagen:', textError);
+        console.error('❌ Text-Fehler Details:', {
+          message: textError.message,
+          stack: textError.stack?.substring(0, 200)
+        });
+        
+        // Letzter Versuch: Binäre Suche nach Text-Patterns  
+        try {
+          console.log('🔄 Versuche binäre Pattern-Erkennung...');
+          const bufferString = dataBuffer.toString('latin1');
+          
+          // Suche nach typischen PDF-Text-Markern
+          const textMatches = bufferString.match(/\(([^)]{10,})\)/g);
+          if (textMatches && textMatches.length > 0) {
+            console.log('📝 Gefundene Text-Fragmente:', textMatches.slice(0, 5).map(m => m.substring(0, 50)));
+          }
+        } catch (binaryError) {
+          console.error('❌ Auch binäre Pattern-Erkennung fehlgeschlagen:', binaryError.message);
+        }
       }
     }
     
-    // Validierung
+    // Erweiterte Validierung mit Windows-spezifischen Hinweisen
     if (customerName === 'Unbekannt' && !answer1 && !answer2 && !answer3) {
+      const userAgent = req.headers['user-agent'] || '';
+      const isWindows = userAgent.includes('Windows');
+      
+      let errorMessage = 'Keine verwertbaren Daten im PDF gefunden. ';
+      
+      if (isWindows) {
+        errorMessage += 'Windows-Tipp: Versuchen Sie, die PDF mit Adobe Reader zu öffnen, auszufüllen und zu speichern. ';
+        errorMessage += 'Oder nutzen Sie "Drucken als PDF" nach dem Ausfüllen im Browser.';
+      } else {
+        errorMessage += 'Bitte stellen Sie sicher, dass das PDF-Formular korrekt ausgefüllt wurde.';
+      }
+      
       return res.status(400).json({ 
-        error: 'Keine verwertbaren Daten im PDF gefunden. Bitte stellen Sie sicher, dass das PDF-Formular korrekt ausgefüllt wurde.' 
+        error: errorMessage,
+        platform: isWindows ? 'Windows' : 'Other',
+        suggestions: isWindows ? [
+          'PDF mit Adobe Reader öffnen und ausfüllen',
+          'Nach Ausfüllen "Drucken als PDF" verwenden', 
+          'Sicherstellen dass Formularfelder nicht nur visual gefüllt sind'
+        ] : [
+          'PDF-Formular korrekt ausfüllen',
+          'Speichern nach dem Ausfüllen nicht vergessen'
+        ]
       });
     }
     
