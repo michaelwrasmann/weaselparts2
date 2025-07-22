@@ -16,11 +16,24 @@
         <h1>WeaselParts</h1>
       </a>
       <nav class="top-nav">
-        <div class="search-container">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input type="text" placeholder="Bauteile suchen" id="global-search">
+        <div class="nav-left">
+          <div class="lab-info">
+            <span class="lab-name">Integrationslabor</span>
+            <div class="mini-sensors">
+              <span class="mini-sensor temp">
+                <span id="temperature-value">--°C</span>
+              </span>
+              <span class="mini-sensor humid">
+                <span id="humidity-value">--%</span>
+              </span>
+            </div>
+          </div>
+          <div class="search-container">
+            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            <input type="text" placeholder="Bauteile suchen" id="global-search">
+          </div>
         </div>
         <div class="nav-icons">
           <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
@@ -834,6 +847,24 @@ function autoFillName() {
     // Globale Funktionen verfügbar machen
     window.removeImage = removeImage;
 
+    // Sensordaten-Funktionen
+    function updateSensorData() {
+      // Simulierte Sensordaten - in der Praxis würden diese von einem API-Endpoint kommen
+      const temperature = (Math.random() * 5 + 22).toFixed(1); // 22-27°C
+      const humidity = (Math.random() * 10 + 45).toFixed(0); // 45-55%
+      
+      const tempElement = document.getElementById('temperature-value');
+      const humidElement = document.getElementById('humidity-value');
+      
+      if (tempElement) tempElement.textContent = `${temperature}°C`;
+      if (humidElement) humidElement.textContent = `${humidity}%`;
+    }
+
+    // Sensordaten alle 30 Sekunden aktualisieren
+    setInterval(updateSensorData, 30000);
+    // Initial einmal laden
+    updateSensorData();
+
     // Error Handling
     window.addEventListener('error', function(e) {
       console.error('❌ Globaler Fehler:', e);
@@ -1042,6 +1073,48 @@ function autoFillName() {
       font-weight: 600;
     }
 
+    /* Navigation Lab Info Styles */
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex: 1;
+    }
+
+    .lab-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .lab-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .mini-sensors {
+      display: flex;
+      gap: 12px;
+    }
+
+    .mini-sensor {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+    }
+
+    .mini-sensor.temp {
+      color: #FF6B35;
+    }
+
+    .mini-sensor.humid {
+      color: #4A90E2;
+    }
+
     /* Responsive Design für Barcode Section */
     @media (max-width: 480px) {
       .barcode-actions {
@@ -1054,6 +1127,20 @@ function autoFillName() {
 
       .barcode-actions .btn {
         max-width: none;
+      }
+
+      .nav-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .lab-info {
+        align-self: stretch;
+      }
+
+      .mini-sensors {
+        justify-content: space-between;
       }
     }
   </style>
