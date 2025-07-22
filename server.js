@@ -1404,7 +1404,6 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     
     const customerNameField = form.createTextField('customer_name');
     customerNameField.setText('');
-    customerNameField.setFontSize(9); // Kleinere Schriftgröße
     customerNameField.addToPage(page, {
       x: 150,
       y: currentY - 5,
@@ -1439,7 +1438,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     const answer1Field = form.createTextField('question_1');
     answer1Field.setText('');
     answer1Field.enableMultiline();
-    answer1Field.setFontSize(9); // Kleinere Schriftgröße
+    // Font size will be controlled by PDF viewer
     answer1Field.addToPage(page, {
       x: 70,
       y: currentY - 40,
@@ -1463,7 +1462,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     const answer2Field = form.createTextField('question_2');
     answer2Field.setText('');
     answer2Field.enableMultiline();
-    answer2Field.setFontSize(9); // Kleinere Schriftgröße
+    // Font size will be controlled by PDF viewer
     answer2Field.addToPage(page, {
       x: 70,
       y: currentY - 40,
@@ -1487,7 +1486,7 @@ app.get('/api/icd/download-pdf', async (req, res) => {
     const answer3Field = form.createTextField('question_3');
     answer3Field.setText('');
     answer3Field.enableMultiline();
-    answer3Field.setFontSize(9); // Kleinere Schriftgröße
+    // Font size will be controlled by PDF viewer
     answer3Field.addToPage(page, {
       x: 70,
       y: currentY - 50,
