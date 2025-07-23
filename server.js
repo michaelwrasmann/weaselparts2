@@ -2247,21 +2247,27 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     // Prüfe ob PostgreSQL verfügbar ist
     if (isDevelopment || !pgPool) {
       console.log('🔧 Using mock data for environmental history (development mode or no PostgreSQL)');
-      // Mock-Daten für 6 Monate - minimalistisch
+      
+      // Mock-Timeline-Daten für 6 Monate (ein Datenpunkt pro Woche)
+      const mockTimeline = [];
+      const now = new Date();
+      
+      for (let i = 0; i < 24; i++) { // 24 Wochen = 6 Monate
+        const weekAgo = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+        const baseTemp = 22 + Math.sin(i / 4) * 3; // Saisonale Schwankung
+        const baseHumidity = 65 + Math.cos(i / 3) * 8; // Saisonale Schwankung
+        
+        mockTimeline.unshift({ // unshift = am Anfang einfügen für chronologische Reihenfolge
+          date: weekAgo.toISOString().split('T')[0],
+          temperature: Math.round((baseTemp + (Math.random() - 0.5) * 2) * 10) / 10,
+          humidity: Math.round((baseHumidity + (Math.random() - 0.5) * 5) * 10) / 10
+        });
+      }
+      
       const mockData = {
-        temperature: {
-          min: Math.round((18 + Math.random() * 2) * 10) / 10,
-          max: Math.round((26 + Math.random() * 2) * 10) / 10,
-          avg: Math.round((22 + Math.random() * 2) * 10) / 10,
-          current: Math.round((21.5 + Math.random() * 2) * 10) / 10
-        },
-        humidity: {
-          min: Math.round((45 + Math.random() * 5) * 10) / 10,
-          max: Math.round((75 + Math.random() * 5) * 10) / 10,
-          avg: Math.round((62 + Math.random() * 5) * 10) / 10,
-          current: Math.round((65 + Math.random() * 5) * 10) / 10
-        },
+        timeline: mockTimeline,
         period: '6 Monate',
+        dataPoints: mockTimeline.length,
         source: 'mock'
       };
       res.json(mockData);
@@ -2270,47 +2276,64 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
 
     console.log('🌡️ Querying PostgreSQL for environmental history...');
 
-    // Echte Daten aus PostgreSQL - 6 Monate Statistiken
+    // Echte Timeline-Daten aus PostgreSQL - 6 Monate mit wöchentlicher Aggregation
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     
-    const tempStats = await pgPool.query(`
+    // Wöchentliche Temperatur-Daten
+    const tempTimeline = await pgPool.query(`
       SELECT 
-        MIN("Value") as min_temp,
-        MAX("Value") as max_temp,
-        AVG("Value") as avg_temp,
-        (SELECT "Value" FROM temp_ssa ORDER BY "timedate" DESC LIMIT 1) as current_temp
+        DATE_TRUNC('week', "timedate") as week,
+        AVG("Value") as avg_temperature
       FROM temp_ssa 
       WHERE "timedate" >= $1
+      GROUP BY DATE_TRUNC('week', "timedate")
+      ORDER BY week ASC
     `, [sixMonthsAgo]);
     
-    const humidityStats = await pgPool.query(`
+    // Wöchentliche Feuchtigkeits-Daten
+    const humidityTimeline = await pgPool.query(`
       SELECT 
-        MIN("Value") as min_humidity,
-        MAX("Value") as max_humidity,
-        AVG("Value") as avg_humidity,
-        (SELECT "Value" FROM rh_ssa ORDER BY "timedate" DESC LIMIT 1) as current_humidity
+        DATE_TRUNC('week', "timedate") as week,
+        AVG("Value") as avg_humidity
       FROM rh_ssa 
       WHERE "timedate" >= $1
+      GROUP BY DATE_TRUNC('week', "timedate")
+      ORDER BY week ASC
     `, [sixMonthsAgo]);
     
-    const tempData = tempStats.rows[0];
-    const humidityData = humidityStats.rows[0];
+    // Timeline-Daten kombinieren
+    const timeline = [];
+    const tempMap = new Map();
+    const humidityMap = new Map();
+    
+    // Temperatur-Daten in Map speichern
+    tempTimeline.rows.forEach(row => {
+      const week = row.week.toISOString().split('T')[0];
+      tempMap.set(week, Math.round(row.avg_temperature * 10) / 10);
+    });
+    
+    // Feuchtigkeits-Daten in Map speichern
+    humidityTimeline.rows.forEach(row => {
+      const week = row.week.toISOString().split('T')[0];
+      humidityMap.set(week, Math.round(row.avg_humidity * 10) / 10);
+    });
+    
+    // Alle Wochen sammeln und kombinieren
+    const allWeeks = new Set([...tempMap.keys(), ...humidityMap.keys()]);
+    
+    for (const week of [...allWeeks].sort()) {
+      timeline.push({
+        date: week,
+        temperature: tempMap.get(week) || null,
+        humidity: humidityMap.get(week) || null
+      });
+    }
     
     res.json({
-      temperature: {
-        min: tempData.min_temp ? Math.round(tempData.min_temp * 10) / 10 : null,
-        max: tempData.max_temp ? Math.round(tempData.max_temp * 10) / 10 : null,
-        avg: tempData.avg_temp ? Math.round(tempData.avg_temp * 10) / 10 : null,
-        current: tempData.current_temp ? Math.round(tempData.current_temp * 10) / 10 : null
-      },
-      humidity: {
-        min: humidityData.min_humidity ? Math.round(humidityData.min_humidity * 10) / 10 : null,
-        max: humidityData.max_humidity ? Math.round(humidityData.max_humidity * 10) / 10 : null,
-        avg: humidityData.avg_humidity ? Math.round(humidityData.avg_humidity * 10) / 10 : null,
-        current: humidityData.current_humidity ? Math.round(humidityData.current_humidity * 10) / 10 : null
-      },
+      timeline: timeline,
       period: '6 Monate',
+      dataPoints: timeline.length,
       source: 'database'
     });
     
@@ -2318,21 +2341,26 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     console.error('❌ Fehler beim Abrufen der 6-Monats-Umgebungsdaten:', error);
     console.log('🔄 Fallback to mock data due to PostgreSQL error');
     
-    // Fallback zu Mock-Daten bei PostgreSQL-Fehler
+    // Fallback zu Mock-Timeline-Daten bei PostgreSQL-Fehler
+    const fallbackTimeline = [];
+    const now = new Date();
+    
+    for (let i = 0; i < 24; i++) { // 24 Wochen = 6 Monate
+      const weekAgo = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
+      const baseTemp = 22 + Math.sin(i / 4) * 3;
+      const baseHumidity = 65 + Math.cos(i / 3) * 8;
+      
+      fallbackTimeline.unshift({
+        date: weekAgo.toISOString().split('T')[0],
+        temperature: Math.round((baseTemp + (Math.random() - 0.5) * 2) * 10) / 10,
+        humidity: Math.round((baseHumidity + (Math.random() - 0.5) * 5) * 10) / 10
+      });
+    }
+    
     const fallbackData = {
-      temperature: {
-        min: Math.round((18 + Math.random() * 2) * 10) / 10,
-        max: Math.round((26 + Math.random() * 2) * 10) / 10,
-        avg: Math.round((22 + Math.random() * 2) * 10) / 10,
-        current: Math.round((21.5 + Math.random() * 2) * 10) / 10
-      },
-      humidity: {
-        min: Math.round((45 + Math.random() * 5) * 10) / 10,
-        max: Math.round((75 + Math.random() * 5) * 10) / 10,
-        avg: Math.round((62 + Math.random() * 5) * 10) / 10,
-        current: Math.round((65 + Math.random() * 5) * 10) / 10
-      },
+      timeline: fallbackTimeline,
       period: '6 Monate',
+      dataPoints: fallbackTimeline.length,
       source: 'fallback',
       error: true
     };
