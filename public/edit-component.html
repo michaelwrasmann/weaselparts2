@@ -1415,14 +1415,16 @@ Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
       if (!barcode) return;
       
       try {
+        console.log('🔍 Loading environmental history for barcode:', barcode);
         const response = await fetch(`/api/bauteil/${encodeURIComponent(barcode)}/environmental-history`);
         if (!response.ok) {
-          console.warn('Environmental history not available');
+          console.warn('Environmental history API returned error:', response.status);
           displayEnvironmentalError();
           return;
         }
         
         const data = await response.json();
+        console.log('📊 Environmental history data received:', data);
         displayEnvironmentalHistory(data);
         
       } catch (error) {

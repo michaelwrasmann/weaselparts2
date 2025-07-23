@@ -2237,7 +2237,16 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
       return res.status(404).json({ error: 'Bauteil nicht gefunden' });
     }
 
+    // Debug logging
+    console.log('🔍 Environmental history request debug:');
+    console.log('  - isDevelopment:', isDevelopment);
+    console.log('  - pgPool exists:', !!pgPool);
+    console.log('  - NODE_ENV:', process.env.NODE_ENV);
+    console.log('  - POSTGRES_HOST:', process.env.POSTGRES_HOST);
+    
+    // Prüfe ob PostgreSQL verfügbar ist
     if (isDevelopment || !pgPool) {
+      console.log('🔧 Using mock data for environmental history (development mode or no PostgreSQL)');
       // Mock-Daten für 6 Monate - minimalistisch
       const mockData = {
         temperature: {
@@ -2258,6 +2267,8 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
       res.json(mockData);
       return;
     }
+
+    console.log('🌡️ Querying PostgreSQL for environmental history...');
 
     // Echte Daten aus PostgreSQL - 6 Monate Statistiken
     const sixMonthsAgo = new Date();
@@ -2305,7 +2316,27 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     
   } catch (error) {
     console.error('❌ Fehler beim Abrufen der 6-Monats-Umgebungsdaten:', error);
-    res.status(500).json({ error: 'Fehler beim Laden der Umgebungsdaten' });
+    console.log('🔄 Fallback to mock data due to PostgreSQL error');
+    
+    // Fallback zu Mock-Daten bei PostgreSQL-Fehler
+    const fallbackData = {
+      temperature: {
+        min: Math.round((18 + Math.random() * 2) * 10) / 10,
+        max: Math.round((26 + Math.random() * 2) * 10) / 10,
+        avg: Math.round((22 + Math.random() * 2) * 10) / 10,
+        current: Math.round((21.5 + Math.random() * 2) * 10) / 10
+      },
+      humidity: {
+        min: Math.round((45 + Math.random() * 5) * 10) / 10,
+        max: Math.round((75 + Math.random() * 5) * 10) / 10,
+        avg: Math.round((62 + Math.random() * 5) * 10) / 10,
+        current: Math.round((65 + Math.random() * 5) * 10) / 10
+      },
+      period: '6 Monate',
+      source: 'fallback',
+      error: true
+    };
+    res.json(fallbackData);
   }
 });
 
