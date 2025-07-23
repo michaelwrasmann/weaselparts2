@@ -300,7 +300,7 @@
   <script src="/js/fixes.js"></script>
   
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', async () => {
       console.log('📝 Add Component wird initialisiert...');
       
       // KRITISCHER FIX: Alle Modals explizit schließen
@@ -309,6 +309,8 @@
       try {
         setupEventListeners();
         checkForPrefillBarcode();
+        await loadSensorData();
+        startSensorRefresh();
         
         // Barcode-Generierung
         setTimeout(() => {
@@ -872,6 +874,41 @@ function autoFillName() {
         showMessage('Ein Element konnte nicht gefunden werden. Bitte lade die Seite neu.', 'warning');
       }
     });
+
+    // Sensor Data Functions
+    async function loadSensorData() {
+      try {
+        const response = await fetch('/api/sensors/current');
+        if (!response.ok) return;
+        
+        const sensorData = await response.json();
+        updateSensorDisplay(sensorData);
+      } catch (error) {
+        console.error('❌ Sensordaten Fehler:', error);
+      }
+    }
+    
+    function updateSensorDisplay(data) {
+      try {
+        const tempValue = document.getElementById('temperature-value');
+        if (data.temperature && tempValue) {
+          tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+        }
+        
+        const humValue = document.getElementById('humidity-value');
+        if (data.humidity && humValue) {
+          humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+        }
+      } catch (error) {
+        console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+      }
+    }
+    
+    function startSensorRefresh() {
+      setInterval(async () => {
+        await loadSensorData();
+      }, 30000);
+    }
   </script>
   
   <style>
@@ -1093,26 +1130,50 @@ function autoFillName() {
       color: var(--text-primary);
     }
 
+    /* Navigation erweitert */
+    .nav-left {
+      display: flex !important;
+      align-items: center !important;
+      gap: 2rem !important;
+      flex-grow: 1 !important;
+    }
+    
+    .lab-info {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+    }
+    
+    .lab-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    
+    /* Mini Sensor Display in Header */
     .mini-sensors {
       display: flex;
-      gap: 12px;
+      gap: 0.5rem;
     }
-
+    
     .mini-sensor {
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 500;
-      background: var(--bg-card);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 15px;
+      background: var(--bg-light);
       border: 1px solid var(--border-color);
     }
-
+    
     .mini-sensor.temp {
-      color: #FF6B35;
+      color: #ff6b6b !important;
+      border-color: #ff6b6b !important;
     }
-
+    
     .mini-sensor.humid {
-      color: #4A90E2;
+      color: #4ecdc4 !important;
+      border-color: #4ecdc4 !important;
     }
 
     /* Responsive Design für Barcode Section */
@@ -1130,18 +1191,76 @@ function autoFillName() {
       }
 
       .nav-left {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
+        gap: 1rem;
       }
-
-      .lab-info {
-        align-self: stretch;
+      
+      .lab-name {
+        display: none;
       }
-
+      
       .mini-sensors {
-        justify-content: space-between;
+        gap: 0.25rem;
       }
+      
+      .mini-sensor {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.4rem;
+      }
+    }
+  </style>
+
+  <!-- SENSOR CSS FIX - HÖCHSTE PRIORITÄT -->
+  <style>
+    .nav-left {
+      display: flex !important;
+      align-items: center !important;
+      gap: 2rem !important;
+      flex-grow: 1 !important;
+      flex-direction: row !important;
+    }
+    
+    .lab-info {
+      display: flex !important;
+      align-items: center !important;
+      gap: 1rem !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+    }
+    
+    .lab-name {
+      font-size: 0.9rem !important;
+      font-weight: 600 !important;
+      color: var(--text-secondary) !important;
+      white-space: nowrap !important;
+      display: inline-block !important;
+      margin-right: 0 !important;
+    }
+    
+    .mini-sensors {
+      display: inline-flex !important;
+      gap: 0.5rem !important;
+      flex-direction: row !important;
+      align-items: center !important;
+    }
+    
+    .mini-sensor {
+      font-size: 0.8rem !important;
+      font-weight: 600 !important;
+      padding: 0.2rem 0.6rem !important;
+      border-radius: 15px !important;
+      background: var(--bg-light) !important;
+      border: 1px solid var(--border-color) !important;
+      display: inline-block !important;
+    }
+    
+    .mini-sensor.temp {
+      color: #ff6b6b !important;
+      border-color: #ff6b6b !important;
+    }
+    
+    .mini-sensor.humid {
+      color: #4ecdc4 !important;
+      border-color: #4ecdc4 !important;
     }
   </style>
 </body>
