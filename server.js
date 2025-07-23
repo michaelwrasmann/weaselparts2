@@ -2245,33 +2245,15 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     console.log('  - POSTGRES_HOST:', process.env.POSTGRES_HOST);
     
     // Prüfe ob PostgreSQL verfügbar ist
-    if (isDevelopment || !pgPool) {
-      console.log('🔧 Using mock data for environmental history (development mode or no PostgreSQL)');
-      
-      // Mock-Timeline-Daten für 6 Monate (ein Datenpunkt alle 5 Tage)
-      const mockTimeline = [];
-      const now = new Date();
-      
-      for (let i = 0; i < 36; i++) { // 36 * 5 Tage = 180 Tage ≈ 6 Monate
-        const daysAgo = new Date(now.getTime() - (i * 5 * 24 * 60 * 60 * 1000));
-        const baseTemp = 22 + Math.sin(i / 8) * 4; // Saisonale Schwankung über längeren Zeitraum
-        const baseHumidity = 65 + Math.cos(i / 6) * 10; // Saisonale Schwankung
-        
-        mockTimeline.unshift({ // unshift = am Anfang einfügen für chronologische Reihenfolge
-          date: daysAgo.toISOString().split('T')[0],
-          temperature: Math.round((baseTemp + (Math.random() - 0.5) * 2) * 10) / 10,
-          humidity: Math.round((baseHumidity + (Math.random() - 0.5) * 5) * 10) / 10
-        });
-      }
-      
-      const mockData = {
-        timeline: mockTimeline,
+    if (!pgPool) {
+      console.log('❌ PostgreSQL nicht verfügbar - keine Umgebungsdaten');
+      return res.json({
+        timeline: [],
         period: '6 Monate',
-        dataPoints: mockTimeline.length,
-        source: 'mock'
-      };
-      res.json(mockData);
-      return;
+        dataPoints: 0,
+        source: 'no_data',
+        message: 'Keine Umgebungsdaten verfügbar'
+      });
     }
 
     console.log('🌡️ Querying PostgreSQL for environmental history...');
