@@ -307,83 +307,119 @@
 <script src="/js/historical-record.js"></script>
 
 <style>
-  /* Navigation Lab Info Styles */
+  /* SENSOR CSS FIX - HÖCHSTE PRIORITÄT */
+  .lab-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 1rem !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+  }
+
   .nav-left {
     display: flex;
     align-items: center;
-    gap: 24px;
-    flex: 1;
-  }
-
-  .lab-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    gap: 2rem;
+    flex-grow: 1;
   }
 
   .lab-name {
-    font-size: 14px;
+    font-size: 0.9rem;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-secondary);
+    white-space: nowrap;
   }
 
+  /* Mini Sensor Display in Header */
   .mini-sensors {
     display: flex;
-    gap: 12px;
+    gap: 0.5rem;
   }
 
   .mini-sensor {
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 500;
-    background: var(--bg-card);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 15px;
+    background: var(--bg-light);
     border: 1px solid var(--border-color);
   }
 
   .mini-sensor.temp {
-    color: #FF6B35;
+    color: #ff6b6b;
+    border-color: #ff6b6b;
   }
 
   .mini-sensor.humid {
-    color: #4A90E2;
+    color: #4ecdc4;
+    border-color: #4ecdc4;
   }
 
   @media (max-width: 768px) {
     .nav-left {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
+      gap: 1rem;
     }
-
-    .lab-info {
-      align-self: stretch;
+    
+    .lab-name {
+      display: none;
     }
-
+    
     .mini-sensors {
-      justify-content: space-between;
+      gap: 0.25rem;
+    }
+    
+    .mini-sensor {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.4rem;
     }
   }
 </style>
 
 <script>
-  // Sensordaten-Funktionen
-  function updateSensorData() {
-    // Simulierte Sensordaten - in der Praxis würden diese von einem API-Endpoint kommen
-    const temperature = (Math.random() * 5 + 22).toFixed(1); // 22-27°C
-    const humidity = (Math.random() * 10 + 45).toFixed(0); // 45-55%
-    
-    const tempElement = document.getElementById('temperature-value');
-    const humidElement = document.getElementById('humidity-value');
-    
-    if (tempElement) tempElement.textContent = `${temperature}°C`;
-    if (humidElement) humidElement.textContent = `${humidity}%`;
+  // Sensor Data Functions - PostgreSQL Integration
+  async function loadSensorData() {
+    try {
+      const response = await fetch('/api/sensors/current');
+      if (!response.ok) return;
+      
+      const sensorData = await response.json();
+      updateSensorDisplay(sensorData);
+    } catch (error) {
+      console.error('❌ Sensordaten Fehler:', error);
+    }
+  }
+  
+  function updateSensorDisplay(data) {
+    try {
+      // Temperature
+      const tempValue = document.getElementById('temperature-value');
+      if (data.temperature && tempValue) {
+        tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+      }
+      
+      // Humidity
+      const humValue = document.getElementById('humidity-value');
+      if (data.humidity && humValue) {
+        humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+      }
+      
+    } catch (error) {
+      console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+    }
+  }
+  
+  function startSensorRefresh() {
+    // Refresh every 30 seconds
+    setInterval(async () => {
+      await loadSensorData();
+    }, 30000);
   }
 
-  // Sensordaten alle 30 Sekunden aktualisieren
-  setInterval(updateSensorData, 30000);
-  // Initial einmal laden
-  document.addEventListener('DOMContentLoaded', updateSensorData);
+  // Initialize sensor data on page load
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadSensorData();
+    startSensorRefresh();
+  });
 </script>
 
 </body>
