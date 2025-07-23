@@ -2226,6 +2226,89 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
   }
 });
 
+// 6-Monats-Umgebungsdaten für Bauteil
+app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
+  const { barcode } = req.params;
+  
+  try {
+    // Erstmal prüfen ob das Bauteil existiert
+    const [componentCheck] = await pool.execute('SELECT id FROM bauteile WHERE barcode = ?', [barcode]);
+    if (componentCheck.length === 0) {
+      return res.status(404).json({ error: 'Bauteil nicht gefunden' });
+    }
+
+    if (isDevelopment || !pgPool) {
+      // Mock-Daten für 6 Monate - minimalistisch
+      const mockData = {
+        temperature: {
+          min: Math.round((18 + Math.random() * 2) * 10) / 10,
+          max: Math.round((26 + Math.random() * 2) * 10) / 10,
+          avg: Math.round((22 + Math.random() * 2) * 10) / 10,
+          current: Math.round((21.5 + Math.random() * 2) * 10) / 10
+        },
+        humidity: {
+          min: Math.round((45 + Math.random() * 5) * 10) / 10,
+          max: Math.round((75 + Math.random() * 5) * 10) / 10,
+          avg: Math.round((62 + Math.random() * 5) * 10) / 10,
+          current: Math.round((65 + Math.random() * 5) * 10) / 10
+        },
+        period: '6 Monate',
+        source: 'mock'
+      };
+      res.json(mockData);
+      return;
+    }
+
+    // Echte Daten aus PostgreSQL - 6 Monate Statistiken
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    
+    const tempStats = await pgPool.query(`
+      SELECT 
+        MIN("Value") as min_temp,
+        MAX("Value") as max_temp,
+        AVG("Value") as avg_temp,
+        (SELECT "Value" FROM temp_ssa ORDER BY "timedate" DESC LIMIT 1) as current_temp
+      FROM temp_ssa 
+      WHERE "timedate" >= $1
+    `, [sixMonthsAgo]);
+    
+    const humidityStats = await pgPool.query(`
+      SELECT 
+        MIN("Value") as min_humidity,
+        MAX("Value") as max_humidity,
+        AVG("Value") as avg_humidity,
+        (SELECT "Value" FROM rh_ssa ORDER BY "timedate" DESC LIMIT 1) as current_humidity
+      FROM rh_ssa 
+      WHERE "timedate" >= $1
+    `, [sixMonthsAgo]);
+    
+    const tempData = tempStats.rows[0];
+    const humidityData = humidityStats.rows[0];
+    
+    res.json({
+      temperature: {
+        min: tempData.min_temp ? Math.round(tempData.min_temp * 10) / 10 : null,
+        max: tempData.max_temp ? Math.round(tempData.max_temp * 10) / 10 : null,
+        avg: tempData.avg_temp ? Math.round(tempData.avg_temp * 10) / 10 : null,
+        current: tempData.current_temp ? Math.round(tempData.current_temp * 10) / 10 : null
+      },
+      humidity: {
+        min: humidityData.min_humidity ? Math.round(humidityData.min_humidity * 10) / 10 : null,
+        max: humidityData.max_humidity ? Math.round(humidityData.max_humidity * 10) / 10 : null,
+        avg: humidityData.avg_humidity ? Math.round(humidityData.avg_humidity * 10) / 10 : null,
+        current: humidityData.current_humidity ? Math.round(humidityData.current_humidity * 10) / 10 : null
+      },
+      period: '6 Monate',
+      source: 'database'
+    });
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Abrufen der 6-Monats-Umgebungsdaten:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Umgebungsdaten' });
+  }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
