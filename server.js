@@ -2248,17 +2248,17 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     if (isDevelopment || !pgPool) {
       console.log('🔧 Using mock data for environmental history (development mode or no PostgreSQL)');
       
-      // Mock-Timeline-Daten für 6 Monate (ein Datenpunkt pro Woche)
+      // Mock-Timeline-Daten für 6 Monate (ein Datenpunkt alle 5 Tage)
       const mockTimeline = [];
       const now = new Date();
       
-      for (let i = 0; i < 24; i++) { // 24 Wochen = 6 Monate
-        const weekAgo = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
-        const baseTemp = 22 + Math.sin(i / 4) * 3; // Saisonale Schwankung
-        const baseHumidity = 65 + Math.cos(i / 3) * 8; // Saisonale Schwankung
+      for (let i = 0; i < 36; i++) { // 36 * 5 Tage = 180 Tage ≈ 6 Monate
+        const daysAgo = new Date(now.getTime() - (i * 5 * 24 * 60 * 60 * 1000));
+        const baseTemp = 22 + Math.sin(i / 8) * 4; // Saisonale Schwankung über längeren Zeitraum
+        const baseHumidity = 65 + Math.cos(i / 6) * 10; // Saisonale Schwankung
         
         mockTimeline.unshift({ // unshift = am Anfang einfügen für chronologische Reihenfolge
-          date: weekAgo.toISOString().split('T')[0],
+          date: daysAgo.toISOString().split('T')[0],
           temperature: Math.round((baseTemp + (Math.random() - 0.5) * 2) * 10) / 10,
           humidity: Math.round((baseHumidity + (Math.random() - 0.5) * 5) * 10) / 10
         });
@@ -2276,30 +2276,30 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
 
     console.log('🌡️ Querying PostgreSQL for environmental history...');
 
-    // Echte Timeline-Daten aus PostgreSQL - 6 Monate mit wöchentlicher Aggregation
+    // Echte Timeline-Daten aus PostgreSQL - 6 Monate mit 5-Tage-Aggregation
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     
-    // Wöchentliche Temperatur-Daten
+    // 5-Tage-Intervalle für Temperatur-Daten
     const tempTimeline = await pgPool.query(`
       SELECT 
-        DATE_TRUNC('week', "timedate") as week,
+        DATE_TRUNC('day', "timedate") - (EXTRACT(DOY FROM "timedate")::int % 5) * INTERVAL '1 day' as period_start,
         AVG("Value") as avg_temperature
       FROM temp_ssa 
       WHERE "timedate" >= $1
-      GROUP BY DATE_TRUNC('week', "timedate")
-      ORDER BY week ASC
+      GROUP BY period_start
+      ORDER BY period_start ASC
     `, [sixMonthsAgo]);
     
-    // Wöchentliche Feuchtigkeits-Daten
+    // 5-Tage-Intervalle für Feuchtigkeits-Daten
     const humidityTimeline = await pgPool.query(`
       SELECT 
-        DATE_TRUNC('week', "timedate") as week,
+        DATE_TRUNC('day', "timedate") - (EXTRACT(DOY FROM "timedate")::int % 5) * INTERVAL '1 day' as period_start,
         AVG("Value") as avg_humidity
       FROM rh_ssa 
       WHERE "timedate" >= $1
-      GROUP BY DATE_TRUNC('week', "timedate")
-      ORDER BY week ASC
+      GROUP BY period_start
+      ORDER BY period_start ASC
     `, [sixMonthsAgo]);
     
     // Timeline-Daten kombinieren
@@ -2309,24 +2309,24 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     
     // Temperatur-Daten in Map speichern
     tempTimeline.rows.forEach(row => {
-      const week = row.week.toISOString().split('T')[0];
-      tempMap.set(week, Math.round(row.avg_temperature * 10) / 10);
+      const period = row.period_start.toISOString().split('T')[0];
+      tempMap.set(period, Math.round(row.avg_temperature * 10) / 10);
     });
     
     // Feuchtigkeits-Daten in Map speichern
     humidityTimeline.rows.forEach(row => {
-      const week = row.week.toISOString().split('T')[0];
-      humidityMap.set(week, Math.round(row.avg_humidity * 10) / 10);
+      const period = row.period_start.toISOString().split('T')[0];
+      humidityMap.set(period, Math.round(row.avg_humidity * 10) / 10);
     });
     
-    // Alle Wochen sammeln und kombinieren
-    const allWeeks = new Set([...tempMap.keys(), ...humidityMap.keys()]);
+    // Alle Perioden sammeln und kombinieren
+    const allPeriods = new Set([...tempMap.keys(), ...humidityMap.keys()]);
     
-    for (const week of [...allWeeks].sort()) {
+    for (const period of [...allPeriods].sort()) {
       timeline.push({
-        date: week,
-        temperature: tempMap.get(week) || null,
-        humidity: humidityMap.get(week) || null
+        date: period,
+        temperature: tempMap.get(period) || null,
+        humidity: humidityMap.get(period) || null
       });
     }
     
@@ -2341,17 +2341,17 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     console.error('❌ Fehler beim Abrufen der 6-Monats-Umgebungsdaten:', error);
     console.log('🔄 Fallback to mock data due to PostgreSQL error');
     
-    // Fallback zu Mock-Timeline-Daten bei PostgreSQL-Fehler
+    // Fallback zu Mock-Timeline-Daten bei PostgreSQL-Fehler (5-Tage-Intervalle)
     const fallbackTimeline = [];
     const now = new Date();
     
-    for (let i = 0; i < 24; i++) { // 24 Wochen = 6 Monate
-      const weekAgo = new Date(now.getTime() - (i * 7 * 24 * 60 * 60 * 1000));
-      const baseTemp = 22 + Math.sin(i / 4) * 3;
-      const baseHumidity = 65 + Math.cos(i / 3) * 8;
+    for (let i = 0; i < 36; i++) { // 36 * 5 Tage = 180 Tage ≈ 6 Monate
+      const daysAgo = new Date(now.getTime() - (i * 5 * 24 * 60 * 60 * 1000));
+      const baseTemp = 22 + Math.sin(i / 8) * 4;
+      const baseHumidity = 65 + Math.cos(i / 6) * 10;
       
       fallbackTimeline.unshift({
-        date: weekAgo.toISOString().split('T')[0],
+        date: daysAgo.toISOString().split('T')[0],
         temperature: Math.round((baseTemp + (Math.random() - 0.5) * 2) * 10) / 10,
         humidity: Math.round((baseHumidity + (Math.random() - 0.5) * 5) * 10) / 10
       });

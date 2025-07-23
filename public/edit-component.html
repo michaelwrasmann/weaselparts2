@@ -1479,28 +1479,87 @@ Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
           <span class="trend trend-${trend}">
             ${trend === 'up' ? '↗' : trend === 'down' ? '↘' : '→'}
           </span>
-          <span class="data-points">${validData.length} Wochen</span>
+          <span class="data-points">${validData.length} Punkte</span>
         </div>
-        <div class="timeline-chart">
+        <div class="line-chart" id="chart-${valueKey}">
       `;
       
-      // Timeline-Punkte erstellen (nur die letzten 12 Datenpunkte für bessere Darstellung)
-      const displayData = validData.slice(-12);
+      // Nehme die letzten 20 Datenpunkte für bessere Darstellung
+      const displayData = validData.slice(-20);
+      const chartWidth = 300; // Feste Breite für SVG
+      const chartHeight = 80;  // Feste Höhe für SVG
+      const padding = 10;
+      
+      // SVG für Liniengrafik erstellen
+      timelineHTML += `
+        <svg class="timeline-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}">
+          <defs>
+            <linearGradient id="gradient-${valueKey}" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:${valueKey === 'temperature' ? '#ff6b6b' : '#4ecdc4'};stop-opacity:0.8" />
+              <stop offset="100%" style="stop-color:${valueKey === 'temperature' ? '#ff6b6b' : '#4ecdc4'};stop-opacity:0.3" />
+            </linearGradient>
+          </defs>
+      `;
+      
+      // Datenpunkte für Linien berechnen
+      const points = [];
+      const stepX = (chartWidth - 2 * padding) / Math.max(displayData.length - 1, 1);
       
       displayData.forEach((point, index) => {
-        const normalizedHeight = ((point[valueKey] - minValue) / range) * 100;
-        const date = new Date(point.date);
-        const monthName = date.toLocaleDateString('de-DE', { month: 'short' });
+        const x = padding + index * stepX;
+        const normalizedY = (point[valueKey] - minValue) / range;
+        const y = chartHeight - padding - (normalizedY * (chartHeight - 2 * padding));
+        points.push({ x, y, value: point[valueKey], date: point.date });
+      });
+      
+      // Linie zeichnen
+      if (points.length > 1) {
+        const pathData = points.map((point, index) => 
+          `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
+        ).join(' ');
+        
+        // Fläche unter der Linie (optional)
+        const areaData = `M ${points[0].x} ${chartHeight - padding} L ` + 
+                         points.map(p => `${p.x} ${p.y}`).join(' L ') + 
+                         ` L ${points[points.length - 1].x} ${chartHeight - padding} Z`;
         
         timelineHTML += `
-          <div class="timeline-point" 
-               title="${point[valueKey]}${unit} (${date.toLocaleDateString('de-DE')})">
-            <div class="timeline-bar ${valueKey}" 
-                 style="height: ${Math.max(normalizedHeight, 5)}%"></div>
-            <div class="timeline-label">${monthName}</div>
-          </div>
+          <path class="line-area" d="${areaData}" fill="url(#gradient-${valueKey})" />
+          <path class="line-path ${valueKey}" d="${pathData}" fill="none" stroke="${valueKey === 'temperature' ? '#ff6b6b' : '#4ecdc4'}" stroke-width="2" />
+        `;
+      }
+      
+      // Datenpunkte als Kreise
+      points.forEach((point, index) => {
+        timelineHTML += `
+          <circle class="data-point ${valueKey}" 
+                  cx="${point.x}" 
+                  cy="${point.y}" 
+                  r="3" 
+                  fill="${valueKey === 'temperature' ? '#ff6b6b' : '#4ecdc4'}"
+                  data-value="${point.value}"
+                  data-unit="${unit}"
+                  data-date="${point.date}"
+                  onmouseover="showTooltip(event, '${point.value}${unit}', '${new Date(point.date).toLocaleDateString('de-DE')}')"
+                  onmouseout="hideTooltip()"
+                  />
         `;
       });
+      
+      timelineHTML += '</svg>';
+      
+      // Zeitachse (Monate)
+      timelineHTML += '<div class="time-axis">';
+      const monthLabels = [];
+      for (let i = 0; i < displayData.length; i += Math.ceil(displayData.length / 4)) {
+        if (displayData[i]) {
+          const date = new Date(displayData[i].date);
+          const monthName = date.toLocaleDateString('de-DE', { month: 'short' });
+          const leftPos = (i / Math.max(displayData.length - 1, 1)) * 100;
+          timelineHTML += `<span class="month-label" style="left: ${leftPos}%">${monthName}</span>`;
+        }
+      }
+      timelineHTML += '</div>';
       
       timelineHTML += '</div>';
       return timelineHTML;
@@ -1517,6 +1576,41 @@ Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
         humidityTimeline.innerHTML = '<div class="env-error">Daten nicht verfügbar</div>';
       }
     }
+
+    // Tooltip-Funktionen für Hover-Effekte
+    window.showTooltip = function(event, value, date) {
+      // Erstelle Tooltip-Element falls nicht vorhanden
+      let tooltip = document.getElementById('chart-tooltip');
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'chart-tooltip';
+        tooltip.className = 'chart-tooltip';
+        document.body.appendChild(tooltip);
+      }
+      
+      // Tooltip-Inhalt setzen
+      tooltip.innerHTML = `
+        <div class="tooltip-value">${value}</div>
+        <div class="tooltip-date">${date}</div>
+      `;
+      
+      // Tooltip positionieren
+      const rect = event.target.getBoundingClientRect();
+      tooltip.style.left = (rect.left + window.scrollX + 10) + 'px';
+      tooltip.style.top = (rect.top + window.scrollY - 40) + 'px';
+      tooltip.style.display = 'block';
+      tooltip.style.opacity = '1';
+    };
+
+    window.hideTooltip = function() {
+      const tooltip = document.getElementById('chart-tooltip');
+      if (tooltip) {
+        tooltip.style.opacity = '0';
+        setTimeout(() => {
+          tooltip.style.display = 'none';
+        }, 200);
+      }
+    };
 
   </script>
 
@@ -1898,57 +1992,84 @@ Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
       font-weight: 500;
     }
 
-    .timeline-chart {
-      display: flex;
-      align-items: flex-end;
-      justify-content: space-between;
-      height: 60px;
+    /* Line Chart Styles */
+    .line-chart {
       padding: 0.5rem;
       background: var(--bg-light);
       border-radius: 6px;
-      gap: 2px;
+      position: relative;
     }
 
-    .timeline-point {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-      height: 100%;
+    .timeline-svg {
+      width: 100%;
+      height: 80px;
+      overflow: visible;
+    }
+
+    .line-path {
+      stroke-width: 2;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .line-area {
+      opacity: 0.2;
+    }
+
+    .data-point {
       cursor: pointer;
       transition: all 0.2s ease;
+      r: 3;
     }
 
-    .timeline-point:hover {
-      transform: translateY(-2px);
+    .data-point:hover {
+      r: 5;
+      stroke: white;
+      stroke-width: 2;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
     }
 
-    .timeline-bar {
-      width: 100%;
-      min-height: 3px;
-      border-radius: 2px 2px 0 0;
-      transition: all 0.2s ease;
-      margin-bottom: auto;
+    .time-axis {
+      position: relative;
+      height: 20px;
+      margin-top: 0.5rem;
     }
 
-    .timeline-bar.temperature {
-      background: linear-gradient(to top, #ff6b6b, #ff8787);
-    }
-
-    .timeline-bar.humidity {
-      background: linear-gradient(to top, #4ecdc4, #63e6da);
-    }
-
-    .timeline-point:hover .timeline-bar {
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .timeline-label {
+    .month-label {
+      position: absolute;
       font-size: 0.6rem;
       color: var(--text-secondary);
-      margin-top: 0.25rem;
-      white-space: nowrap;
       font-weight: 500;
+      transform: translateX(-50%);
+    }
+
+    /* Tooltip Styles */
+    .chart-tooltip {
+      position: absolute;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      display: none;
+    }
+
+    .tooltip-value {
+      font-weight: 600;
+      font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+      color: var(--text-primary);
+    }
+
+    .tooltip-date {
+      font-size: 0.65rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
     }
 
     /* Responsive Design */
