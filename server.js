@@ -99,6 +99,16 @@ async function initializePostgreSQL() {
 // PostgreSQL beim Start initialisieren
 initializePostgreSQL();
 
+// Helper-Funktion für Standort-Namen
+function getLocationName(location) {
+  const locationNames = {
+    'ssa': 'Integrationslabor',
+    'int_up': 'Integration Oben',
+    'int_low': 'Integration Unten'
+  };
+  return locationNames[location] || `Standort ${location}`;
+}
+
 // MySQL-Verbindungspool mit deinen Datenbankdaten
 let pool;
 
@@ -2175,8 +2185,9 @@ app.post('/api/icd/upload-pdf', uploadPdf.single('pdf'), async (req, res) => {
 // PostgreSQL Sensor-Daten API
 // =====================================================
 
-// Aktuelle Sensor-Werte
-app.get('/api/sensors/current', async (req, res) => {
+// Aktuelle Sensor-Werte mit Standort-Parameter
+app.get('/api/sensors/current/:location?', async (req, res) => {
+  const location = req.params.location || 'ssa'; // Standard: ssa
   try {
     if (isDevelopment || !pgPool) {
       // Mock-Daten im Entwicklungsmodus
@@ -2196,24 +2207,28 @@ app.get('/api/sensors/current', async (req, res) => {
     }
 
     // Echte Daten aus PostgreSQL
-    console.log('🌡️ Abfrage aktueller Sensordaten...');
+    console.log(`🌡️ Abfrage aktueller Sensordaten für Standort: ${location}`);
     
-    // Temperatur-Abfrage mit korrekten Anführungszeichen (zurück zur funktionierenden Version)
+    // Dynamische Tabellenauswahl basierend auf Standort
+    const tempTable = `fms01.temp_${location}`;
+    const humidityTable = `fms01.rh_${location}`;
+    
+    // Temperatur-Abfrage mit dynamischem Standort
     const tempResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "temperature"
-      FROM fms01.temp_ssa 
+      FROM ${tempTable} 
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
     
-    // Luftfeuchtigkeit-Abfrage mit korrekter "Value" Spalte (vereinfacht wie Temperatur)
+    // Luftfeuchtigkeit-Abfrage mit dynamischem Standort
     const humidityResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "humidity" 
-      FROM fms01.rh_ssa 
+      FROM ${humidityTable} 
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
@@ -2249,7 +2264,9 @@ app.get('/api/sensors/current', async (req, res) => {
       temperature: tempData,
       humidity: humidityData,
       timestamp: new Date(),
-      source: 'database'
+      source: 'database',
+      location: location,
+      locationName: getLocationName(location)
     });
     
   } catch (error) {
@@ -2285,6 +2302,21 @@ app.get('/api/sensors/current', async (req, res) => {
       errorMessage: errorMessage,
       errorDetails: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
+  }
+});
+
+// Verfügbare Sensor-Standorte
+app.get('/api/sensors/locations', (req, res) => {
+  try {
+    const locations = [
+      { id: 'ssa', name: 'Integrationslabor', tables: ['temp_ssa', 'rh_ssa'] },
+      { id: 'int_up', name: 'Integration Oben', tables: ['temp_int_up', 'rh_int_up'] },
+      { id: 'int_low', name: 'Integration Unten', tables: ['temp_int_low', 'rh_int_low'] }
+    ];
+    res.json(locations);
+  } catch (error) {
+    console.error('❌ Fehler beim Abrufen der Standorte:', error);
+    res.status(500).json({ error: 'Fehler beim Abrufen der Standorte' });
   }
 });
 

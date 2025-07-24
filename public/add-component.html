@@ -18,7 +18,13 @@
       <nav class="top-nav">
         <div class="nav-left">
           <div class="lab-info">
-            <span class="lab-name">Integrationslabor</span>
+            <div class="location-selector">
+              <select id="sensor-location-select" class="location-dropdown">
+                <option value="ssa">Integrationslabor</option>
+                <option value="int_up">Integration Oben</option>
+                <option value="int_low">Integration Unten</option>
+              </select>
+            </div>
             <div class="mini-sensors">
               <span class="mini-sensor temp">
                 <span id="temperature-value">--°C</span>
@@ -370,6 +376,14 @@
       const globalSearch = document.getElementById('global-search');
       if (globalSearch) {
         globalSearch.addEventListener('input', handleGlobalSearch);
+      }
+      
+      // Sensor Location Dropdown
+      const locationSelect = document.getElementById('sensor-location-select');
+      if (locationSelect) {
+        locationSelect.addEventListener('change', async () => {
+          await loadSensorData();
+        });
       }
       
       // Form Submission
@@ -878,7 +892,10 @@ function autoFillName() {
     // Sensor Data Functions
     async function loadSensorData() {
       try {
-        const response = await fetch('/api/sensors/current');
+        const locationSelect = document.getElementById('sensor-location-select');
+        const location = locationSelect ? locationSelect.value : 'ssa';
+        
+        const response = await fetch(`/api/sensors/current/${location}`);
         if (!response.ok) return;
         
         const sensorData = await response.json();
@@ -1174,6 +1191,29 @@ function autoFillName() {
     .mini-sensor.humid {
       color: #4ecdc4 !important;
       border-color: #4ecdc4 !important;
+    }
+    
+    /* Location Dropdown Styling */
+    .location-dropdown {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.3rem 0.8rem;
+      outline: none;
+      cursor: pointer;
+      transition: border-color 0.2s ease;
+    }
+    
+    .location-dropdown:hover {
+      border-color: var(--primary-color);
+    }
+    
+    .location-dropdown:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
     }
 
     /* Responsive Design für Barcode Section */
