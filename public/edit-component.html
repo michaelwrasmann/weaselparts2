@@ -1330,14 +1330,29 @@ Schrank: ${currentComponent.schrank_name || 'Nicht eingelagert'}
     
     function updateSensorDisplay(data) {
       try {
+        // Temperature
         const tempValue = document.getElementById('temperature-value');
-        if (data.temperature && tempValue) {
-          tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+        if (tempValue) {
+          if (data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
+            tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+          } else {
+            tempValue.textContent = '--°C';
+          }
         }
         
+        // Humidity
         const humValue = document.getElementById('humidity-value');
-        if (data.humidity && humValue) {
-          humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+        if (humValue) {
+          if (data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
+            humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+          } else {
+            humValue.textContent = '--%';
+          }
+        }
+        
+        // Debug-Info bei Fehler
+        if (data.error || data.warning) {
+          console.warn('⚠️ Sensordaten-Warnung:', data.errorMessage || data.warning);
         }
       } catch (error) {
         console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
