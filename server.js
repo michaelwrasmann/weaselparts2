@@ -45,7 +45,7 @@ async function initializePostgreSQL() {
       database: process.env.POSTGRES_NAME || 'fms01',
       user: process.env.POSTGRES_USER || 'monitor',
       password: process.env.POSTGRES_PASSWORD,
-      ssl: false,
+      ssl: process.env.POSTGRES_SSL === 'true' ? true : false,
       connectionTimeoutMillis: 5000,
       query_timeout: 5000
     };
@@ -602,6 +602,26 @@ app.get('/api/bauteil/:barcode', async (req, res) => {
 });
 
 // Alle Bauteile abrufen
+// Alias für /api/bauteile - für Kompatibilität mit Frontend
+app.get('/api/parts', async (req, res) => {
+  try {
+    const [rows] = await pool.execute(`
+      SELECT b.*, 
+             s.name as schrank_name,
+             b.name as equipment_name,
+             b.standard as identification_number
+      FROM bauteile b 
+      LEFT JOIN schraenke s ON b.schrank_id = s.id 
+      ORDER BY b.name, b.barcode
+    `);
+    
+    res.json(rows);
+  } catch (error) {
+    console.error('Fehler beim Abrufen der Bauteile (parts):', error);
+    res.status(500).json({ error: 'Datenbankfehler beim Abrufen der Bauteile' });
+  }
+});
+
 app.get('/api/bauteile', async (req, res) => {
   try {
     const [rows] = await pool.execute(`

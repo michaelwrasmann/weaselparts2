@@ -131,6 +131,20 @@ const api = {
       throw error;
     }
   },
+
+  /**
+   * Ruft alle Parts ab (Alias für getAllComponents)
+   * @returns {Promise<Array>} Liste aller Parts/Bauteile
+   */
+  getAllParts: async function() {
+    try {
+      const response = await fetch(`${baseUrl}/api/parts`);
+      return handleResponse(response);
+    } catch (error) {
+      console.error('Fehler beim Laden der Parts:', error);
+      throw error;
+    }
+  },
   
   /**
    * Sucht nach Bauteilen
