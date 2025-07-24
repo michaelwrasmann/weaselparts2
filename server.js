@@ -2196,13 +2196,13 @@ app.get('/api/sensors/current', async (req, res) => {
       LIMIT 1
     `);
     
-    // Luftfeuchtigkeit-Abfrage mit korrekten Anführungszeichen
+    // Luftfeuchtigkeit-Abfrage mit korrekten Anführungszeichen (vereinfacht wie Temperatur)
     const humidityResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "humidity" 
       FROM rh_ssa 
-      WHERE "timedate" = (SELECT MAX("timedate") FROM rh_ssa) 
+      ORDER BY "timedate" DESC
       LIMIT 1
     `);
     
