@@ -2203,7 +2203,7 @@ app.get('/api/sensors/current', async (req, res) => {
       SELECT 
         "timedate" AS "time", 
         "Value" AS "temperature"
-      FROM temp_ssa 
+      FROM fms01.temp_ssa 
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
@@ -2213,7 +2213,7 @@ app.get('/api/sensors/current', async (req, res) => {
       SELECT 
         "timedate" AS "time", 
         "Value" AS "humidity" 
-      FROM rh_ssa 
+      FROM fms01.rh_ssa 
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
@@ -2316,14 +2316,14 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
     // Echte Daten aus PostgreSQL
     const tempData = await pgPool.query(`
       SELECT "timedate", "Value" as temperature
-      FROM temp_ssa 
+      FROM fms01.temp_ssa 
       WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
       ORDER BY "timedate" ASC
     `);
     
     const humidityData = await pgPool.query(`
       SELECT "timedate", "Value" as humidity
-      FROM rh_ssa 
+      FROM fms01.rh_ssa 
       WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
       ORDER BY "timedate" ASC
     `);
@@ -2381,7 +2381,7 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
       SELECT 
         DATE_TRUNC('day', "timedate") - (EXTRACT(DOY FROM "timedate")::int % 5) * INTERVAL '1 day' as period_start,
         AVG("Value") as avg_temperature
-      FROM temp_ssa 
+      FROM fms01.temp_ssa 
       WHERE "timedate" >= $1
       GROUP BY period_start
       ORDER BY period_start ASC
@@ -2392,7 +2392,7 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
       SELECT 
         DATE_TRUNC('day', "timedate") - (EXTRACT(DOY FROM "timedate")::int % 5) * INTERVAL '1 day' as period_start,
         AVG("Value") as avg_humidity
-      FROM rh_ssa 
+      FROM fms01.rh_ssa 
       WHERE "timedate" >= $1
       GROUP BY period_start
       ORDER BY period_start ASC
