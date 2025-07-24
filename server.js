@@ -2193,7 +2193,7 @@ app.get('/api/sensors/current', async (req, res) => {
         "Value" AS "temperature"
       FROM temp_ssa 
       ORDER BY "timedate" DESC
-      LIMIT 1
+      LIMIT 2
     `);
     
     // Luftfeuchtigkeit-Abfrage mit korrekten Anführungszeichen (vereinfacht wie Temperatur)
@@ -2203,7 +2203,7 @@ app.get('/api/sensors/current', async (req, res) => {
         "Value" AS "humidity" 
       FROM rh_ssa 
       ORDER BY "timedate" DESC
-      LIMIT 1
+      LIMIT 2
     `);
     
     // Debug-Logging der Ergebnisse
