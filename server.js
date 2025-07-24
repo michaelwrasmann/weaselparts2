@@ -35,27 +35,57 @@ const mockSensorData = {
 
 // PostgreSQL-Konfiguration (nur in Produktion)
 let pgPool = null;
-if (!isDevelopment && process.env.POSTGRES_HOST) {
-  const pgConfig = {
-    host: process.env.POSTGRES_HOST || '129.247.232.65',
-    port: process.env.POSTGRES_PORT || 5432,
-    database: process.env.POSTGRES_NAME || 'fms01',
-    user: process.env.POSTGRES_USER || 'monitor',
-    password: process.env.POSTGRES_PASSWORD,
-    ssl: false,
-    connectionTimeoutMillis: 5000,
-    query_timeout: 5000
-  };
-  
-  try {
-    pgPool = new Pool(pgConfig);
-    console.log('🌡️ PostgreSQL-Pool für Sensordaten erstellt');
-  } catch (error) {
-    console.log('⚠️ PostgreSQL nicht verfügbar - verwende Mock-Daten');
+
+// PostgreSQL initialisieren
+async function initializePostgreSQL() {
+  if (!isDevelopment && process.env.POSTGRES_HOST) {
+    const pgConfig = {
+      host: process.env.POSTGRES_HOST || '129.247.232.65',
+      port: process.env.POSTGRES_PORT || 5432,
+      database: process.env.POSTGRES_NAME || 'fms01',
+      user: process.env.POSTGRES_USER || 'monitor',
+      password: process.env.POSTGRES_PASSWORD,
+      ssl: false,
+      connectionTimeoutMillis: 5000,
+      query_timeout: 5000
+    };
+    
+    try {
+      pgPool = new Pool(pgConfig);
+      console.log('🌡️ PostgreSQL-Pool für Sensordaten erstellt');
+      console.log('📊 PostgreSQL-Konfiguration:', {
+        host: pgConfig.host,
+        port: pgConfig.port,
+        database: pgConfig.database,
+        user: pgConfig.user,
+        hasPassword: !!pgConfig.password
+      });
+      
+      // Verbindung testen
+      const testResult = await pgPool.query('SELECT NOW()');
+      console.log('✅ PostgreSQL-Verbindung erfolgreich:', testResult.rows[0].now);
+      
+      // Tabellen prüfen
+      const tablesCheck = await pgPool.query(`
+        SELECT table_name 
+        FROM information_schema.tables 
+        WHERE table_schema = 'public' 
+        AND table_name IN ('temp_ssa', 'rh_ssa')
+      `);
+      console.log('📋 Gefundene Tabellen:', tablesCheck.rows.map(r => r.table_name));
+      
+    } catch (error) {
+      console.log('⚠️ PostgreSQL nicht verfügbar - verwende Mock-Daten');
+      console.error('❌ PostgreSQL-Fehler:', error.message);
+      pgPool = null;
+    }
+  } else {
+    console.log('🔧 Entwicklungsmodus - Mock-Sensordaten werden verwendet');
   }
-} else {
-  console.log('🔧 Entwicklungsmodus - Mock-Sensordaten werden verwendet');
 }
+
+// PostgreSQL beim Start initialisieren
+initializePostgreSQL();
 
 // MySQL-Verbindungspool mit deinen Datenbankdaten
 let pool;
@@ -2134,42 +2164,94 @@ app.get('/api/sensors/current', async (req, res) => {
     }
 
     // Echte Daten aus PostgreSQL
+    console.log('🌡️ Abfrage aktueller Sensordaten...');
+    
+    // Temperatur-Abfrage mit korrekten Anführungszeichen
     const tempResult = await pgPool.query(`
-      SELECT "timedate", "Value" as temperature 
+      SELECT 
+        "timedate" AS "time", 
+        "Value" AS "temperature"
       FROM temp_ssa 
-      ORDER BY "timedate" DESC 
+      ORDER BY "timedate" DESC
       LIMIT 1
     `);
     
+    // Luftfeuchtigkeit-Abfrage mit korrekten Anführungszeichen
     const humidityResult = await pgPool.query(`
-      SELECT "timedate", "Value" as humidity 
+      SELECT 
+        "timedate" AS "time", 
+        "Value" AS "humidity" 
       FROM rh_ssa 
-      ORDER BY "timedate" DESC 
+      WHERE "timedate" = (SELECT MAX("timedate") FROM rh_ssa) 
       LIMIT 1
     `);
+    
+    // Debug-Logging der Ergebnisse
+    console.log('📊 Temperatur-Ergebnis:', tempResult.rows[0]);
+    console.log('📊 Luftfeuchtigkeit-Ergebnis:', humidityResult.rows[0]);
+    
+    // Daten aufbereiten
+    const tempData = tempResult.rows[0] ? {
+      timedate: tempResult.rows[0].time,
+      temperature: parseFloat(tempResult.rows[0].temperature)
+    } : null;
+    
+    const humidityData = humidityResult.rows[0] ? {
+      timedate: humidityResult.rows[0].time,
+      humidity: parseFloat(humidityResult.rows[0].humidity)
+    } : null;
+    
+    // Fehlerbehandlung wenn keine Daten
+    if (!tempData || !humidityData) {
+      console.warn('⚠️ Keine Sensordaten in der Datenbank gefunden');
+      return res.json({
+        temperature: tempData || { timedate: new Date().toISOString(), temperature: null },
+        humidity: humidityData || { timedate: new Date().toISOString(), humidity: null },
+        timestamp: new Date(),
+        source: 'database',
+        warning: 'Teilweise keine Daten verfügbar'
+      });
+    }
     
     res.json({
-      temperature: tempResult.rows[0] || { timedate: new Date(), temperature: null },
-      humidity: humidityResult.rows[0] || { timedate: new Date(), humidity: null },
+      temperature: tempData,
+      humidity: humidityData,
       timestamp: new Date(),
       source: 'database'
     });
     
   } catch (error) {
     console.error('❌ Fehler beim Abrufen der Sensordaten:', error);
-    // Fallback zu Mock-Daten bei Fehler
-    res.json({
+    console.error('❌ Error Details:', {
+      message: error.message,
+      code: error.code,
+      detail: error.detail
+    });
+    
+    // Detaillierte Fehlerbehandlung
+    let errorMessage = 'Datenbankfehler';
+    if (error.code === 'ECONNREFUSED') {
+      errorMessage = 'Keine Verbindung zur PostgreSQL-Datenbank';
+    } else if (error.code === '42P01') {
+      errorMessage = 'Tabelle nicht gefunden';
+    } else if (error.code === '42703') {
+      errorMessage = 'Spalte nicht gefunden';
+    }
+    
+    res.status(500).json({
       temperature: {
         timedate: new Date().toISOString(),
-        temperature: 21.7
+        temperature: null
       },
       humidity: {
         timedate: new Date().toISOString(),
-        humidity: 65.2
+        humidity: null
       },
       timestamp: new Date(),
-      source: 'mock',
-      error: true
+      source: 'error',
+      error: true,
+      errorMessage: errorMessage,
+      errorDetails: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
