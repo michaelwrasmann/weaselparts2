@@ -65,14 +65,26 @@ async function initializePostgreSQL() {
       const testResult = await pgPool.query('SELECT NOW()');
       console.log('✅ PostgreSQL-Verbindung erfolgreich:', testResult.rows[0].now);
       
-      // Tabellen prüfen
+      // Tabellen prüfen - erweiterte Suche
       const tablesCheck = await pgPool.query(`
-        SELECT table_name 
+        SELECT table_schema, table_name 
         FROM information_schema.tables 
-        WHERE table_schema = 'public' 
-        AND table_name IN ('temp_ssa', 'rh_ssa')
+        WHERE table_name LIKE '%temp%' 
+           OR table_name LIKE '%rh%' 
+           OR table_name LIKE '%ssa%'
+        ORDER BY table_schema, table_name
       `);
-      console.log('📋 Gefundene Tabellen:', tablesCheck.rows.map(r => r.table_name));
+      console.log('📋 Gefundene Tabellen:', tablesCheck.rows.map(r => `${r.table_schema}.${r.table_name}`));
+      
+      // Zusätzlich: Alle Tabellen in der Datenbank anzeigen
+      const allTablesCheck = await pgPool.query(`
+        SELECT table_schema, table_name 
+        FROM information_schema.tables 
+        WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
+        ORDER BY table_schema, table_name
+        LIMIT 20
+      `);
+      console.log('📊 Alle verfügbaren Tabellen (erste 20):', allTablesCheck.rows.map(r => `${r.table_schema}.${r.table_name}`));
       
     } catch (error) {
       console.log('⚠️ PostgreSQL nicht verfügbar - verwende Mock-Daten');
