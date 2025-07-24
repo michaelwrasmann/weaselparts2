@@ -2186,24 +2186,23 @@ app.get('/api/sensors/current', async (req, res) => {
     // Echte Daten aus PostgreSQL
     console.log('🌡️ Abfrage aktueller Sensordaten...');
     
-    // Temperatur-Abfrage mit korrekten Anführungszeichen
+    // Temperatur-Abfrage mit korrekten Anführungszeichen (zurück zur funktionierenden Version)
     const tempResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "temperature"
       FROM temp_ssa 
       ORDER BY "timedate" DESC
-      LIMIT 2
+      LIMIT 1
     `);
     
-    // Luftfeuchtigkeit-Abfrage mit korrekten Anführungszeichen (vereinfacht wie Temperatur)
+    // Luftfeuchtigkeit-Abfrage mit korrekten Anführungszeichen (zurück zur ursprünglichen funktionierenden Version)
     const humidityResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "humidity" 
       FROM rh_ssa 
-      ORDER BY "timedate" DESC
-      LIMIT 2
+      WHERE "timedate" = (SELECT MAX("timedate") FROM rh_ssa)
     `);
     
     // Debug-Logging der Ergebnisse
