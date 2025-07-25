@@ -219,49 +219,51 @@ async function setupEmployeesProjectsAPI() {
   console.log('📋 Initialisiere Employees & Projects API...');
   
   try {
-    // Tabellen erstellen falls sie nicht existieren oder migrieren
-    await pool.execute(`
-      CREATE TABLE IF NOT EXISTS employees (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100),
-        nachname VARCHAR(50),
-        vorname VARCHAR(50),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
+    // Check if table exists and get its structure
+    const [tableInfo] = await pool.execute(`
+      SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'employees'
     `);
     
-    // Migration: Spalten hinzufügen falls sie nicht existieren
-    try {
+    const existingColumns = tableInfo.map(row => row.COLUMN_NAME);
+    const hasOldStructure = existingColumns.includes('name') && !existingColumns.includes('nachname');
+    
+    if (hasOldStructure) {
+      console.log('📋 Migriere Employees-Tabelle zu neuer Struktur...');
+      
+      // Add new columns
       await pool.execute(`ALTER TABLE employees ADD COLUMN nachname VARCHAR(50)`);
       await pool.execute(`ALTER TABLE employees ADD COLUMN vorname VARCHAR(50)`);
-    } catch (error) {
-      // Spalten existieren bereits, das ist ok
-    }
-    
-    // Migration: Daten von name zu nachname/vorname konvertieren
-    const [existingEmployees] = await pool.execute(`
-      SELECT id, name FROM employees WHERE name IS NOT NULL AND (nachname IS NULL OR vorname IS NULL)
-    `);
-    
-    for (const employee of existingEmployees) {
-      const nameParts = employee.name.split(',').map(part => part.trim());
-      if (nameParts.length === 2) {
-        await pool.execute(`
-          UPDATE employees SET nachname = ?, vorname = ? WHERE id = ?
-        `, [nameParts[0], nameParts[1], employee.id]);
-      } else {
-        // Fallback: ganzer Name als Nachname
-        await pool.execute(`
-          UPDATE employees SET nachname = ?, vorname = 'N/A' WHERE id = ?
-        `, [employee.name, employee.id]);
+      
+      // Migrate existing data
+      const [existingEmployees] = await pool.execute(`SELECT id, name FROM employees WHERE name IS NOT NULL`);
+      
+      for (const employee of existingEmployees) {
+        const nameParts = employee.name.split(',').map(part => part.trim());
+        if (nameParts.length === 2) {
+          await pool.execute(`
+            UPDATE employees SET nachname = ?, vorname = ? WHERE id = ?
+          `, [nameParts[0], nameParts[1], employee.id]);
+        } else {
+          // Fallback: ganzer Name als Nachname
+          await pool.execute(`
+            UPDATE employees SET nachname = ?, vorname = 'N/A' WHERE id = ?
+          `, [employee.name, employee.id]);
+        }
       }
-    }
-    
-    // Unique constraint hinzufügen falls nicht vorhanden
-    try {
-      await pool.execute(`ALTER TABLE employees ADD UNIQUE KEY unique_name (nachname, vorname)`);
-    } catch (error) {
-      // Constraint existiert bereits
+      
+      console.log('✅ Migration der Employees-Tabelle abgeschlossen');
+    } else {
+      // Create table with new structure if it doesn't exist
+      await pool.execute(`
+        CREATE TABLE IF NOT EXISTS employees (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          nachname VARCHAR(50) NOT NULL,
+          vorname VARCHAR(50) NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE KEY unique_name (nachname, vorname)
+        )
+      `);
     }
     
     await pool.execute(`
