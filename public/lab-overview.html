@@ -213,18 +213,27 @@
   }
 
   async function loadAllSensorData() {
+    console.log(`🔄 Lade Sensordaten für ${currentTimeRange} Stunden...`);
     const locations = ['ssa', 'int_up', 'int_low'];
     
     for (const location of locations) {
       try {
+        console.log(`📡 Lade Daten für ${location}...`);
         const response = await fetch(`/api/sensors/history/${location}/${currentTimeRange}`);
+        console.log(`📡 Response Status für ${location}:`, response.status);
+        
         if (response.ok) {
           const data = await response.json();
+          console.log(`📊 Daten für ${location} erhalten:`, data);
           sensorData[location] = data;
           renderChart(location, data);
+        } else {
+          console.error(`❌ HTTP Error für ${location}:`, response.status, response.statusText);
+          const errorText = await response.text();
+          console.error(`❌ Error Text:`, errorText);
         }
       } catch (error) {
-        console.error(`Fehler beim Laden der Daten für ${location}:`, error);
+        console.error(`❌ Fehler beim Laden der Daten für ${location}:`, error);
       }
     }
   }
@@ -263,16 +272,23 @@
   }
 
   function renderChart(location, data) {
+    console.log(`📊 Rendering chart for ${location}:`, data);
     const container = document.getElementById(`${location}-chart`);
-    if (!container) return;
+    if (!container) {
+      console.error(`❌ Container für ${location}-chart nicht gefunden`);
+      return;
+    }
     
     // Clear existing content
     container.innerHTML = '';
     
     if (!data.temperature || data.temperature.length === 0) {
+      console.log(`⚠️ Keine Temperaturdaten für ${location}`);
       container.innerHTML = '<div class="no-data">Keine Daten verfügbar</div>';
       return;
     }
+    
+    console.log(`📈 ${location}: ${data.temperature.length} Temperaturwerte, ${data.humidity?.length || 0} Feuchtigkeitswerte`);
     
     // Create SVG chart
     const width = container.offsetWidth || 600;
@@ -355,6 +371,19 @@
     `;
     
     container.innerHTML = svg;
+    console.log(`✅ Chart für ${location} erstellt (${width}x${height})`);
+    
+    // Fallback wenn SVG leer ist
+    if (!svg.trim()) {
+      container.innerHTML = `
+        <div class="simple-chart">
+          <div class="chart-placeholder">
+            <p>Chart wird geladen...</p>
+            <p>Temp: ${tempData.length} Punkte, Humid: ${humidData.length} Punkte</p>
+          </div>
+        </div>
+      `;
+    }
   }
 
   function createPath(data, xDomain, yDomain, width, height, color) {
@@ -553,9 +582,10 @@
   }
 
   .time-btn.active {
-    background: var(--primary-color);
+    background: #2563eb;
     color: white;
-    border-color: var(--primary-color);
+    border-color: #2563eb;
+    font-weight: 600;
   }
 
   .sensor-stations {
@@ -613,6 +643,19 @@
     height: 100%;
     color: var(--text-secondary);
     font-style: italic;
+  }
+
+  .chart-placeholder {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    border: 2px dashed var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-light);
+  }
+
+  .chart-placeholder p {
+    margin: 0.5rem 0;
   }
 
   /* Navigation erweitert */
