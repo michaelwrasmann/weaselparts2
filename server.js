@@ -2213,22 +2213,28 @@ app.get('/api/sensors/current/:location?', async (req, res) => {
     const tempTable = `fms01.temp_${location}`;
     const humidityTable = `fms01.rh_${location}`;
     
-    // Temperatur-Abfrage mit dynamischem Standort
+    // Temperatur-Abfrage mit dynamischem Standort - hole ersten NICHT-NULL Wert
     const tempResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "temperature"
       FROM ${tempTable} 
+      WHERE "Value" IS NOT NULL 
+        AND "Value" != ''
+        AND "Value"::text != 'NaN'
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
     
-    // Luftfeuchtigkeit-Abfrage mit dynamischem Standort
+    // Luftfeuchtigkeit-Abfrage mit dynamischem Standort - hole ersten NICHT-NULL Wert
     const humidityResult = await pgPool.query(`
       SELECT 
         "timedate" AS "time", 
         "Value" AS "humidity" 
       FROM ${humidityTable} 
+      WHERE "Value" IS NOT NULL 
+        AND "Value" != ''
+        AND "Value"::text != 'NaN'
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
@@ -2345,11 +2351,14 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
       return;
     }
 
-    // Echte Daten aus PostgreSQL
+    // Echte Daten aus PostgreSQL - filtere NULL und ungültige Werte
     const tempData = await pgPool.query(`
       SELECT "timedate", "Value" as temperature
       FROM fms01.temp_ssa 
       WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
+        AND "Value" IS NOT NULL 
+        AND "Value" != ''
+        AND "Value"::text != 'NaN'
       ORDER BY "timedate" ASC
     `);
     
@@ -2357,6 +2366,9 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
       SELECT "timedate", "Value" as humidity
       FROM fms01.rh_ssa 
       WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
+        AND "Value" IS NOT NULL 
+        AND "Value" != ''
+        AND "Value"::text != 'NaN'
       ORDER BY "timedate" ASC
     `);
     
@@ -2408,24 +2420,30 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     
-    // 5-Tage-Intervalle für Temperatur-Daten
+    // 5-Tage-Intervalle für Temperatur-Daten - filtere NULL und ungültige Werte
     const tempTimeline = await pgPool.query(`
       SELECT 
         DATE_TRUNC('day', "timedate") - (EXTRACT(DOY FROM "timedate")::int % 5) * INTERVAL '1 day' as period_start,
         AVG("Value") as avg_temperature
       FROM fms01.temp_ssa 
       WHERE "timedate" >= $1
+        AND "Value" IS NOT NULL 
+        AND "Value" != ''
+        AND "Value"::text != 'NaN'
       GROUP BY period_start
       ORDER BY period_start ASC
     `, [sixMonthsAgo]);
     
-    // 5-Tage-Intervalle für Feuchtigkeits-Daten
+    // 5-Tage-Intervalle für Feuchtigkeits-Daten - filtere NULL und ungültige Werte
     const humidityTimeline = await pgPool.query(`
       SELECT 
         DATE_TRUNC('day', "timedate") - (EXTRACT(DOY FROM "timedate")::int % 5) * INTERVAL '1 day' as period_start,
         AVG("Value") as avg_humidity
       FROM fms01.rh_ssa 
       WHERE "timedate" >= $1
+        AND "Value" IS NOT NULL 
+        AND "Value" != ''
+        AND "Value"::text != 'NaN'
       GROUP BY period_start
       ORDER BY period_start ASC
     `, [sixMonthsAgo]);
