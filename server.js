@@ -219,52 +219,16 @@ async function setupEmployeesProjectsAPI() {
   console.log('📋 Initialisiere Employees & Projects API...');
   
   try {
-    // Check if table exists and get its structure
-    const [tableInfo] = await pool.execute(`
-      SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
-      WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'employees'
+    // Tabellen erstellen falls sie nicht existieren
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS employees (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nachname VARCHAR(50) NOT NULL,
+        vorname VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_name (nachname, vorname)
+      )
     `);
-    
-    const existingColumns = tableInfo.map(row => row.COLUMN_NAME);
-    const hasOldStructure = existingColumns.includes('name') && !existingColumns.includes('nachname');
-    
-    if (hasOldStructure) {
-      console.log('📋 Migriere Employees-Tabelle zu neuer Struktur...');
-      
-      // Add new columns
-      await pool.execute(`ALTER TABLE employees ADD COLUMN nachname VARCHAR(50)`);
-      await pool.execute(`ALTER TABLE employees ADD COLUMN vorname VARCHAR(50)`);
-      
-      // Migrate existing data
-      const [existingEmployees] = await pool.execute(`SELECT id, name FROM employees WHERE name IS NOT NULL`);
-      
-      for (const employee of existingEmployees) {
-        const nameParts = employee.name.split(',').map(part => part.trim());
-        if (nameParts.length === 2) {
-          await pool.execute(`
-            UPDATE employees SET nachname = ?, vorname = ? WHERE id = ?
-          `, [nameParts[0], nameParts[1], employee.id]);
-        } else {
-          // Fallback: ganzer Name als Nachname
-          await pool.execute(`
-            UPDATE employees SET nachname = ?, vorname = 'N/A' WHERE id = ?
-          `, [employee.name, employee.id]);
-        }
-      }
-      
-      console.log('✅ Migration der Employees-Tabelle abgeschlossen');
-    } else {
-      // Create table with new structure if it doesn't exist
-      await pool.execute(`
-        CREATE TABLE IF NOT EXISTS employees (
-          id INT AUTO_INCREMENT PRIMARY KEY,
-          nachname VARCHAR(50) NOT NULL,
-          vorname VARCHAR(50) NOT NULL,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-          UNIQUE KEY unique_name (nachname, vorname)
-        )
-      `);
-    }
     
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS projects (
@@ -286,13 +250,13 @@ app.get('/api/employees', async (req, res) => {
     console.log('📋 Lade alle Mitarbeiter...');
     
     const [rows] = await pool.execute(
-      'SELECT id, nachname, vorname, created_at FROM employees WHERE nachname IS NOT NULL AND vorname IS NOT NULL ORDER BY nachname ASC, vorname ASC'
+      'SELECT id, nachname, vorname, created_at FROM employees ORDER BY nachname ASC, vorname ASC'
     );
     
     // Format names as "Nachname, Vorname" for frontend
     const formattedRows = rows.map(row => ({
       ...row,
-      displayName: `${row.nachname || ''}, ${row.vorname || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Unbekannt'
+      displayName: `${row.nachname}, ${row.vorname}`
     }));
     
     console.log(`✅ ${rows.length} Mitarbeiter geladen`);

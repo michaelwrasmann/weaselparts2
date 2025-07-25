@@ -212,13 +212,12 @@ function setupEventListeners() {
   const saveEmployeeBtn = document.getElementById('save-employee-btn');
   const cancelEmployeeBtn = document.getElementById('cancel-employee-btn');
   const employeeForm = document.getElementById('employee-form');
-  const employeeNachnameInput = document.getElementById('employee-nachname');
-  const employeeVornameInput = document.getElementById('employee-vorname');
+  const employeeNameInput = document.getElementById('employee-name');
   
   if (addEmployeeBtn) {
     addEmployeeBtn.addEventListener('click', () => {
       employeeForm.style.display = 'block';
-      if (employeeNachnameInput) employeeNachnameInput.focus();
+      employeeNameInput.focus();
     });
   }
   
@@ -229,22 +228,12 @@ function setupEventListeners() {
   if (cancelEmployeeBtn) {
     cancelEmployeeBtn.addEventListener('click', () => {
       employeeForm.style.display = 'none';
-      if (employeeNachnameInput) employeeNachnameInput.value = '';
-      if (employeeVornameInput) employeeVornameInput.value = '';
+      employeeNameInput.value = '';
     });
   }
   
-  // Add keypress listeners for both input fields
-  if (employeeNachnameInput) {
-    employeeNachnameInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        if (employeeVornameInput) employeeVornameInput.focus();
-      }
-    });
-  }
-  
-  if (employeeVornameInput) {
-    employeeVornameInput.addEventListener('keypress', (e) => {
+  if (employeeNameInput) {
+    employeeNameInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         saveEmployee();
       }
