@@ -223,8 +223,10 @@ async function setupEmployeesProjectsAPI() {
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS employees (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL UNIQUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        nachname VARCHAR(50) NOT NULL,
+        vorname VARCHAR(50) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_name (nachname, vorname)
       )
     `);
     
@@ -248,11 +250,17 @@ app.get('/api/employees', async (req, res) => {
     console.log('📋 Lade alle Mitarbeiter...');
     
     const [rows] = await pool.execute(
-      'SELECT id, name, created_at FROM employees ORDER BY name ASC'
+      'SELECT id, nachname, vorname, created_at FROM employees ORDER BY nachname ASC, vorname ASC'
     );
     
+    // Format names as "Nachname, Vorname" for frontend
+    const formattedRows = rows.map(row => ({
+      ...row,
+      displayName: `${row.nachname}, ${row.vorname}`
+    }));
+    
     console.log(`✅ ${rows.length} Mitarbeiter geladen`);
-    res.json(rows);
+    res.json(formattedRows);
   } catch (error) {
     console.error('❌ Fehler beim Laden der Mitarbeiter:', error);
     res.status(500).json({ error: 'Fehler beim Laden der Mitarbeiter' });
@@ -262,38 +270,44 @@ app.get('/api/employees', async (req, res) => {
 // Add new employee
 app.post('/api/employees', async (req, res) => {
   try {
-    const { name } = req.body;
+    const { nachname, vorname } = req.body;
     
-    if (!name || !name.trim()) {
-      return res.status(400).json({ error: 'Mitarbeitername ist erforderlich' });
+    if (!nachname || !nachname.trim() || !vorname || !vorname.trim()) {
+      return res.status(400).json({ error: 'Nachname und Vorname sind erforderlich' });
     }
     
-    const trimmedName = name.trim();
+    const trimmedNachname = nachname.trim();
+    const trimmedVorname = vorname.trim();
     
     // Check if employee already exists
     const [existingEmployee] = await pool.execute(
-      'SELECT id FROM employees WHERE LOWER(name) = LOWER(?)',
-      [trimmedName]
+      'SELECT id FROM employees WHERE LOWER(nachname) = LOWER(?) AND LOWER(vorname) = LOWER(?)',
+      [trimmedNachname, trimmedVorname]
     );
     
     if (existingEmployee.length > 0) {
       return res.status(400).json({ error: 'Mitarbeiter existiert bereits' });
     }
     
-    console.log(`📋 Füge neuen Mitarbeiter hinzu: ${trimmedName}`);
+    console.log(`📋 Füge neuen Mitarbeiter hinzu: ${trimmedNachname}, ${trimmedVorname}`);
     
     const [result] = await pool.execute(
-      'INSERT INTO employees (name) VALUES (?)',
-      [trimmedName]
+      'INSERT INTO employees (nachname, vorname) VALUES (?, ?)',
+      [trimmedNachname, trimmedVorname]
     );
     
     const [newEmployee] = await pool.execute(
-      'SELECT id, name, created_at FROM employees WHERE id = ?',
+      'SELECT id, nachname, vorname, created_at FROM employees WHERE id = ?',
       [result.insertId]
     );
     
-    console.log(`✅ Mitarbeiter "${trimmedName}" erfolgreich hinzugefügt`);
-    res.status(201).json(newEmployee[0]);
+    const employeeWithDisplayName = {
+      ...newEmployee[0],
+      displayName: `${newEmployee[0].nachname}, ${newEmployee[0].vorname}`
+    };
+    
+    console.log(`✅ Mitarbeiter "${trimmedNachname}, ${trimmedVorname}" erfolgreich hinzugefügt`);
+    res.status(201).json(employeeWithDisplayName);
   } catch (error) {
     console.error('❌ Fehler beim Hinzufügen des Mitarbeiters:', error);
     res.status(500).json({ error: 'Fehler beim Speichern des Mitarbeiters' });
@@ -308,7 +322,7 @@ app.delete('/api/employees/:id', async (req, res) => {
     console.log(`📋 Lösche Mitarbeiter mit ID: ${id}`);
     
     const [employee] = await pool.execute(
-      'SELECT name FROM employees WHERE id = ?',
+      'SELECT nachname, vorname FROM employees WHERE id = ?',
       [id]
     );
     
@@ -318,7 +332,7 @@ app.delete('/api/employees/:id', async (req, res) => {
     
     await pool.execute('DELETE FROM employees WHERE id = ?', [id]);
     
-    console.log(`✅ Mitarbeiter "${employee[0].name}" erfolgreich gelöscht`);
+    console.log(`✅ Mitarbeiter "${employee[0].nachname}, ${employee[0].vorname}" erfolgreich gelöscht`);
     res.json({ message: 'Mitarbeiter erfolgreich gelöscht' });
   } catch (error) {
     console.error('❌ Fehler beim Löschen des Mitarbeiters:', error);
