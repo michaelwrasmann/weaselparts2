@@ -2219,9 +2219,7 @@ app.get('/api/sensors/current/:location?', async (req, res) => {
         "timedate" AS "time", 
         "Value" AS "temperature"
       FROM ${tempTable} 
-      WHERE "Value" IS NOT NULL 
-        AND "Value" != ''
-        AND "Value"::text != 'NaN'
+      WHERE "Value" IS NOT NULL
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
@@ -2232,9 +2230,7 @@ app.get('/api/sensors/current/:location?', async (req, res) => {
         "timedate" AS "time", 
         "Value" AS "humidity" 
       FROM ${humidityTable} 
-      WHERE "Value" IS NOT NULL 
-        AND "Value" != ''
-        AND "Value"::text != 'NaN'
+      WHERE "Value" IS NOT NULL
       ORDER BY "timedate" DESC
       LIMIT 1
     `);
@@ -2356,9 +2352,7 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
       SELECT "timedate", "Value" as temperature
       FROM fms01.temp_ssa 
       WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
-        AND "Value" IS NOT NULL 
-        AND "Value" != ''
-        AND "Value"::text != 'NaN'
+        AND "Value" IS NOT NULL
       ORDER BY "timedate" ASC
     `);
     
@@ -2366,9 +2360,7 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
       SELECT "timedate", "Value" as humidity
       FROM fms01.rh_ssa 
       WHERE "timedate" >= NOW() - INTERVAL '${hours} hours'
-        AND "Value" IS NOT NULL 
-        AND "Value" != ''
-        AND "Value"::text != 'NaN'
+        AND "Value" IS NOT NULL
       ORDER BY "timedate" ASC
     `);
     
@@ -2427,9 +2419,7 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
         AVG("Value") as avg_temperature
       FROM fms01.temp_ssa 
       WHERE "timedate" >= $1
-        AND "Value" IS NOT NULL 
-        AND "Value" != ''
-        AND "Value"::text != 'NaN'
+        AND "Value" IS NOT NULL
       GROUP BY period_start
       ORDER BY period_start ASC
     `, [sixMonthsAgo]);
@@ -2441,9 +2431,7 @@ app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
         AVG("Value") as avg_humidity
       FROM fms01.rh_ssa 
       WHERE "timedate" >= $1
-        AND "Value" IS NOT NULL 
-        AND "Value" != ''
-        AND "Value"::text != 'NaN'
+        AND "Value" IS NOT NULL
       GROUP BY period_start
       ORDER BY period_start ASC
     `, [sixMonthsAgo]);
