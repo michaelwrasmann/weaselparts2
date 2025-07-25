@@ -65,7 +65,7 @@
         </a>
         <a href="/glue-protocol.html" class="nav-btn active" title="Klebeprotokoll">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-5a2 2 0 00-2-2h-2.5"></path>
           </svg>
         </a>
         <a href="/settings.html" class="nav-btn" title="Einstellungen">
@@ -83,7 +83,7 @@
   <div class="page-header">
     <div class="header-title">
       <svg class="page-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-5a2 2 0 00-2-2h-2.5"></path>
       </svg>
       <h1 class="page-title">Klebeprotokoll erstellen</h1>
     </div>
@@ -104,17 +104,23 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="component-name-select">Bauteil Name *</label>
-            <select id="component-name-select" name="component_name" required>
-              <option value="">Bauteil wählen...</option>
+            <label for="employee-select">Mitarbeiter *</label>
+            <select id="employee-select" name="employee" required>
+              <option value="">Mitarbeiter wählen...</option>
             </select>
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
+            <label for="component-name">Bauteil Name *</label>
+            <input type="text" id="component-name" name="component_name" placeholder="Bauteilname eingeben..." required>
+          </div>
+          <div class="form-group">
             <label for="hardware-model">Hardware Model</label>
             <input type="text" id="hardware-model" name="hardware_model" placeholder="Hardware Model eingeben...">
           </div>
+        </div>
+        <div class="form-row">
           <div class="form-group">
             <label for="glue-date">Datum der Klebung *</label>
             <input type="date" id="glue-date" name="glue_date" required>
@@ -359,20 +365,20 @@ async function loadDropdownData() {
       }
     }
     
-    // Load component names from existing components
-    const componentsResponse = await fetch('/api/components');
-    if (componentsResponse.ok) {
-      const components = await componentsResponse.json();
-      const componentSelect = document.getElementById('component-name-select');
-      if (componentSelect) {
-        componentSelect.innerHTML = '<option value="">Bauteil wählen...</option>';
-        // Get unique component names
-        const uniqueNames = [...new Set(components.map(c => c.name))];
-        uniqueNames.forEach(name => {
+    // Load employees
+    const employeesResponse = await fetch('/api/employees');
+    if (employeesResponse.ok) {
+      const employees = await employeesResponse.json();
+      const employeeSelect = document.getElementById('employee-select');
+      if (employeeSelect) {
+        employeeSelect.innerHTML = '<option value="">Mitarbeiter wählen...</option>';
+        employees.forEach(employee => {
           const option = document.createElement('option');
-          option.value = name;
-          option.textContent = name;
-          componentSelect.appendChild(option);
+          // Use displayName if available, otherwise construct it
+          const displayName = employee.displayName || `${employee.nachname}, ${employee.vorname}`;
+          option.value = displayName;
+          option.textContent = displayName;
+          employeeSelect.appendChild(option);
         });
       }
     }
@@ -509,6 +515,9 @@ function showPrintPreview(data) {
           <strong>Projekt:</strong> ${data.project}
         </div>
         <div class="label-row">
+          <strong>Mitarbeiter:</strong> ${data.employee || 'Nicht angegeben'}
+        </div>
+        <div class="label-row">
           <strong>Kleber:</strong> ${data.glue_type}
         </div>
         <div class="label-row">
@@ -630,6 +639,9 @@ function createPrintableLabel(glueNumber, data) {
         </div>
         <div class="label-row">
           <strong>Projekt:</strong> ${data.project}
+        </div>
+        <div class="label-row">
+          <strong>Mitarbeiter:</strong> ${data.employee || 'Nicht angegeben'}
         </div>
         <div class="label-row">
           <strong>Kleber:</strong> ${data.glue_type}

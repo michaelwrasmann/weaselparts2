@@ -434,7 +434,7 @@ app.get('/api/glue-protocols', async (req, res) => {
     console.log('🔧 Lade alle Klebeprotokolle...');
     
     const [rows] = await pool.execute(`
-      SELECT id, glue_number, project, component_name, hardware_model, 
+      SELECT id, glue_number, project, component_name, employee, hardware_model, 
              glue_date, glue_type, temperature, humidity, sensor_location,
              created_at 
       FROM glue_protocols 
@@ -487,6 +487,7 @@ app.post('/api/glue-protocols', async (req, res) => {
     const {
       project,
       component_name,
+      employee,
       hardware_model,
       glue_date,
       glue_type,
@@ -510,11 +511,11 @@ app.post('/api/glue-protocols', async (req, res) => {
     
     const [result] = await pool.execute(`
       INSERT INTO glue_protocols (
-        glue_number, project, component_name, hardware_model, 
+        glue_number, project, component_name, employee, hardware_model, 
         glue_date, glue_type, temperature, humidity, sensor_location
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      glue_number, project, component_name, hardware_model || null,
+      glue_number, project, component_name, employee || null, hardware_model || null,
       glue_date, glue_type, temperature, humidity, sensor_location || 'ssa'
     ]);
     
@@ -655,6 +656,7 @@ async function initializeDatabase() {
         glue_number VARCHAR(50) NOT NULL UNIQUE,
         project VARCHAR(255) NOT NULL,
         component_name VARCHAR(255) NOT NULL,
+        employee VARCHAR(255),
         hardware_model VARCHAR(255),
         glue_date DATE NOT NULL,
         glue_type VARCHAR(255) NOT NULL,
