@@ -338,34 +338,15 @@ function createEmployeeItem(employee) {
 }
 
 async function saveEmployee() {
-  console.log('📋 saveEmployee() aufgerufen');
-  
   const nachnameInput = document.getElementById('employee-nachname');
   const vornameInput = document.getElementById('employee-vorname');
-  
-  console.log('📋 Input-Elemente:', {
-    nachnameInput: nachnameInput ? 'gefunden' : 'NULL',
-    vornameInput: vornameInput ? 'gefunden' : 'NULL'
-  });
-  
-  if (!nachnameInput || !vornameInput) {
-    console.error('❌ Input-Elemente nicht gefunden!');
-    showMessage('Fehler: Input-Felder nicht gefunden', 'error');
-    return;
-  }
-  
   const nachname = nachnameInput.value.trim();
   const vorname = vornameInput.value.trim();
   
-  console.log('📋 Eingabewerte:', { nachname, vorname });
-  
   if (!nachname || !vorname) {
-    console.log('❌ Validierung fehlgeschlagen - leere Werte');
     showMessage('Bitte geben Sie Nachname und Vorname ein', 'error');
     return;
   }
-  
-  console.log('📋 Sende POST-Request mit Daten:', { nachname, vorname });
   
   try {
     const response = await fetch('/api/employees', {
@@ -376,13 +357,7 @@ async function saveEmployee() {
       body: JSON.stringify({ nachname, vorname })
     });
     
-    console.log('📋 Response erhalten:', {
-      status: response.status,
-      ok: response.ok
-    });
-    
     if (response.ok) {
-      console.log('✅ Mitarbeiter erfolgreich gespeichert');
       showMessage('Mitarbeiter erfolgreich hinzugefügt', 'success');
       nachnameInput.value = '';
       vornameInput.value = '';
@@ -390,12 +365,11 @@ async function saveEmployee() {
       await loadEmployees();
     } else {
       const error = await response.json();
-      console.error('❌ Server-Fehler:', error);
       showMessage(error.error || 'Fehler beim Speichern', 'error');
     }
   } catch (error) {
-    console.error('❌ Netzwerk-Fehler beim Speichern:', error);
-    showMessage('Netzwerk-Fehler beim Speichern des Mitarbeiters', 'error');
+    console.error('Fehler beim Speichern:', error);
+    showMessage('Fehler beim Speichern des Mitarbeiters', 'error');
   }
 }
 

@@ -106,13 +106,21 @@
     <!-- Hauptinhalt - Bauteile Grid -->
     <div class="components-container">
       <div class="section-header">
-        <h2 class="section-title">Alle Komponenten</h2>
-        <button class="add-btn" onclick="window.location.href='/add-component.html'">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Hinzufügen
-        </button>
+        <h2 class="section-title">Alle Komponenten <span id="filter-count"></span></h2>
+        <div class="header-controls">
+          <div class="filter-group">
+            <label for="project-filter">Projekt:</label>
+            <select id="project-filter" class="filter-dropdown">
+              <option value="">Alle Projekte</option>
+            </select>
+          </div>
+          <button class="add-btn" onclick="window.location.href='/add-component.html'">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Hinzufügen
+          </button>
+        </div>
       </div>
 
       <div class="components-grid" id="components-grid">
@@ -235,6 +243,12 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (globalSearch) {
         globalSearch.addEventListener('input', handleGlobalSearch);
       }
+
+      // Project Filter - mit Null-Check
+      const projectFilter = document.getElementById('project-filter');
+      if (projectFilter) {
+        projectFilter.addEventListener('change', handleProjectFilter);
+      }
       
       // Sensor Location Dropdown - mit Null-Check
       const locationSelect = document.getElementById('sensor-location-select');
@@ -305,6 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         allComponents = await api.getAllComponents();
         filteredComponents = [...allComponents];
         renderComponents();
+        await loadProjectFilter(); // Load project filter after components
         console.log(`✅ ${allComponents.length} Bauteile geladen`);
       } catch (error) {
         console.error('❌ Fehler beim Laden der Bauteile:', error);
@@ -317,6 +332,34 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
+    async function loadProjectFilter() {
+      try {
+        const projectFilter = document.getElementById('project-filter');
+        if (!projectFilter) return;
+
+        // Get unique projects from components
+        const uniqueProjects = [...new Set(allComponents
+          .map(component => component.project)
+          .filter(project => project && project.trim())
+        )].sort();
+
+        // Clear existing options except "Alle Projekte"
+        projectFilter.innerHTML = '<option value="">Alle Projekte</option>';
+
+        // Add project options
+        uniqueProjects.forEach(project => {
+          const option = document.createElement('option');
+          option.value = project;
+          option.textContent = project;
+          projectFilter.appendChild(option);
+        });
+
+        console.log(`✅ ${uniqueProjects.length} Projekte für Filter geladen`);
+      } catch (error) {
+        console.error('❌ Fehler beim Laden der Projekt-Filter:', error);
+      }
+    }
+
     function renderComponents() {
       const grid = document.getElementById('components-grid');
       if (!grid) {
@@ -325,6 +368,21 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
       
       grid.innerHTML = '';
+      
+      // Update filter count
+      const filterCount = document.getElementById('filter-count');
+      if (filterCount) {
+        const totalComponents = allComponents.length;
+        const filteredCount = filteredComponents.length;
+        
+        if (filteredCount === totalComponents) {
+          filterCount.textContent = `(${totalComponents})`;
+          filterCount.style.color = 'var(--text-secondary)';
+        } else {
+          filterCount.textContent = `(${filteredCount} von ${totalComponents})`;
+          filterCount.style.color = 'var(--primary-color)';
+        }
+      }
       
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
@@ -420,28 +478,39 @@ document.addEventListener('DOMContentLoaded', async () => {
       return card;
     }
 
-    function handleGlobalSearch() {
+    function applyFilters() {
       const searchInput = document.getElementById('global-search');
-      if (!searchInput) return;
+      const projectFilter = document.getElementById('project-filter');
       
-      const query = searchInput.value.toLowerCase().trim();
+      const searchQuery = searchInput ? searchInput.value.toLowerCase().trim() : '';
+      const selectedProject = projectFilter ? projectFilter.value : '';
       
-      if (!query) {
-        filteredComponents = [...allComponents];
-      } else {
-        filteredComponents = allComponents.filter(component => {
-          return (
-            (component.name && component.name.toLowerCase().includes(query)) ||
-            (component.barcode && component.barcode.toLowerCase().includes(query)) ||
-            (component.project && component.project.toLowerCase().includes(query)) ||
-            (component.responsible_engineer && component.responsible_engineer.toLowerCase().includes(query)) ||
-            (component.equipment_name && component.equipment_name.toLowerCase().includes(query))
-          );
-        });
-      }
+      filteredComponents = allComponents.filter(component => {
+        // Search filter
+        const matchesSearch = !searchQuery || (
+          (component.name && component.name.toLowerCase().includes(searchQuery)) ||
+          (component.barcode && component.barcode.toLowerCase().includes(searchQuery)) ||
+          (component.project && component.project.toLowerCase().includes(searchQuery)) ||
+          (component.responsible_engineer && component.responsible_engineer.toLowerCase().includes(searchQuery)) ||
+          (component.equipment_name && component.equipment_name.toLowerCase().includes(searchQuery))
+        );
+        
+        // Project filter
+        const matchesProject = !selectedProject || (component.project === selectedProject);
+        
+        return matchesSearch && matchesProject;
+      });
       
       currentPage = 1;
       renderComponents();
+    }
+
+    function handleGlobalSearch() {
+      applyFilters();
+    }
+
+    function handleProjectFilter() {
+      applyFilters();
     }
 
     function changePage(direction) {
@@ -810,6 +879,48 @@ document.addEventListener('DOMContentLoaded', async () => {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
     }
+
+    /* Header Controls Styling */
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-group label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .filter-dropdown {
+      font-size: 0.9rem;
+      color: var(--text-primary);
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      outline: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 150px;
+    }
+
+    .filter-dropdown:hover {
+      border-color: var(--primary-color);
+    }
+
+    .filter-dropdown:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
     
     @media (max-width: 768px) {
       .nav-left {
@@ -827,6 +938,23 @@ document.addEventListener('DOMContentLoaded', async () => {
       .mini-sensor {
         font-size: 0.75rem;
         padding: 0.15rem 0.4rem;
+      }
+
+      .header-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+
+      .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.25rem;
+      }
+
+      .filter-dropdown {
+        min-width: auto;
+        width: 100%;
       }
     }
   </style>
