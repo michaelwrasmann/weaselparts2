@@ -327,22 +327,29 @@ function setupEventListeners() {
   const cancelPrintBtn = document.getElementById('cancel-print');
   const confirmPrintBtn = document.getElementById('confirm-print');
   
+  console.log('🔧 Print Modal Buttons:', { closePrintBtn, cancelPrintBtn, confirmPrintBtn });
+  
   if (closePrintBtn) {
     closePrintBtn.addEventListener('click', () => {
+      console.log('❌ Close Print Button geklickt');
       document.getElementById('print-preview-modal').style.display = 'none';
     });
   }
   
   if (cancelPrintBtn) {
     cancelPrintBtn.addEventListener('click', () => {
+      console.log('❌ Cancel Print Button geklickt');
       document.getElementById('print-preview-modal').style.display = 'none';
     });
   }
   
   if (confirmPrintBtn) {
     confirmPrintBtn.addEventListener('click', () => {
+      console.log('✅ Confirm Print Button geklickt - rufe printLabel() auf');
       printLabel();
     });
+  } else {
+    console.error('❌ Confirm Print Button nicht gefunden!');
   }
 }
 
@@ -543,11 +550,18 @@ async function handleFormSubmit(event) {
 }
 
 function showPrintPreview(data) {
+  console.log('🖨️ Zeige Print Preview...', data);
   const modal = document.getElementById('print-preview-modal');
   const preview = document.getElementById('label-preview');
   
+  if (!modal) {
+    console.error('❌ Modal nicht gefunden!');
+    return;
+  }
+  
   // Generate a temporary glue number for preview
   const tempGlueNumber = `GLUE-${Date.now().toString().substr(-6)}`;
+  console.log('🏷️ Temporäre Klebe-Nummer generiert:', tempGlueNumber);
   
   // Create label content
   preview.innerHTML = `
@@ -584,10 +598,12 @@ function showPrintPreview(data) {
   // Store data for actual saving
   modal.dataset.formData = JSON.stringify(data);
   modal.style.display = 'block';
+  console.log('📦 Modal angezeigt und Daten gespeichert');
   
   // Generate barcode after element is in DOM
   setTimeout(() => {
     try {
+      console.log('🔢 Generiere Barcode...');
       JsBarcode("#preview-barcode", tempGlueNumber, {
         format: "CODE128",
         width: 2,
@@ -595,6 +611,7 @@ function showPrintPreview(data) {
         displayValue: true,
         fontSize: 12
       });
+      console.log('✅ Barcode erfolgreich generiert');
     } catch (error) {
       console.error('❌ Barcode-Fehler:', error);
     }
@@ -602,8 +619,21 @@ function showPrintPreview(data) {
 }
 
 async function printLabel() {
+  console.log('🖨️ PrintLabel Funktion aufgerufen!');
   const modal = document.getElementById('print-preview-modal');
+  
+  if (!modal) {
+    console.error('❌ Print Modal nicht gefunden!');
+    return;
+  }
+  
+  if (!modal.dataset.formData) {
+    console.error('❌ Keine FormData im Modal gefunden!');
+    return;
+  }
+  
   const formData = JSON.parse(modal.dataset.formData);
+  console.log('📋 FormData für Druck geladen:', formData);
   
   try {
     // Save to database first
