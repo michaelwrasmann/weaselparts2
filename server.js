@@ -291,9 +291,12 @@ app.post('/api/employees', async (req, res) => {
     
     console.log(`📋 Füge neuen Mitarbeiter hinzu: ${trimmedNachname}, ${trimmedVorname}`);
     
+    // Create display name for backward compatibility with existing 'name' field
+    const displayName = `${trimmedNachname}, ${trimmedVorname}`;
+    
     const [result] = await pool.execute(
-      'INSERT INTO employees (nachname, vorname) VALUES (?, ?)',
-      [trimmedNachname, trimmedVorname]
+      'INSERT INTO employees (name, nachname, vorname) VALUES (?, ?, ?)',
+      [displayName, trimmedNachname, trimmedVorname]
     );
     
     const [newEmployee] = await pool.execute(
