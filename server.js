@@ -2376,6 +2376,77 @@ app.get('/api/sensors/history/:hours', async (req, res) => {
   }
 });
 
+// Sensor-Historie für spezifischen Standort und Zeitbereich
+app.get('/api/sensors/history/:location/:hours', async (req, res) => {
+  const { location, hours } = req.params;
+  
+  try {
+    // Validierung
+    const validLocations = ['ssa', 'int_up', 'int_low'];
+    if (!validLocations.includes(location)) {
+      return res.status(400).json({ error: 'Ungültiger Standort' });
+    }
+    
+    const hoursNum = parseInt(hours);
+    if (isNaN(hoursNum) || hoursNum <= 0 || hoursNum > 8760) {
+      return res.status(400).json({ error: 'Ungültige Stundenzahl' });
+    }
+    
+    // Überprüfe ob PostgreSQL verfügbar ist
+    if (!pgPool) {
+      console.log('⚠️ PostgreSQL nicht verfügbar, verwende Mock-Daten');
+      const mockHistory = [];
+      const now = new Date();
+      for (let i = 0; i < hoursNum * 4; i++) { // Alle 15 Minuten ein Datenpunkt
+        const time = new Date(now.getTime() - i * 15 * 60 * 1000);
+        mockHistory.push({
+          timedate: time.toISOString(),
+          temperature: 20 + Math.sin(i / 10) * 5 + Math.random() * 2,
+          humidity: 50 + Math.sin(i / 8) * 10 + Math.random() * 5
+        });
+      }
+      res.json({
+        temperature: mockHistory.map(d => ({ timedate: d.timedate, temperature: d.temperature })),
+        humidity: mockHistory.map(d => ({ timedate: d.timedate, humidity: d.humidity })),
+        source: 'mock'
+      });
+      return;
+    }
+
+    // Dynamische Tabellenauswahl
+    const tempTable = `fms01.temp_${location}`;
+    const humidityTable = `fms01.rh_${location}`;
+    
+    // Echte Daten aus PostgreSQL
+    const tempData = await pgPool.query(`
+      SELECT "timedate", "Value" as temperature
+      FROM ${tempTable}
+      WHERE "timedate" >= NOW() - INTERVAL '${hoursNum} hours'
+        AND "Value" IS NOT NULL
+      ORDER BY "timedate" ASC
+    `);
+    
+    const humidityData = await pgPool.query(`
+      SELECT "timedate", "Value" as humidity
+      FROM ${humidityTable}
+      WHERE "timedate" >= NOW() - INTERVAL '${hoursNum} hours'
+        AND "Value" IS NOT NULL
+      ORDER BY "timedate" ASC
+    `);
+    
+    res.json({
+      temperature: tempData.rows,
+      humidity: humidityData.rows,
+      source: 'database',
+      location: getLocationName(location)
+    });
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Abrufen der Sensor-Historie:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Sensor-Historie' });
+  }
+});
+
 // 6-Monats-Umgebungsdaten für Bauteil
 app.get('/api/bauteil/:barcode/environmental-history', async (req, res) => {
   const { barcode } = req.params;

@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeaselParts - Labor-Übersicht</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/modal-fixes.js"></script>
+</head>
+<body>
+<header>
+  <div class="header-content">
+    <a href="/" class="logo">
+      <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
+      </svg>
+      <h1>WeaselParts</h1>
+    </a>
+    <nav class="top-nav">
+      <div class="nav-left">
+        <div class="lab-info">
+          <div class="location-selector">
+            <select id="sensor-location-select" class="location-dropdown">
+              <option value="ssa">Jarvis-Ecke</option>
+              <option value="int_up">Am Telefon</option>
+              <option value="int_low">Empore</option>
+            </select>
+          </div>
+          <div class="mini-sensors">
+            <span class="mini-sensor temp">
+              <span id="temperature-value">--°C</span>
+            </span>
+            <span class="mini-sensor humid">
+              <span id="humidity-value">--%</span>
+            </span>
+          </div>
+        </div>
+        <div class="search-container">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Bauteile suchen" id="global-search">
+        </div>
+      </div>
+      <div class="nav-icons">
+        <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
+          </svg>
+        </button>
+        <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </button>
+        <a href="/ICD.html" class="nav-btn" title="ICD">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </a>
+        <a href="/lab-overview.html" class="nav-btn active" title="Labor-Übersicht">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+          </svg>
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="page-header">
+    <h1 class="page-title">Labor-Übersicht</h1>
+    <p class="page-subtitle">Klimadaten aller Messstationen im Überblick</p>
+  </div>
+
+  <div class="lab-controls">
+    <div class="time-range-selector">
+      <button class="time-btn active" data-hours="24">24 Stunden</button>
+      <button class="time-btn" data-hours="168">7 Tage</button>
+      <button class="time-btn" data-hours="720">30 Tage</button>
+    </div>
+    <button class="btn primary" id="download-data-btn">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      Daten exportieren
+    </button>
+  </div>
+
+  <div class="sensor-stations">
+    <!-- Jarvis-Ecke -->
+    <div class="station-card">
+      <div class="station-header">
+        <h2>Jarvis-Ecke</h2>
+        <div class="current-values">
+          <span class="current-temp" id="ssa-temp">--°C</span>
+          <span class="current-humid" id="ssa-humid">--%</span>
+        </div>
+      </div>
+      <div class="chart-container" id="ssa-chart"></div>
+    </div>
+
+    <!-- Am Telefon -->
+    <div class="station-card">
+      <div class="station-header">
+        <h2>Am Telefon</h2>
+        <div class="current-values">
+          <span class="current-temp" id="int_up-temp">--°C</span>
+          <span class="current-humid" id="int_up-humid">--%</span>
+        </div>
+      </div>
+      <div class="chart-container" id="int_up-chart"></div>
+    </div>
+
+    <!-- Empore -->
+    <div class="station-card">
+      <div class="station-header">
+        <h2>Empore</h2>
+        <div class="current-values">
+          <span class="current-temp" id="int_low-temp">--°C</span>
+          <span class="current-humid" id="int_low-humid">--%</span>
+        </div>
+      </div>
+      <div class="chart-container" id="int_low-chart"></div>
+    </div>
+  </div>
+</main>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="/js/api.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+  let currentTimeRange = 24; // Stunden
+  let sensorData = {
+    ssa: { temperature: [], humidity: [] },
+    int_up: { temperature: [], humidity: [] },
+    int_low: { temperature: [], humidity: [] }
+  };
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    console.log('🧪 Labor-Übersicht wird initialisiert...');
+    
+    // Event Listeners
+    setupEventListeners();
+    
+    // Initial data load
+    await loadAllSensorData();
+    await loadCurrentValues();
+    
+    // Refresh interval
+    setInterval(async () => {
+      await loadCurrentValues();
+    }, 30000);
+    
+    setInterval(async () => {
+      await loadAllSensorData();
+    }, 300000); // 5 Minuten
+  });
+
+  function setupEventListeners() {
+    // Navigation
+    const addBtn = document.getElementById('add-component-nav-btn');
+    if (addBtn) {
+      addBtn.addEventListener('click', () => {
+        window.location.href = '/add-component.html';
+      });
+    }
+
+    const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
+    if (manageCabinetsBtn) {
+      manageCabinetsBtn.addEventListener('click', () => {
+        window.location.href = '/manage-cabinets.html';
+      });
+    }
+    
+    // Global Search
+    const globalSearch = document.getElementById('global-search');
+    if (globalSearch) {
+      globalSearch.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && e.target.value.trim()) {
+          window.location.href = `/index.html?search=${encodeURIComponent(e.target.value)}`;
+        }
+      });
+    }
+    
+    // Sensor Location Dropdown
+    const locationSelect = document.getElementById('sensor-location-select');
+    if (locationSelect) {
+      locationSelect.addEventListener('change', async () => {
+        await loadSensorData();
+      });
+    }
+    
+    // Time range buttons
+    document.querySelectorAll('.time-btn').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentTimeRange = parseInt(e.target.dataset.hours);
+        await loadAllSensorData();
+      });
+    });
+    
+    // Download button
+    const downloadBtn = document.getElementById('download-data-btn');
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', downloadSensorData);
+    }
+  }
+
+  async function loadAllSensorData() {
+    const locations = ['ssa', 'int_up', 'int_low'];
+    
+    for (const location of locations) {
+      try {
+        const response = await fetch(`/api/sensors/history/${location}/${currentTimeRange}`);
+        if (response.ok) {
+          const data = await response.json();
+          sensorData[location] = data;
+          renderChart(location, data);
+        }
+      } catch (error) {
+        console.error(`Fehler beim Laden der Daten für ${location}:`, error);
+      }
+    }
+  }
+
+  async function loadCurrentValues() {
+    const locations = ['ssa', 'int_up', 'int_low'];
+    
+    for (const location of locations) {
+      try {
+        const response = await fetch(`/api/sensors/current/${location}`);
+        if (response.ok) {
+          const data = await response.json();
+          updateCurrentValues(location, data);
+        }
+      } catch (error) {
+        console.error(`Fehler beim Laden aktueller Werte für ${location}:`, error);
+      }
+    }
+  }
+
+  function updateCurrentValues(location, data) {
+    const tempEl = document.getElementById(`${location}-temp`);
+    const humidEl = document.getElementById(`${location}-humid`);
+    
+    if (tempEl && data.temperature && data.temperature.temperature !== null) {
+      tempEl.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+    } else if (tempEl) {
+      tempEl.textContent = '--°C';
+    }
+    
+    if (humidEl && data.humidity && data.humidity.humidity !== null) {
+      humidEl.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+    } else if (humidEl) {
+      humidEl.textContent = '--%';
+    }
+  }
+
+  function renderChart(location, data) {
+    const container = document.getElementById(`${location}-chart`);
+    if (!container) return;
+    
+    // Clear existing content
+    container.innerHTML = '';
+    
+    if (!data.temperature || data.temperature.length === 0) {
+      container.innerHTML = '<div class="no-data">Keine Daten verfügbar</div>';
+      return;
+    }
+    
+    // Create SVG chart
+    const width = container.offsetWidth || 600;
+    const height = 200;
+    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
+    
+    // Prepare data
+    const tempData = data.temperature.map(d => ({
+      time: new Date(d.timedate),
+      value: parseFloat(d.temperature)
+    })).filter(d => !isNaN(d.value));
+    
+    const humidData = data.humidity.map(d => ({
+      time: new Date(d.timedate),
+      value: parseFloat(d.humidity)
+    })).filter(d => !isNaN(d.value));
+    
+    if (tempData.length === 0 && humidData.length === 0) {
+      container.innerHTML = '<div class="no-data">Keine gültigen Daten verfügbar</div>';
+      return;
+    }
+    
+    // Create scales
+    const xExtent = [...tempData, ...humidData].reduce((acc, d) => {
+      return [
+        Math.min(acc[0], d.time),
+        Math.max(acc[1], d.time)
+      ];
+    }, [Infinity, -Infinity]);
+    
+    const tempExtent = tempData.reduce((acc, d) => {
+      return [Math.min(acc[0], d.value), Math.max(acc[1], d.value)];
+    }, [Infinity, -Infinity]);
+    
+    const humidExtent = humidData.reduce((acc, d) => {
+      return [Math.min(acc[0], d.value), Math.max(acc[1], d.value)];
+    }, [Infinity, -Infinity]);
+    
+    // Add padding to y-scales
+    const tempPadding = (tempExtent[1] - tempExtent[0]) * 0.1;
+    const humidPadding = (humidExtent[1] - humidExtent[0]) * 0.1;
+    
+    const svg = `
+      <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">
+        <defs>
+          <linearGradient id="temp-gradient-${location}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.8" />
+            <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:0.1" />
+          </linearGradient>
+          <linearGradient id="humid-gradient-${location}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#4ecdc4;stop-opacity:0.8" />
+            <stop offset="100%" style="stop-color:#4ecdc4;stop-opacity:0.1" />
+          </linearGradient>
+        </defs>
+        
+        <g transform="translate(${margin.left},${margin.top})">
+          <!-- Temperature line -->
+          ${createPath(tempData, xExtent, [tempExtent[0] - tempPadding, tempExtent[1] + tempPadding], chartWidth, chartHeight, '#ff6b6b')}
+          
+          <!-- Humidity line -->
+          ${createPath(humidData, xExtent, [humidExtent[0] - humidPadding, humidExtent[1] + humidPadding], chartWidth, chartHeight, '#4ecdc4')}
+          
+          <!-- Axes -->
+          ${createXAxis(xExtent, chartWidth, chartHeight)}
+          ${createYAxis([tempExtent[0] - tempPadding, tempExtent[1] + tempPadding], chartHeight, '#ff6b6b', '°C')}
+          ${createYAxis([humidExtent[0] - humidPadding, humidExtent[1] + humidPadding], chartHeight, '#4ecdc4', '%', chartWidth)}
+        </g>
+        
+        <!-- Legend -->
+        <g transform="translate(${width / 2 - 60}, 5)">
+          <rect x="0" y="0" width="15" height="3" fill="#ff6b6b" />
+          <text x="20" y="3" font-size="11" fill="#666">Temperatur</text>
+          
+          <rect x="80" y="0" width="15" height="3" fill="#4ecdc4" />
+          <text x="100" y="3" font-size="11" fill="#666">Feuchtigkeit</text>
+        </g>
+      </svg>
+    `;
+    
+    container.innerHTML = svg;
+  }
+
+  function createPath(data, xDomain, yDomain, width, height, color) {
+    if (data.length === 0) return '';
+    
+    const xScale = (time) => ((time - xDomain[0]) / (xDomain[1] - xDomain[0])) * width;
+    const yScale = (value) => height - ((value - yDomain[0]) / (yDomain[1] - yDomain[0])) * height;
+    
+    const pathData = data.map((d, i) => {
+      const x = xScale(d.time);
+      const y = yScale(d.value);
+      return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+    }).join(' ');
+    
+    return `<path d="${pathData}" fill="none" stroke="${color}" stroke-width="2" />`;
+  }
+
+  function createXAxis(domain, width, height) {
+    const ticks = 5;
+    let axisHTML = `<line x1="0" y1="${height}" x2="${width}" y2="${height}" stroke="#ddd" />`;
+    
+    for (let i = 0; i <= ticks; i++) {
+      const x = (i / ticks) * width;
+      const time = new Date(domain[0].getTime() + (i / ticks) * (domain[1] - domain[0]));
+      const label = formatTime(time);
+      
+      axisHTML += `
+        <line x1="${x}" y1="${height}" x2="${x}" y2="${height + 5}" stroke="#ddd" />
+        <text x="${x}" y="${height + 18}" text-anchor="middle" font-size="10" fill="#666">${label}</text>
+      `;
+    }
+    
+    return axisHTML;
+  }
+
+  function createYAxis(domain, height, color, unit, xOffset = 0) {
+    const ticks = 4;
+    let axisHTML = '';
+    
+    for (let i = 0; i <= ticks; i++) {
+      const y = height - (i / ticks) * height;
+      const value = domain[0] + (i / ticks) * (domain[1] - domain[0]);
+      
+      axisHTML += `
+        <text x="${xOffset - 5}" y="${y + 3}" text-anchor="${xOffset > 0 ? 'start' : 'end'}" font-size="10" fill="${color}">
+          ${value.toFixed(1)}${unit}
+        </text>
+      `;
+    }
+    
+    return axisHTML;
+  }
+
+  function formatTime(date) {
+    if (currentTimeRange <= 24) {
+      return date.getHours() + ':' + date.getMinutes().toString().padStart(2, '0');
+    } else {
+      return date.getDate() + '.' + (date.getMonth() + 1);
+    }
+  }
+
+  async function downloadSensorData() {
+    try {
+      const csvData = generateCSV();
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `sensordaten_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      showMessage('Daten erfolgreich exportiert!', 'success');
+    } catch (error) {
+      console.error('Fehler beim Export:', error);
+      showMessage('Fehler beim Exportieren der Daten', 'error');
+    }
+  }
+
+  function generateCSV() {
+    let csv = 'Zeitstempel,Station,Temperatur (°C),Luftfeuchtigkeit (%)\n';
+    
+    const locations = [
+      { id: 'ssa', name: 'Jarvis-Ecke' },
+      { id: 'int_up', name: 'Am Telefon' },
+      { id: 'int_low', name: 'Empore' }
+    ];
+    
+    for (const loc of locations) {
+      const data = sensorData[loc.id];
+      if (!data.temperature) continue;
+      
+      // Combine temperature and humidity data by timestamp
+      const timeMap = new Map();
+      
+      data.temperature.forEach(t => {
+        if (t.temperature !== null) {
+          timeMap.set(t.timedate, { temp: t.temperature });
+        }
+      });
+      
+      data.humidity.forEach(h => {
+        if (h.humidity !== null) {
+          const existing = timeMap.get(h.timedate) || {};
+          timeMap.set(h.timedate, { ...existing, humid: h.humidity });
+        }
+      });
+      
+      // Convert to CSV rows
+      Array.from(timeMap.entries()).sort().forEach(([time, values]) => {
+        csv += `${time},${loc.name},${values.temp || ''},${values.humid || ''}\n`;
+      });
+    }
+    
+    return csv;
+  }
+
+  // Sensor header functions
+  async function loadSensorData() {
+    try {
+      const locationSelect = document.getElementById('sensor-location-select');
+      const location = locationSelect ? locationSelect.value : 'ssa';
+      
+      const response = await fetch(`/api/sensors/current/${location}`);
+      if (!response.ok) return;
+      
+      const sensorData = await response.json();
+      updateSensorDisplay(sensorData);
+    } catch (error) {
+      console.error('❌ Sensordaten Fehler:', error);
+    }
+  }
+
+  function updateSensorDisplay(data) {
+    try {
+      const tempValue = document.getElementById('temperature-value');
+      if (tempValue) {
+        if (data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
+          tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+        } else {
+          tempValue.textContent = '--°C';
+        }
+      }
+      
+      const humValue = document.getElementById('humidity-value');
+      if (humValue) {
+        if (data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
+          humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+        } else {
+          humValue.textContent = '--%';
+        }
+      }
+    } catch (error) {
+      console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+    }
+  }
+
+  // Initial load
+  loadSensorData();
+  setInterval(loadSensorData, 30000);
+</script>
+
+<style>
+  .lab-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: var(--bg-light);
+    border-radius: 12px;
+  }
+
+  .time-range-selector {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .time-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+  }
+
+  .time-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .time-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+  }
+
+  .sensor-stations {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .station-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+  }
+
+  .station-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  .station-header h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .current-values {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .current-temp {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ff6b6b;
+  }
+
+  .current-humid {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #4ecdc4;
+  }
+
+  .chart-container {
+    width: 100%;
+    height: 200px;
+    position: relative;
+  }
+
+  .no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+
+  /* Navigation erweitert */
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-grow: 1;
+  }
+
+  .lab-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* Mini Sensor Display in Header */
+  .mini-sensors {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .mini-sensor {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 15px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+  }
+
+  .mini-sensor.temp {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+  }
+
+  .mini-sensor.humid {
+    color: #4ecdc4;
+    border-color: #4ecdc4;
+  }
+
+  /* Location Dropdown Styling */
+  .location-dropdown {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .location-dropdown:hover {
+    border-color: var(--primary-color);
+  }
+
+  .location-dropdown:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .lab-controls {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .nav-left {
+      gap: 1rem;
+    }
+
+    .mini-sensors {
+      gap: 0.25rem;
+    }
+
+    .mini-sensor {
+      font-size: 0.75rem;
+      padding: 0.15rem 0.4rem;
+    }
+  }
+</style>
+
+</body>
+</html>
