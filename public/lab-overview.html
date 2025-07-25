@@ -245,13 +245,20 @@
     
     for (const location of locations) {
       try {
-        console.log(`📡 Lade Daten für ${location}...`);
-        const response = await fetch(`/api/sensors/history/${location}/${currentTimeRange}`);
+        const url = `/api/sensors/history/${location}/${currentTimeRange}`;
+        console.log(`📡 Lade Daten für ${location} von URL: ${url}`);
+        const response = await fetch(url);
         console.log(`📡 Response Status für ${location}:`, response.status);
         
         if (response.ok) {
           const data = await response.json();
-          console.log(`📊 Daten für ${location} erhalten:`, data);
+          console.log(`📊 Daten für ${location} erhalten:`, {
+            tempCount: data.temperature?.length || 0,
+            humidCount: data.humidity?.length || 0,
+            timeRange: currentTimeRange,
+            firstTemp: data.temperature?.[0],
+            lastTemp: data.temperature?.[data.temperature?.length - 1]
+          });
           sensorData[location] = data;
           renderChart(location, data);
         } else {
@@ -308,16 +315,16 @@
     
     console.log(`📈 ${location}: ${data.temperature.length} Temperaturwerte, ${data.humidity?.length || 0} Feuchtigkeitswerte`);
     
-    // Prepare data (last 20 points)
+    // Prepare data (use all points, don't limit to 20)
     const tempData = data.temperature
       .map(d => ({ value: parseFloat(d.temperature), date: new Date(d.timedate) }))
-      .filter(d => !isNaN(d.value))
-      .slice(-20);
+      .filter(d => !isNaN(d.value));
     
     const humidData = data.humidity
       .map(d => ({ value: parseFloat(d.humidity), date: new Date(d.timedate) }))
-      .filter(d => !isNaN(d.value))
-      .slice(-20);
+      .filter(d => !isNaN(d.value));
+    
+    console.log(`📊 ${location}: Verwende ${tempData.length} Temp-Punkte, ${humidData.length} Humid-Punkte für ${currentTimeRange}h`);
     
     // Render temperature chart
     renderSeparateChart(`${location}-temp-chart`, tempData, 'temperature', '#ff6b6b', '°C');
@@ -496,20 +503,38 @@
       
       data.temperature.forEach(t => {
         if (t.temperature !== null) {
-          timeMap.set(t.timedate, { temp: t.temperature });
+          timeMap.set(t.timedate, { temp: t.temperature, date: new Date(t.timedate) });
         }
       });
       
       data.humidity.forEach(h => {
         if (h.humidity !== null) {
           const existing = timeMap.get(h.timedate) || {};
-          timeMap.set(h.timedate, { ...existing, humid: h.humidity });
+          timeMap.set(h.timedate, { ...existing, humid: h.humidity, date: new Date(h.timedate) });
         }
       });
       
+      // Convert to array and sort by time
+      const sortedData = Array.from(timeMap.entries())
+        .map(([time, values]) => ({ time, ...values }))
+        .sort((a, b) => a.date - b.date);
+      
+      // Take only 4 points per day (every 6 hours)
+      const filteredData = sortedData.filter((entry, index) => {
+        if (sortedData.length <= 4) return true; // If we have 4 or fewer points, take all
+        
+        const totalDays = (sortedData[sortedData.length - 1].date - sortedData[0].date) / (1000 * 60 * 60 * 24);
+        const pointsPerDay = 4;
+        const interval = Math.max(1, Math.floor(sortedData.length / (totalDays * pointsPerDay)));
+        
+        return index % interval === 0;
+      });
+      
+      console.log(`📊 CSV Export ${loc.name}: ${sortedData.length} → ${filteredData.length} Punkte`);
+      
       // Convert to CSV rows
-      Array.from(timeMap.entries()).sort().forEach(([time, values]) => {
-        csv += `${time},${loc.name},${values.temp || ''},${values.humid || ''}\n`;
+      filteredData.forEach(entry => {
+        csv += `${entry.time},${loc.name},${entry.temp || ''},${entry.humid || ''}\n`;
       });
     }
     
@@ -588,8 +613,8 @@
   }
 
   .time-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    border-color: #4a90e2;
+    color: #4a90e2;
   }
 
   .time-btn.active {
