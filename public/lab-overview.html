@@ -98,7 +98,16 @@
           <span class="current-humid" id="ssa-humid">--%</span>
         </div>
       </div>
-      <div class="chart-container" id="ssa-chart"></div>
+      <div class="charts-grid">
+        <div class="chart-section">
+          <h4>🌡️ Temperatur</h4>
+          <div class="chart-container" id="ssa-temp-chart"></div>
+        </div>
+        <div class="chart-section">
+          <h4>💧 Feuchtigkeit</h4>
+          <div class="chart-container" id="ssa-humid-chart"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Am Telefon -->
@@ -110,7 +119,16 @@
           <span class="current-humid" id="int_up-humid">--%</span>
         </div>
       </div>
-      <div class="chart-container" id="int_up-chart"></div>
+      <div class="charts-grid">
+        <div class="chart-section">
+          <h4>🌡️ Temperatur</h4>
+          <div class="chart-container" id="int_up-temp-chart"></div>
+        </div>
+        <div class="chart-section">
+          <h4>💧 Feuchtigkeit</h4>
+          <div class="chart-container" id="int_up-humid-chart"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Empore -->
@@ -122,7 +140,16 @@
           <span class="current-humid" id="int_low-humid">--%</span>
         </div>
       </div>
-      <div class="chart-container" id="int_low-chart"></div>
+      <div class="charts-grid">
+        <div class="chart-section">
+          <h4>🌡️ Temperatur</h4>
+          <div class="chart-container" id="int_low-temp-chart"></div>
+        </div>
+        <div class="chart-section">
+          <h4>💧 Feuchtigkeit</h4>
+          <div class="chart-container" id="int_low-humid-chart"></div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -272,114 +299,161 @@
   }
 
   function renderChart(location, data) {
-    console.log(`📊 Rendering simple chart for ${location}:`, data);
-    const container = document.getElementById(`${location}-chart`);
-    if (!container) {
-      console.error(`❌ Container für ${location}-chart nicht gefunden`);
-      return;
-    }
-    
-    // Clear existing content
-    container.innerHTML = '';
+    console.log(`📊 Rendering separate charts for ${location}:`, data);
     
     if (!data.temperature || data.temperature.length === 0) {
       console.log(`⚠️ Keine Temperaturdaten für ${location}`);
-      container.innerHTML = '<div class="no-data">Keine Daten verfügbar</div>';
       return;
     }
     
     console.log(`📈 ${location}: ${data.temperature.length} Temperaturwerte, ${data.humidity?.length || 0} Feuchtigkeitswerte`);
     
-    // Prepare temperature data (last 20 points like edit-component)
+    // Prepare data (last 20 points)
     const tempData = data.temperature
-      .map(d => ({ value: parseFloat(d.temperature), date: d.timedate }))
+      .map(d => ({ value: parseFloat(d.temperature), date: new Date(d.timedate) }))
       .filter(d => !isNaN(d.value))
       .slice(-20);
     
     const humidData = data.humidity
-      .map(d => ({ value: parseFloat(d.humidity), date: d.timedate }))
+      .map(d => ({ value: parseFloat(d.humidity), date: new Date(d.timedate) }))
       .filter(d => !isNaN(d.value))
       .slice(-20);
     
-    if (tempData.length === 0 && humidData.length === 0) {
-      container.innerHTML = '<div class="no-data">Keine gültigen Daten verfügbar</div>';
+    // Render temperature chart
+    renderSeparateChart(`${location}-temp-chart`, tempData, 'temperature', '#ff6b6b', '°C');
+    
+    // Render humidity chart
+    renderSeparateChart(`${location}-humid-chart`, humidData, 'humidity', '#4ecdc4', '%');
+  }
+
+  function renderSeparateChart(containerId, data, type, color, unit) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+      console.error(`❌ Container ${containerId} nicht gefunden`);
       return;
     }
     
-    // Simple chart setup like edit-component.html
-    const chartWidth = container.offsetWidth || 600;
-    const chartHeight = 200;
-    const padding = 30;
+    container.innerHTML = '';
     
+    if (!data || data.length === 0) {
+      container.innerHTML = '<div class="no-data">Keine Daten verfügbar</div>';
+      return;
+    }
+    
+    const chartWidth = container.offsetWidth || 400;
+    const chartHeight = 180;
+    const margin = { top: 20, right: 30, bottom: 40, left: 50 };
+    const plotWidth = chartWidth - margin.left - margin.right;
+    const plotHeight = chartHeight - margin.top - margin.bottom;
+    
+    // Calculate scales
+    const values = data.map(d => d.value);
+    const dates = data.map(d => d.date);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const valueRange = maxValue - minValue || 1;
+    const minDate = Math.min(...dates);
+    const maxDate = Math.max(...dates);
+    const timeRange = maxDate - minDate || 1;
+    
+    // Create chart
     let chartHTML = `
-      <div class="simple-chart-container">
-        <div class="chart-legend">
-          <span class="legend-item temp">🌡️ Temperatur (${tempData.length} Punkte)</span>
-          <span class="legend-item humid">💧 Feuchtigkeit (${humidData.length} Punkte)</span>
-        </div>
-        <svg class="timeline-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}">
+      <svg class="chart-svg" width="${chartWidth}" height="${chartHeight}" viewBox="0 0 ${chartWidth} ${chartHeight}">
+        <defs>
+          <linearGradient id="gradient-${type}-${containerId}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:${color};stop-opacity:0.6" />
+            <stop offset="100%" style="stop-color:${color};stop-opacity:0.1" />
+          </linearGradient>
+        </defs>
+        
+        <g transform="translate(${margin.left},${margin.top})">
     `;
     
-    // Temperature chart
-    if (tempData.length > 1) {
-      chartHTML += createSimpleChart(tempData, 'temperature', chartWidth, chartHeight, padding, '#ff6b6b');
-    }
+    // Generate path data
+    const points = data.map((d, i) => {
+      const x = (d.date - minDate) / timeRange * plotWidth;
+      const y = plotHeight - ((d.value - minValue) / valueRange * plotHeight);
+      return { x, y, value: d.value, date: d.date };
+    });
     
-    // Humidity chart  
-    if (humidData.length > 1) {
-      chartHTML += createSimpleChart(humidData, 'humidity', chartWidth, chartHeight, padding, '#4ecdc4');
-    }
+    const pathData = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
     
+    // Area under curve
+    const areaData = `M 0 ${plotHeight} L ` + 
+                     points.map(p => `${p.x} ${p.y}`).join(' L ') + 
+                     ` L ${plotWidth} ${plotHeight} Z`;
+    
+    // Draw area and line
     chartHTML += `
-        </svg>
-      </div>
+          <path d="${areaData}" fill="url(#gradient-${type}-${containerId})" />
+          <path d="${pathData}" fill="none" stroke="${color}" stroke-width="2" />
+    `;
+    
+    // Draw points
+    points.forEach(p => {
+      chartHTML += `<circle cx="${p.x}" cy="${p.y}" r="3" fill="${color}" />`;
+    });
+    
+    // Y-Axis
+    const yTicks = 5;
+    for (let i = 0; i <= yTicks; i++) {
+      const y = plotHeight - (i / yTicks) * plotHeight;
+      const value = minValue + (i / yTicks) * valueRange;
+      
+      chartHTML += `
+        <line x1="0" y1="${y}" x2="-5" y2="${y}" stroke="#666" />
+        <text x="-10" y="${y + 3}" text-anchor="end" font-size="10" fill="#666">
+          ${value.toFixed(1)}${unit}
+        </text>
+      `;
+      
+      if (i > 0) {
+        chartHTML += `<line x1="0" y1="${y}" x2="${plotWidth}" y2="${y}" stroke="#eee" stroke-width="1" />`;
+      }
+    }
+    
+    // X-Axis
+    const xTicks = Math.min(5, data.length);
+    for (let i = 0; i <= xTicks; i++) {
+      const x = (i / xTicks) * plotWidth;
+      const dateIndex = Math.floor((i / xTicks) * (data.length - 1));
+      const date = data[dateIndex].date;
+      const timeLabel = formatTimeAxis(date);
+      
+      chartHTML += `
+        <line x1="${x}" y1="${plotHeight}" x2="${x}" y2="${plotHeight + 5}" stroke="#666" />
+        <text x="${x}" y="${plotHeight + 18}" text-anchor="middle" font-size="9" fill="#666">
+          ${timeLabel}
+        </text>
+      `;
+      
+      if (i > 0) {
+        chartHTML += `<line x1="${x}" y1="0" x2="${x}" y2="${plotHeight}" stroke="#eee" stroke-width="1" />`;
+      }
+    }
+    
+    // Axes lines
+    chartHTML += `
+          <line x1="0" y1="0" x2="0" y2="${plotHeight}" stroke="#666" stroke-width="1" />
+          <line x1="0" y1="${plotHeight}" x2="${plotWidth}" y2="${plotHeight}" stroke="#666" stroke-width="1" />
+        </g>
+      </svg>
     `;
     
     container.innerHTML = chartHTML;
-    console.log(`✅ Simple chart für ${location} erstellt`);
+  }
+
+  function formatTimeAxis(date) {
+    if (currentTimeRange <= 24) {
+      return date.getHours().toString().padStart(2, '0') + ':' + 
+             date.getMinutes().toString().padStart(2, '0');
+    } else if (currentTimeRange <= 168) {
+      return date.getDate() + '.' + (date.getMonth() + 1);
+    } else {
+      return date.getDate() + '.' + (date.getMonth() + 1);
+    }
   }
   
-  function createSimpleChart(data, type, chartWidth, chartHeight, padding, color) {
-    const values = data.map(d => d.value);
-    const minValue = Math.min(...values);
-    const maxValue = Math.max(...values);
-    const range = maxValue - minValue || 1;
-    
-    // Calculate points
-    const points = [];
-    const stepX = (chartWidth - 2 * padding) / Math.max(data.length - 1, 1);
-    
-    data.forEach((point, index) => {
-      const x = padding + index * stepX;
-      const normalizedY = (point.value - minValue) / range;
-      const y = chartHeight - padding - (normalizedY * (chartHeight - 2 * padding));
-      points.push({ x, y, value: point.value });
-    });
-    
-    // Create path
-    const pathData = points.map((point, index) => 
-      `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`
-    ).join(' ');
-    
-    // Area under curve
-    const areaData = `M ${points[0].x} ${chartHeight - padding} L ` + 
-                     points.map(p => `${p.x} ${p.y}`).join(' L ') + 
-                     ` L ${points[points.length - 1].x} ${chartHeight - padding} Z`;
-    
-    return `
-      <defs>
-        <linearGradient id="gradient-${type}" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" style="stop-color:${color};stop-opacity:0.8" />
-          <stop offset="100%" style="stop-color:${color};stop-opacity:0.3" />
-        </linearGradient>
-      </defs>
-      <path class="line-area" d="${areaData}" fill="url(#gradient-${type})" />
-      <path class="line-path" d="${pathData}" fill="none" stroke="${color}" stroke-width="2" />
-      ${points.map(point => `
-        <circle cx="${point.x}" cy="${point.y}" r="3" fill="${color}" />
-      `).join('')}
-    `;
-  }
 
 
   async function downloadSensorData() {
@@ -567,9 +641,30 @@
     color: #4ecdc4;
   }
 
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .chart-section {
+    background: var(--bg-light);
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+  }
+
+  .chart-section h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    color: var(--text-primary);
+    text-align: center;
+  }
+
   .chart-container {
     width: 100%;
-    height: 200px;
+    height: 180px;
     position: relative;
   }
 
@@ -618,12 +713,11 @@
     font-weight: 600;
   }
 
-  .timeline-svg {
+  .chart-svg {
     width: 100%;
     height: 180px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
     background: white;
+    border-radius: 6px;
   }
 
   .line-area {
@@ -700,6 +794,11 @@
   @media (max-width: 768px) {
     .lab-controls {
       flex-direction: column;
+      gap: 1rem;
+    }
+
+    .charts-grid {
+      grid-template-columns: 1fr;
       gap: 1rem;
     }
 
