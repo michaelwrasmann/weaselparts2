@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeaselParts - Klebeprotokoll</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/modal-fixes.js"></script>
+</head>
+<body>
+<header>
+  <div class="header-content">
+    <a href="/" class="logo">
+      <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+        <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
+      </svg>
+      <h1>WeaselParts</h1>
+    </a>
+    <nav class="top-nav">
+      <div class="nav-left">
+        <div class="lab-info">
+          <div class="location-selector">
+            <select id="sensor-location-select" class="location-dropdown">
+              <option value="ssa">Jarvis-Ecke</option>
+              <option value="int_up">Am Telefon</option>
+              <option value="int_low">Empore</option>
+            </select>
+          </div>
+          <div class="mini-sensors">
+            <span class="mini-sensor temp">
+              <span id="temperature-value">--°C</span>
+            </span>
+            <span class="mini-sensor humid">
+              <span id="humidity-value">--%</span>
+            </span>
+          </div>
+        </div>
+        <div class="search-container">
+          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <input type="text" placeholder="Bauteile suchen" id="global-search">
+        </div>
+      </div>
+      <div class="nav-icons">
+        <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
+          </svg>
+        </button>
+        <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+        </button>
+        <a href="/ICD.html" class="nav-btn" title="ICD">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </a>
+        <a href="/lab-overview.html" class="nav-btn" title="Labor-Übersicht">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+          </svg>
+        </a>
+        <a href="/glue-protocol.html" class="nav-btn active" title="Klebeprotokoll">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </a>
+        <a href="/settings.html" class="nav-btn" title="Einstellungen">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main class="main-content">
+  <div class="page-header">
+    <div class="header-title">
+      <svg class="page-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+      </svg>
+      <h1 class="page-title">Klebeprotokoll erstellen</h1>
+    </div>
+    <p class="page-subtitle">Neues Klebeprotokoll für Bauteile erstellen und Label drucken</p>
+  </div>
+
+  <div class="form-container">
+    <form id="glue-protocol-form" class="component-form">
+      
+      <!-- Projekt und Bauteil Information -->
+      <div class="form-section">
+        <h3 class="section-title">Bauteil Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="project-select">Projekt *</label>
+            <select id="project-select" name="project" required>
+              <option value="">Projekt wählen...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="component-name-select">Bauteil Name *</label>
+            <select id="component-name-select" name="component_name" required>
+              <option value="">Bauteil wählen...</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="hardware-model">Hardware Model</label>
+            <input type="text" id="hardware-model" name="hardware_model" placeholder="Hardware Model eingeben...">
+          </div>
+          <div class="form-group">
+            <label for="glue-date">Datum der Klebung *</label>
+            <input type="date" id="glue-date" name="glue_date" required>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kleber Information -->
+      <div class="form-section">
+        <h3 class="section-title">Kleber Information</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="glue-type">Kleber *</label>
+            <select id="glue-type" name="glue_type" required>
+              <option value="">Kleber wählen...</option>
+              <option value="ScotchWeld 2216 B/A">ScotchWeld 2216 B/A</option>
+              <option value="Loctite Ablestik 285 (Eccobond)">Loctite Ablestik 285 (Eccobond)</option>
+              <option value="Araldite">Araldite</option>
+              <option value="andere">Andere</option>
+            </select>
+          </div>
+          <div class="form-group" id="custom-glue-group" style="display: none;">
+            <label for="custom-glue">Anderer Kleber</label>
+            <input type="text" id="custom-glue" name="custom_glue" placeholder="Anderen Kleber eingeben...">
+          </div>
+        </div>
+      </div>
+
+      <!-- Umgebungsbedingungen -->
+      <div class="form-section">
+        <h3 class="section-title">Umgebungsbedingungen</h3>
+        <div class="sensor-info">
+          <div class="sensor-status">
+            <span class="sensor-location-info">Daten von: <strong id="current-sensor-location">Jarvis-Ecke</strong></span>
+            <button type="button" id="refresh-sensor-data" class="btn secondary small">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Aktualisieren
+            </button>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="temperature">Temperatur (°C) *</label>
+            <input type="number" id="temperature" name="temperature" step="0.1" required readonly>
+          </div>
+          <div class="form-group">
+            <label for="humidity">Luftfeuchtigkeit (%) *</label>
+            <input type="number" id="humidity" name="humidity" step="0.1" min="0" max="100" required readonly>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button type="button" class="btn secondary" id="cancel-btn">Abbrechen</button>
+        <button type="submit" class="btn primary" id="save-and-print-btn">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          Speichern & Label drucken
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<!-- Print Preview Modal -->
+<div id="print-preview-modal" class="modal" style="display: none;">
+  <div class="modal-content print-preview-content">
+    <div class="modal-header">
+      <h3>Label Vorschau</h3>
+      <button class="close-modal" id="close-print-preview">&times;</button>
+    </div>
+    <div class="print-preview-body">
+      <div class="label-preview" id="label-preview">
+        <!-- Label content will be generated here -->
+      </div>
+      <div class="print-actions">
+        <button class="btn secondary" id="cancel-print">Abbrechen</button>
+        <button class="btn primary" id="confirm-print">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+          </svg>
+          Drucken
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+let currentSensorData = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('🔧 Klebeprotokoll-Seite wird initialisiert...');
+  
+  try {
+    setupEventListeners();
+    await loadDropdownData();
+    await loadSensorData();
+    startSensorRefresh();
+    
+    // Set current date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('glue-date').value = today;
+    
+    console.log('✅ Klebeprotokoll-Seite erfolgreich initialisiert');
+  } catch (error) {
+    console.error('❌ Initialisierungsfehler:', error);
+    showMessage('Fehler beim Laden der Seite. Seite wird neu geladen...', 'error');
+    setTimeout(() => window.location.reload(), 3000);
+  }
+});
+
+function setupEventListeners() {
+  // Navigation
+  const addBtn = document.getElementById('add-component-nav-btn');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      window.location.href = '/add-component.html';
+    });
+  }
+
+  const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
+  if (manageCabinetsBtn) {
+    manageCabinetsBtn.addEventListener('click', () => {
+      window.location.href = '/manage-cabinets.html';
+    });
+  }
+  
+  // Global Search
+  const globalSearch = document.getElementById('global-search');
+  if (globalSearch) {
+    globalSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        window.location.href = `/index.html?search=${encodeURIComponent(e.target.value)}`;
+      }
+    });
+  }
+  
+  // Sensor Location Dropdown
+  const locationSelect = document.getElementById('sensor-location-select');
+  if (locationSelect) {
+    locationSelect.addEventListener('change', async () => {
+      await loadSensorData();
+      updateSensorLocationDisplay();
+    });
+  }
+  
+  // Glue type dropdown
+  const glueTypeSelect = document.getElementById('glue-type');
+  const customGlueGroup = document.getElementById('custom-glue-group');
+  
+  if (glueTypeSelect) {
+    glueTypeSelect.addEventListener('change', () => {
+      if (glueTypeSelect.value === 'andere') {
+        customGlueGroup.style.display = 'block';
+        document.getElementById('custom-glue').required = true;
+      } else {
+        customGlueGroup.style.display = 'none';
+        document.getElementById('custom-glue').required = false;
+        document.getElementById('custom-glue').value = '';
+      }
+    });
+  }
+  
+  // Refresh sensor data button
+  const refreshBtn = document.getElementById('refresh-sensor-data');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', async () => {
+      await loadSensorData();
+      showMessage('Sensordaten aktualisiert', 'success');
+    });
+  }
+  
+  // Form submission
+  const form = document.getElementById('glue-protocol-form');
+  if (form) {
+    form.addEventListener('submit', handleFormSubmit);
+  }
+  
+  // Cancel button
+  const cancelBtn = document.getElementById('cancel-btn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      if (confirm('Möchten Sie wirklich abbrechen? Alle Eingaben gehen verloren.')) {
+        window.location.href = '/';
+      }
+    });
+  }
+  
+  // Print preview modal
+  const closePrintBtn = document.getElementById('close-print-preview');
+  const cancelPrintBtn = document.getElementById('cancel-print');
+  const confirmPrintBtn = document.getElementById('confirm-print');
+  
+  if (closePrintBtn) {
+    closePrintBtn.addEventListener('click', () => {
+      document.getElementById('print-preview-modal').style.display = 'none';
+    });
+  }
+  
+  if (cancelPrintBtn) {
+    cancelPrintBtn.addEventListener('click', () => {
+      document.getElementById('print-preview-modal').style.display = 'none';
+    });
+  }
+  
+  if (confirmPrintBtn) {
+    confirmPrintBtn.addEventListener('click', () => {
+      printLabel();
+    });
+  }
+}
+
+// Load dropdown data
+async function loadDropdownData() {
+  try {
+    // Load projects
+    const projectsResponse = await fetch('/api/projects');
+    if (projectsResponse.ok) {
+      const projects = await projectsResponse.json();
+      const projectSelect = document.getElementById('project-select');
+      if (projectSelect) {
+        projectSelect.innerHTML = '<option value="">Projekt wählen...</option>';
+        projects.forEach(project => {
+          const option = document.createElement('option');
+          option.value = project.name;
+          option.textContent = project.name;
+          projectSelect.appendChild(option);
+        });
+      }
+    }
+    
+    // Load component names from existing components
+    const componentsResponse = await fetch('/api/components');
+    if (componentsResponse.ok) {
+      const components = await componentsResponse.json();
+      const componentSelect = document.getElementById('component-name-select');
+      if (componentSelect) {
+        componentSelect.innerHTML = '<option value="">Bauteil wählen...</option>';
+        // Get unique component names
+        const uniqueNames = [...new Set(components.map(c => c.name))];
+        uniqueNames.forEach(name => {
+          const option = document.createElement('option');
+          option.value = name;
+          option.textContent = name;
+          componentSelect.appendChild(option);
+        });
+      }
+    }
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Dropdown-Daten:', error);
+    showMessage('Fehler beim Laden der Dropdown-Daten', 'error');
+  }
+}
+
+// Sensor data functions
+async function loadSensorData() {
+  try {
+    const locationSelect = document.getElementById('sensor-location-select');
+    const location = locationSelect ? locationSelect.value : 'ssa';
+    
+    const response = await fetch(`/api/sensors/current/${location}`);
+    if (!response.ok) return;
+    
+    const sensorData = await response.json();
+    currentSensorData = sensorData;
+    updateSensorDisplay(sensorData);
+    updateFormSensorData(sensorData);
+  } catch (error) {
+    console.error('❌ Sensordaten Fehler:', error);
+  }
+}
+
+function updateSensorDisplay(data) {
+  try {
+    const tempValue = document.getElementById('temperature-value');
+    if (tempValue) {
+      if (data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
+        tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+      } else {
+        tempValue.textContent = '--°C';
+      }
+    }
+    
+    const humValue = document.getElementById('humidity-value');
+    if (humValue) {
+      if (data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
+        humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+      } else {
+        humValue.textContent = '--%';
+      }
+    }
+  } catch (error) {
+    console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+  }
+}
+
+function updateFormSensorData(data) {
+  try {
+    const tempInput = document.getElementById('temperature');
+    const humInput = document.getElementById('humidity');
+    
+    if (tempInput && data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
+      tempInput.value = data.temperature.temperature.toFixed(1);
+    }
+    
+    if (humInput && data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
+      humInput.value = data.humidity.humidity.toFixed(1);
+    }
+  } catch (error) {
+    console.error('❌ Fehler beim Aktualisieren der Formulardaten:', error);
+  }
+}
+
+function updateSensorLocationDisplay() {
+  const locationSelect = document.getElementById('sensor-location-select');
+  const locationDisplay = document.getElementById('current-sensor-location');
+  
+  if (locationSelect && locationDisplay) {
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    locationDisplay.textContent = selectedOption.text;
+  }
+}
+
+function startSensorRefresh() {
+  setInterval(async () => {
+    await loadSensorData();
+  }, 30000);
+}
+
+// Form submission
+async function handleFormSubmit(event) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const data = Object.fromEntries(formData.entries());
+  
+  // Handle custom glue type
+  if (data.glue_type === 'andere' && data.custom_glue) {
+    data.glue_type = data.custom_glue;
+  }
+  delete data.custom_glue;
+  
+  // Add sensor location
+  const locationSelect = document.getElementById('sensor-location-select');
+  data.sensor_location = locationSelect ? locationSelect.value : 'ssa';
+  
+  try {
+    // Show preview first
+    showPrintPreview(data);
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Verarbeiten:', error);
+    showMessage('Fehler beim Verarbeiten des Klebeprotokolls', 'error');
+  }
+}
+
+function showPrintPreview(data) {
+  const modal = document.getElementById('print-preview-modal');
+  const preview = document.getElementById('label-preview');
+  
+  // Generate a temporary glue number for preview
+  const tempGlueNumber = `GLUE-${Date.now().toString().substr(-6)}`;
+  
+  // Create label content
+  preview.innerHTML = `
+    <div class="label-content">
+      <div class="label-header">
+        <h3>Klebeprotokoll</h3>
+      </div>
+      <div class="label-info">
+        <div class="label-row">
+          <strong>Bauteil:</strong> ${data.component_name}
+        </div>
+        <div class="label-row">
+          <strong>Klebe-Nummer:</strong> ${tempGlueNumber}
+        </div>
+        <div class="label-row">
+          <strong>Projekt:</strong> ${data.project}
+        </div>
+        <div class="label-row">
+          <strong>Kleber:</strong> ${data.glue_type}
+        </div>
+        <div class="label-row">
+          <strong>Datum:</strong> ${new Date(data.glue_date).toLocaleDateString('de-DE')}
+        </div>
+      </div>
+      <div class="barcode-container">
+        <svg id="preview-barcode"></svg>
+      </div>
+    </div>
+  `;
+  
+  // Generate barcode
+  try {
+    JsBarcode("#preview-barcode", tempGlueNumber, {
+      format: "CODE128",
+      width: 2,
+      height: 50,
+      displayValue: true,
+      fontSize: 12
+    });
+  } catch (error) {
+    console.error('❌ Barcode-Fehler:', error);
+  }
+  
+  // Store data for actual saving
+  modal.dataset.formData = JSON.stringify(data);
+  modal.style.display = 'block';
+}
+
+async function printLabel() {
+  const modal = document.getElementById('print-preview-modal');
+  const formData = JSON.parse(modal.dataset.formData);
+  
+  try {
+    // Save to database first
+    const response = await fetch('/api/glue-protocols', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    if (!response.ok) {
+      throw new Error('Fehler beim Speichern');
+    }
+    
+    const result = await response.json();
+    
+    // Print the label
+    const printWindow = window.open('', '_blank');
+    const labelContent = createPrintableLabel(result.glue_number, formData);
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Klebeprotokoll Label</title>
+        <style>
+          body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+          .label { width: 300px; border: 2px solid #000; padding: 15px; }
+          .label-header { text-align: center; font-weight: bold; margin-bottom: 10px; }
+          .label-row { margin: 5px 0; }
+          .barcode-container { text-align: center; margin-top: 15px; }
+          @media print {
+            body { margin: 0; padding: 0; }
+            .label { border: 1px solid #000; }
+          }
+        </style>
+      </head>
+      <body>
+        ${labelContent}
+        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+        <script>
+          JsBarcode("#label-barcode", "${result.glue_number}", {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: true,
+            fontSize: 12
+          });
+          setTimeout(() => {
+            window.print();
+            window.close();
+          }, 500);
+        </script>
+      </body>
+      </html>
+    `);
+    
+    modal.style.display = 'none';
+    showMessage('Klebeprotokoll erfolgreich erstellt und Label gedruckt!', 'success');
+    
+    // Reset form
+    document.getElementById('glue-protocol-form').reset();
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('glue-date').value = today;
+    await loadSensorData();
+    
+  } catch (error) {
+    console.error('❌ Fehler beim Speichern/Drucken:', error);
+    showMessage('Fehler beim Speichern oder Drucken', 'error');
+  }
+}
+
+function createPrintableLabel(glueNumber, data) {
+  return `
+    <div class="label">
+      <div class="label-header">
+        <h3>Klebeprotokoll</h3>
+      </div>
+      <div class="label-info">
+        <div class="label-row">
+          <strong>Bauteil:</strong> ${data.component_name}
+        </div>
+        <div class="label-row">
+          <strong>Klebe-Nummer:</strong> ${glueNumber}
+        </div>
+        <div class="label-row">
+          <strong>Projekt:</strong> ${data.project}
+        </div>
+        <div class="label-row">
+          <strong>Kleber:</strong> ${data.glue_type}
+        </div>
+        <div class="label-row">
+          <strong>Datum:</strong> ${new Date(data.glue_date).toLocaleDateString('de-DE')}
+        </div>
+      </div>
+      <div class="barcode-container">
+        <svg id="label-barcode"></svg>
+      </div>
+    </div>
+  `;
+}
+</script>
+
+<style>
+  .page-icon {
+    width: 2rem;
+    height: 2rem;
+    color: #4a90e2;
+    margin-right: 0.75rem;
+  }
+
+  .header-title {
+    display: flex;
+    align-items: center;
+  }
+
+  .form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 2rem;
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+  }
+
+  .section-title {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .form-group label {
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .form-group input,
+  .form-group select {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+  }
+
+  .form-group input[readonly] {
+    background-color: var(--bg-light);
+    color: var(--text-secondary);
+  }
+
+  .sensor-info {
+    background: var(--bg-light);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .sensor-status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sensor-location-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .btn.small {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  /* Print Preview Modal */
+  .print-preview-content {
+    max-width: 500px;
+  }
+
+  .print-preview-body {
+    padding: 1.5rem;
+  }
+
+  .label-preview {
+    border: 2px solid #000;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background: white;
+  }
+
+  .label-content {
+    text-align: left;
+  }
+
+  .label-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .label-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .label-row {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .barcode-container {
+    text-align: center;
+    margin-top: 1rem;
+  }
+
+  .print-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
+
+  @media (max-width: 768px) {
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .sensor-status {
+      flex-direction: column;
+      gap: 0.5rem;
+      align-items: flex-start;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+  }
+</style>
+
+</body>
+</html>

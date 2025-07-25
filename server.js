@@ -424,6 +424,140 @@ app.delete('/api/projects/:id', async (req, res) => {
   }
 });
 
+// =============================================================================
+// GLUE PROTOCOLS API ENDPOINTS
+// =============================================================================
+
+// Get all glue protocols
+app.get('/api/glue-protocols', async (req, res) => {
+  try {
+    console.log('🔧 Lade alle Klebeprotokolle...');
+    
+    const [rows] = await pool.execute(`
+      SELECT id, glue_number, project, component_name, hardware_model, 
+             glue_date, glue_type, temperature, humidity, sensor_location,
+             created_at 
+      FROM glue_protocols 
+      ORDER BY created_at DESC
+    `);
+    
+    console.log(`✅ ${rows.length} Klebeprotokolle geladen`);
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Klebeprotokolle:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Klebeprotokolle' });
+  }
+});
+
+// Get glue protocol by ID or glue_number
+app.get('/api/glue-protocols/:identifier', async (req, res) => {
+  try {
+    const { identifier } = req.params;
+    console.log(`🔧 Lade Klebeprotokoll: ${identifier}`);
+    
+    // Try to find by ID first, then by glue_number
+    let query, params;
+    if (identifier.match(/^\d+$/)) {
+      // It's a numeric ID
+      query = 'SELECT * FROM glue_protocols WHERE id = ?';
+      params = [identifier];
+    } else {
+      // It's a glue_number (barcode)
+      query = 'SELECT * FROM glue_protocols WHERE glue_number = ?';
+      params = [identifier];
+    }
+    
+    const [rows] = await pool.execute(query, params);
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Klebeprotokoll nicht gefunden' });
+    }
+    
+    console.log(`✅ Klebeprotokoll gefunden: ${rows[0].glue_number}`);
+    res.json(rows[0]);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden des Klebeprotokolls:', error);
+    res.status(500).json({ error: 'Fehler beim Laden des Klebeprotokolls' });
+  }
+});
+
+// Create new glue protocol
+app.post('/api/glue-protocols', async (req, res) => {
+  try {
+    const {
+      project,
+      component_name,
+      hardware_model,
+      glue_date,
+      glue_type,
+      temperature,
+      humidity,
+      sensor_location
+    } = req.body;
+    
+    // Validate required fields
+    if (!project || !component_name || !glue_date || !glue_type || !temperature || !humidity) {
+      return res.status(400).json({ 
+        error: 'Projekt, Bauteilname, Datum, Kleber, Temperatur und Luftfeuchtigkeit sind erforderlich' 
+      });
+    }
+    
+    // Generate unique glue number
+    const timestamp = Date.now().toString();
+    const glue_number = `GLUE-${timestamp.substr(-8)}`;
+    
+    console.log(`🔧 Erstelle neues Klebeprotokoll: ${glue_number}`);
+    
+    const [result] = await pool.execute(`
+      INSERT INTO glue_protocols (
+        glue_number, project, component_name, hardware_model, 
+        glue_date, glue_type, temperature, humidity, sensor_location
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      glue_number, project, component_name, hardware_model || null,
+      glue_date, glue_type, temperature, humidity, sensor_location || 'ssa'
+    ]);
+    
+    // Return the created protocol
+    const [newProtocol] = await pool.execute(
+      'SELECT * FROM glue_protocols WHERE id = ?',
+      [result.insertId]
+    );
+    
+    console.log(`✅ Klebeprotokoll "${glue_number}" erfolgreich erstellt`);
+    res.status(201).json(newProtocol[0]);
+  } catch (error) {
+    console.error('❌ Fehler beim Erstellen des Klebeprotokolls:', error);
+    res.status(500).json({ error: 'Fehler beim Speichern des Klebeprotokolls' });
+  }
+});
+
+// Delete glue protocol
+app.delete('/api/glue-protocols/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log(`🔧 Lösche Klebeprotokoll mit ID: ${id}`);
+    
+    const [protocol] = await pool.execute(
+      'SELECT glue_number FROM glue_protocols WHERE id = ?',
+      [id]
+    );
+    
+    if (protocol.length === 0) {
+      return res.status(404).json({ error: 'Klebeprotokoll nicht gefunden' });
+    }
+    
+    await pool.execute('DELETE FROM glue_protocols WHERE id = ?', [id]);
+    
+    console.log(`✅ Klebeprotokoll "${protocol[0].glue_number}" erfolgreich gelöscht`);
+    res.json({ message: 'Klebeprotokoll erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('❌ Fehler beim Löschen des Klebeprotokolls:', error);
+    res.status(500).json({ error: 'Fehler beim Löschen des Klebeprotokolls' });
+  }
+});
+
 async function initializeDatabase() {
   try {
     console.log('📊 Initialisiere MySQL-Datenbank...');
@@ -513,6 +647,28 @@ async function initializeDatabase() {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
     console.log('✅ Tabelle "activity_records" erstellt/geprüft');
+    
+    // Glue Protocols Tabelle erstellen
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS glue_protocols (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        glue_number VARCHAR(50) NOT NULL UNIQUE,
+        project VARCHAR(255) NOT NULL,
+        component_name VARCHAR(255) NOT NULL,
+        hardware_model VARCHAR(255),
+        glue_date DATE NOT NULL,
+        glue_type VARCHAR(255) NOT NULL,
+        temperature DECIMAL(5,2) NOT NULL,
+        humidity DECIMAL(5,2) NOT NULL,
+        sensor_location VARCHAR(50) DEFAULT 'ssa',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_glue_number (glue_number),
+        INDEX idx_glue_project (project),
+        INDEX idx_glue_date (glue_date)
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
+    console.log('✅ Tabelle "glue_protocols" erstellt/geprüft');
     
     // Index für Schränke
     await pool.execute(`

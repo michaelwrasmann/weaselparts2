@@ -64,6 +64,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
           </svg>
         </a>
+        <a href="/glue-protocol.html" class="nav-btn" title="Klebeprotokoll">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+        </a>
         <a href="/settings.html" class="nav-btn" title="Einstellungen">
           <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
@@ -114,6 +119,12 @@
               <option value="">Alle Projekte</option>
             </select>
           </div>
+          <button class="scan-btn" id="scan-barcode-btn" title="Barcode scannen">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V6a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1zm12 0h2a1 1 0 001-1V6a1 1 0 00-1-1h-2a1 1 0 00-1 1v1a1 1 0 001 1zM5 20h2a1 1 0 001-1v-1a1 1 0 00-1-1H5a1 1 0 00-1 1v1a1 1 0 001 1z"></path>
+            </svg>
+            Scannen
+          </button>
           <button class="add-btn" onclick="window.location.href='/add-component.html'">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
@@ -135,6 +146,34 @@
     </div>
 
   </main>
+
+  <!-- Barcode Scanner Modal -->
+  <div id="scanner-modal" class="modal" style="display: none;">
+    <div class="modal-content scanner-modal-content">
+      <div class="modal-header">
+        <h3>Barcode Scanner</h3>
+        <button class="close-modal" id="close-scanner">&times;</button>
+      </div>
+      <div class="scanner-body">
+        <div class="scanner-input-section">
+          <label for="barcode-input">Barcode eingeben oder scannen:</label>
+          <input type="text" id="barcode-input" placeholder="Barcode eingeben..." autofocus>
+          <button class="btn primary" id="process-barcode">Verarbeiten</button>
+        </div>
+        <div class="scanner-instructions">
+          <p>📱 Geben Sie einen Barcode ein oder verwenden Sie einen Barcode-Scanner</p>
+          <div class="scanner-types">
+            <div class="scanner-type">
+              <strong>Bauteile:</strong> Normale Barcodes (z.B. WP-12345)
+            </div>
+            <div class="scanner-type">
+              <strong>Klebeprotokolle:</strong> GLUE-Codes (z.B. GLUE-12345678)
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Delete Confirmation Modal für Bauteile -->
   <div id="component-delete-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
@@ -271,6 +310,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       
       // Delete Modal Event Listeners hinzufügen
       setupDeleteModalEventListeners();
+      
+      // Barcode Scanner Event Listeners hinzufügen
+      setupBarcodeScanner();
       
       console.log('✅ Event Listeners eingerichtet');
     }
@@ -760,6 +802,150 @@ document.addEventListener('DOMContentLoaded', async () => {
       }, 30000);
     }
 
+    // Barcode Scanner Funktionen
+    function setupBarcodeScanner() {
+      const scanBtn = document.getElementById('scan-barcode-btn');
+      const scannerModal = document.getElementById('scanner-modal');
+      const closeScannerBtn = document.getElementById('close-scanner');
+      const barcodeInput = document.getElementById('barcode-input');
+      const processBarcodeBtn = document.getElementById('process-barcode');
+      
+      if (scanBtn) {
+        scanBtn.addEventListener('click', () => {
+          scannerModal.style.display = 'block';
+          setTimeout(() => {
+            if (barcodeInput) barcodeInput.focus();
+          }, 100);
+        });
+      }
+      
+      if (closeScannerBtn) {
+        closeScannerBtn.addEventListener('click', () => {
+          scannerModal.style.display = 'none';
+          if (barcodeInput) barcodeInput.value = '';
+        });
+      }
+      
+      if (barcodeInput) {
+        barcodeInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            processBarcode();
+          }
+        });
+      }
+      
+      if (processBarcodeBtn) {
+        processBarcodeBtn.addEventListener('click', processBarcode);
+      }
+    }
+    
+    async function processBarcode() {
+      const barcodeInput = document.getElementById('barcode-input');
+      const scannerModal = document.getElementById('scanner-modal');
+      
+      if (!barcodeInput || !barcodeInput.value.trim()) {
+        showMessage('Bitte geben Sie einen Barcode ein', 'error');
+        return;
+      }
+      
+      const barcode = barcodeInput.value.trim();
+      
+      try {
+        // Check if it's a glue protocol (starts with GLUE-)
+        if (barcode.startsWith('GLUE-')) {
+          console.log('🔧 Klebeprotokoll-Barcode erkannt:', barcode);
+          
+          const response = await fetch(`/api/glue-protocols/${barcode}`);
+          if (response.ok) {
+            const protocol = await response.json();
+            showGlueProtocolDetails(protocol);
+          } else {
+            showMessage('Klebeprotokoll nicht gefunden', 'error');
+          }
+        } else {
+          // It's a regular component barcode
+          console.log('📦 Bauteil-Barcode erkannt:', barcode);
+          
+          const response = await fetch(`/api/bauteil/${barcode}`);
+          if (response.ok) {
+            const component = await response.json();
+            // Navigate to edit component page
+            window.location.href = `/edit-component.html?barcode=${encodeURIComponent(barcode)}`;
+          } else {
+            showMessage('Bauteil nicht gefunden', 'error');
+          }
+        }
+        
+        // Close scanner modal
+        scannerModal.style.display = 'none';
+        barcodeInput.value = '';
+        
+      } catch (error) {
+        console.error('❌ Fehler beim Verarbeiten des Barcodes:', error);
+        showMessage('Fehler beim Verarbeiten des Barcodes', 'error');
+      }
+    }
+    
+    function showGlueProtocolDetails(protocol) {
+      const modalHtml = `
+        <div id="glue-protocol-modal" class="modal" style="display: block;">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3>Klebeprotokoll Details</h3>
+              <button class="close-modal" onclick="closeGlueProtocolModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="protocol-details">
+                <div class="detail-row">
+                  <strong>Klebe-Nummer:</strong> ${protocol.glue_number}
+                </div>
+                <div class="detail-row">
+                  <strong>Bauteil:</strong> ${protocol.component_name}
+                </div>
+                <div class="detail-row">
+                  <strong>Projekt:</strong> ${protocol.project}
+                </div>
+                <div class="detail-row">
+                  <strong>Hardware Model:</strong> ${protocol.hardware_model || 'Nicht angegeben'}
+                </div>
+                <div class="detail-row">
+                  <strong>Datum:</strong> ${new Date(protocol.glue_date).toLocaleDateString('de-DE')}
+                </div>
+                <div class="detail-row">
+                  <strong>Kleber:</strong> ${protocol.glue_type}
+                </div>
+                <div class="detail-row">
+                  <strong>Temperatur:</strong> ${protocol.temperature}°C
+                </div>
+                <div class="detail-row">
+                  <strong>Luftfeuchtigkeit:</strong> ${protocol.humidity}%
+                </div>
+                <div class="detail-row">
+                  <strong>Sensor-Standort:</strong> ${protocol.sensor_location === 'ssa' ? 'Jarvis-Ecke' : protocol.sensor_location === 'int_up' ? 'Am Telefon' : 'Empore'}
+                </div>
+                <div class="detail-row">
+                  <strong>Erstellt:</strong> ${new Date(protocol.created_at).toLocaleString('de-DE')}
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn secondary" onclick="closeGlueProtocolModal()">Schließen</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Add modal to body
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    window.closeGlueProtocolModal = function() {
+      const modal = document.getElementById('glue-protocol-modal');
+      if (modal) {
+        modal.remove();
+      }
+    };
+    
     // Globale Funktionen verfügbar machen
     window.showComponentDeleteModal = showComponentDeleteModal;
     window.closeComponentDeleteModal = closeComponentDeleteModal;
@@ -938,6 +1124,105 @@ document.addEventListener('DOMContentLoaded', async () => {
       .mini-sensor {
         font-size: 0.75rem;
         padding: 0.15rem 0.4rem;
+      }
+
+      /* Scanner Button */
+      .scan-btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .scan-btn:hover {
+        background: #218838;
+        transform: translateY(-1px);
+      }
+
+      .scan-btn svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Scanner Modal */
+      .scanner-modal-content {
+        max-width: 500px;
+      }
+
+      .scanner-body {
+        padding: 1.5rem;
+      }
+
+      .scanner-input-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+      }
+
+      .scanner-input-section label {
+        font-weight: 500;
+        color: var(--text-primary);
+      }
+
+      .scanner-input-section input {
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+      }
+
+      .scanner-input-section input:focus {
+        outline: none;
+        border-color: #4a90e2;
+        box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+      }
+
+      .scanner-instructions {
+        background: var(--bg-light);
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 4px solid #4a90e2;
+      }
+
+      .scanner-types {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .scanner-type {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      /* Glue Protocol Details */
+      .protocol-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem;
+        background: var(--bg-light);
+        border-radius: 4px;
+      }
+
+      .detail-row strong {
+        color: var(--text-primary);
+        min-width: 140px;
       }
 
       .header-controls {
