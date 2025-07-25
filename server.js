@@ -102,9 +102,9 @@ initializePostgreSQL();
 // Helper-Funktion für Standort-Namen
 function getLocationName(location) {
   const locationNames = {
-    'ssa': 'Integrationslabor',
-    'int_up': 'Integration Oben',
-    'int_low': 'Integration Unten'
+    'ssa': 'Jarvis-Ecke',
+    'int_up': 'Am Telefon',
+    'int_low': 'Empore'
   };
   return locationNames[location] || `Standort ${location}`;
 }
@@ -2311,9 +2311,9 @@ app.get('/api/sensors/current/:location?', async (req, res) => {
 app.get('/api/sensors/locations', (req, res) => {
   try {
     const locations = [
-      { id: 'ssa', name: 'Integrationslabor', tables: ['temp_ssa', 'rh_ssa'] },
-      { id: 'int_up', name: 'Integration Oben', tables: ['temp_int_up', 'rh_int_up'] },
-      { id: 'int_low', name: 'Integration Unten', tables: ['temp_int_low', 'rh_int_low'] }
+      { id: 'ssa', name: 'Jarvis-Ecke', tables: ['temp_ssa', 'rh_ssa'] },
+      { id: 'int_up', name: 'Am Telefon', tables: ['temp_int_up', 'rh_int_up'] },
+      { id: 'int_low', name: 'Empore', tables: ['temp_int_low', 'rh_int_low'] }
     ];
     res.json(locations);
   } catch (error) {
