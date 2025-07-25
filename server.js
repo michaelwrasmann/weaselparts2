@@ -211,6 +211,205 @@ const uploadPdf = multer({
   }
 });
 
+// =============================================================================
+// EMPLOYEES & PROJECTS API SETUP
+// =============================================================================
+
+async function setupEmployeesProjectsAPI() {
+  console.log('📋 Initialisiere Employees & Projects API...');
+  
+  try {
+    // Tabellen erstellen falls sie nicht existieren
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS employees (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    await pool.execute(`
+      CREATE TABLE IF NOT EXISTS projects (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    
+    console.log('✅ Employees & Projects Tabellen initialisiert');
+  } catch (error) {
+    console.error('❌ Fehler beim Initialisieren der Employees & Projects Tabellen:', error);
+  }
+}
+
+// Get all employees
+app.get('/api/employees', async (req, res) => {
+  try {
+    console.log('📋 Lade alle Mitarbeiter...');
+    
+    const [rows] = await pool.execute(
+      'SELECT id, name, created_at FROM employees ORDER BY name ASC'
+    );
+    
+    console.log(`✅ ${rows.length} Mitarbeiter geladen`);
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Mitarbeiter:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Mitarbeiter' });
+  }
+});
+
+// Add new employee
+app.post('/api/employees', async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Mitarbeitername ist erforderlich' });
+    }
+    
+    const trimmedName = name.trim();
+    
+    // Check if employee already exists
+    const [existingEmployee] = await pool.execute(
+      'SELECT id FROM employees WHERE LOWER(name) = LOWER(?)',
+      [trimmedName]
+    );
+    
+    if (existingEmployee.length > 0) {
+      return res.status(400).json({ error: 'Mitarbeiter existiert bereits' });
+    }
+    
+    console.log(`📋 Füge neuen Mitarbeiter hinzu: ${trimmedName}`);
+    
+    const [result] = await pool.execute(
+      'INSERT INTO employees (name) VALUES (?)',
+      [trimmedName]
+    );
+    
+    const [newEmployee] = await pool.execute(
+      'SELECT id, name, created_at FROM employees WHERE id = ?',
+      [result.insertId]
+    );
+    
+    console.log(`✅ Mitarbeiter "${trimmedName}" erfolgreich hinzugefügt`);
+    res.status(201).json(newEmployee[0]);
+  } catch (error) {
+    console.error('❌ Fehler beim Hinzufügen des Mitarbeiters:', error);
+    res.status(500).json({ error: 'Fehler beim Speichern des Mitarbeiters' });
+  }
+});
+
+// Delete employee
+app.delete('/api/employees/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log(`📋 Lösche Mitarbeiter mit ID: ${id}`);
+    
+    const [employee] = await pool.execute(
+      'SELECT name FROM employees WHERE id = ?',
+      [id]
+    );
+    
+    if (employee.length === 0) {
+      return res.status(404).json({ error: 'Mitarbeiter nicht gefunden' });
+    }
+    
+    await pool.execute('DELETE FROM employees WHERE id = ?', [id]);
+    
+    console.log(`✅ Mitarbeiter "${employee[0].name}" erfolgreich gelöscht`);
+    res.json({ message: 'Mitarbeiter erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('❌ Fehler beim Löschen des Mitarbeiters:', error);
+    res.status(500).json({ error: 'Fehler beim Löschen des Mitarbeiters' });
+  }
+});
+
+// Get all projects
+app.get('/api/projects', async (req, res) => {
+  try {
+    console.log('📋 Lade alle Projekte...');
+    
+    const [rows] = await pool.execute(
+      'SELECT id, name, created_at FROM projects ORDER BY name ASC'
+    );
+    
+    console.log(`✅ ${rows.length} Projekte geladen`);
+    res.json(rows);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Projekte:', error);
+    res.status(500).json({ error: 'Fehler beim Laden der Projekte' });
+  }
+});
+
+// Add new project
+app.post('/api/projects', async (req, res) => {
+  try {
+    const { name } = req.body;
+    
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: 'Projektname ist erforderlich' });
+    }
+    
+    const trimmedName = name.trim();
+    
+    // Check if project already exists
+    const [existingProject] = await pool.execute(
+      'SELECT id FROM projects WHERE LOWER(name) = LOWER(?)',
+      [trimmedName]
+    );
+    
+    if (existingProject.length > 0) {
+      return res.status(400).json({ error: 'Projekt existiert bereits' });
+    }
+    
+    console.log(`📋 Füge neues Projekt hinzu: ${trimmedName}`);
+    
+    const [result] = await pool.execute(
+      'INSERT INTO projects (name) VALUES (?)',
+      [trimmedName]
+    );
+    
+    const [newProject] = await pool.execute(
+      'SELECT id, name, created_at FROM projects WHERE id = ?',
+      [result.insertId]
+    );
+    
+    console.log(`✅ Projekt "${trimmedName}" erfolgreich hinzugefügt`);
+    res.status(201).json(newProject[0]);
+  } catch (error) {
+    console.error('❌ Fehler beim Hinzufügen des Projekts:', error);
+    res.status(500).json({ error: 'Fehler beim Speichern des Projekts' });
+  }
+});
+
+// Delete project
+app.delete('/api/projects/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    console.log(`📋 Lösche Projekt mit ID: ${id}`);
+    
+    const [project] = await pool.execute(
+      'SELECT name FROM projects WHERE id = ?',
+      [id]
+    );
+    
+    if (project.length === 0) {
+      return res.status(404).json({ error: 'Projekt nicht gefunden' });
+    }
+    
+    await pool.execute('DELETE FROM projects WHERE id = ?', [id]);
+    
+    console.log(`✅ Projekt "${project[0].name}" erfolgreich gelöscht`);
+    res.json({ message: 'Projekt erfolgreich gelöscht' });
+  } catch (error) {
+    console.error('❌ Fehler beim Löschen des Projekts:', error);
+    res.status(500).json({ error: 'Fehler beim Löschen des Projekts' });
+  }
+});
+
 async function initializeDatabase() {
   try {
     console.log('📊 Initialisiere MySQL-Datenbank...');
@@ -2612,6 +2811,9 @@ async function startServer() {
     
     // Datenbank initialisieren
     await initializeDatabase();
+    
+    // Employees & Projects API Endpoints hinzufügen
+    await setupEmployeesProjectsAPI();
     
     // Server starten
     app.listen(PORT, () => {
