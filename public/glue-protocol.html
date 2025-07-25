@@ -349,10 +349,15 @@ function setupEventListeners() {
 // Load dropdown data
 async function loadDropdownData() {
   try {
-    // Load projects
+    // Load projects with debug logging
+    console.log('📋 Lade Projekte...');
     const projectsResponse = await fetch('/api/projects');
+    console.log('Projekte Response Status:', projectsResponse.status);
+    
     if (projectsResponse.ok) {
       const projects = await projectsResponse.json();
+      console.log('✅ Projekte geladen:', projects);
+      
       const projectSelect = document.getElementById('project-select');
       if (projectSelect) {
         projectSelect.innerHTML = '<option value="">Projekt wählen...</option>';
@@ -362,13 +367,25 @@ async function loadDropdownData() {
           option.textContent = project.name;
           projectSelect.appendChild(option);
         });
+        console.log(`✅ ${projects.length} Projekte zum Dropdown hinzugefügt`);
+      } else {
+        console.error('❌ project-select Element nicht gefunden!');
       }
+    } else {
+      console.error('❌ Fehler beim Laden der Projekte:', projectsResponse.status);
+      const errorText = await projectsResponse.text();
+      console.error('Fehlerdetails:', errorText);
     }
     
-    // Load employees
+    // Load employees with debug logging
+    console.log('👥 Lade Mitarbeiter...');
     const employeesResponse = await fetch('/api/employees');
+    console.log('Mitarbeiter Response Status:', employeesResponse.status);
+    
     if (employeesResponse.ok) {
       const employees = await employeesResponse.json();
+      console.log('✅ Mitarbeiter geladen:', employees);
+      
       const employeeSelect = document.getElementById('employee-select');
       if (employeeSelect) {
         employeeSelect.innerHTML = '<option value="">Mitarbeiter wählen...</option>';
@@ -380,7 +397,14 @@ async function loadDropdownData() {
           option.textContent = displayName;
           employeeSelect.appendChild(option);
         });
+        console.log(`✅ ${employees.length} Mitarbeiter zum Dropdown hinzugefügt`);
+      } else {
+        console.error('❌ employee-select Element nicht gefunden!');
       }
+    } else {
+      console.error('❌ Fehler beim Laden der Mitarbeiter:', employeesResponse.status);
+      const errorText = await employeesResponse.text();
+      console.error('Fehlerdetails:', errorText);
     }
     
   } catch (error) {
@@ -530,22 +554,24 @@ function showPrintPreview(data) {
     </div>
   `;
   
-  // Generate barcode
-  try {
-    JsBarcode("#preview-barcode", tempGlueNumber, {
-      format: "CODE128",
-      width: 2,
-      height: 50,
-      displayValue: true,
-      fontSize: 12
-    });
-  } catch (error) {
-    console.error('❌ Barcode-Fehler:', error);
-  }
-  
   // Store data for actual saving
   modal.dataset.formData = JSON.stringify(data);
   modal.style.display = 'block';
+  
+  // Generate barcode after element is in DOM
+  setTimeout(() => {
+    try {
+      JsBarcode("#preview-barcode", tempGlueNumber, {
+        format: "CODE128",
+        width: 2,
+        height: 50,
+        displayValue: true,
+        fontSize: 12
+      });
+    } catch (error) {
+      console.error('❌ Barcode-Fehler:', error);
+    }
+  }, 100);
 }
 
 async function printLabel() {
@@ -591,7 +617,7 @@ async function printLabel() {
       </head>
       <body>
         ${labelContent}
-        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"><\/script>
         <script>
           JsBarcode("#label-barcode", "${result.glue_number}", {
             format: "CODE128",
@@ -604,7 +630,7 @@ async function printLabel() {
             window.print();
             window.close();
           }, 500);
-        </script>
+        <\/script>
       </body>
       </html>
     `);
