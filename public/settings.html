@@ -212,12 +212,13 @@ function setupEventListeners() {
   const saveEmployeeBtn = document.getElementById('save-employee-btn');
   const cancelEmployeeBtn = document.getElementById('cancel-employee-btn');
   const employeeForm = document.getElementById('employee-form');
-  const employeeNameInput = document.getElementById('employee-name');
+  const employeeNachnameInput = document.getElementById('employee-nachname');
+  const employeeVornameInput = document.getElementById('employee-vorname');
   
   if (addEmployeeBtn) {
     addEmployeeBtn.addEventListener('click', () => {
       employeeForm.style.display = 'block';
-      employeeNameInput.focus();
+      if (employeeNachnameInput) employeeNachnameInput.focus();
     });
   }
   
@@ -228,12 +229,22 @@ function setupEventListeners() {
   if (cancelEmployeeBtn) {
     cancelEmployeeBtn.addEventListener('click', () => {
       employeeForm.style.display = 'none';
-      employeeNameInput.value = '';
+      if (employeeNachnameInput) employeeNachnameInput.value = '';
+      if (employeeVornameInput) employeeVornameInput.value = '';
     });
   }
   
-  if (employeeNameInput) {
-    employeeNameInput.addEventListener('keypress', (e) => {
+  // Add keypress listeners for both input fields
+  if (employeeNachnameInput) {
+    employeeNachnameInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        if (employeeVornameInput) employeeVornameInput.focus();
+      }
+    });
+  }
+  
+  if (employeeVornameInput) {
+    employeeVornameInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         saveEmployee();
       }
