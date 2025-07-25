@@ -490,10 +490,35 @@ function startSensorRefresh() {
 
 // Form submission
 async function handleFormSubmit(event) {
+  console.log('🔧 Form Submit Event ausgelöst');
   event.preventDefault();
   
   const formData = new FormData(event.target);
   const data = Object.fromEntries(formData.entries());
+  
+  console.log('📋 Formulardaten:', data);
+  
+  // Validate required fields
+  if (!data.project || !data.employee || !data.component_name || !data.glue_date || !data.glue_type || !data.temperature || !data.humidity) {
+    console.error('❌ Validierung fehlgeschlagen - Pflichtfelder fehlen');
+    console.error('Fehlende Felder:', {
+      project: !data.project,
+      employee: !data.employee,
+      component_name: !data.component_name,
+      glue_date: !data.glue_date,
+      glue_type: !data.glue_type,
+      temperature: !data.temperature,
+      humidity: !data.humidity
+    });
+    
+    // Use showMessage if available, otherwise alert
+    if (typeof showMessage === 'function') {
+      showMessage('Bitte füllen Sie alle Pflichtfelder aus', 'error');
+    } else {
+      alert('Bitte füllen Sie alle Pflichtfelder aus');
+    }
+    return;
+  }
   
   // Handle custom glue type
   if (data.glue_type === 'andere' && data.custom_glue) {
@@ -504,6 +529,8 @@ async function handleFormSubmit(event) {
   // Add sensor location
   const locationSelect = document.getElementById('sensor-location-select');
   data.sensor_location = locationSelect ? locationSelect.value : 'ssa';
+  
+  console.log('✅ Validierung erfolgreich, zeige Preview...');
   
   try {
     // Show preview first
@@ -839,6 +866,68 @@ function createPrintableLabel(glueNumber, data) {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
+  }
+
+  /* Navigation erweitert */
+  .nav-left {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-grow: 1;
+  }
+
+  .lab-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  /* Mini Sensor Display in Header */
+  .mini-sensors {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .mini-sensor {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 15px;
+    background: var(--bg-light);
+    border: 1px solid var(--border-color);
+  }
+
+  .mini-sensor.temp {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+  }
+
+  .mini-sensor.humid {
+    color: #4ecdc4;
+    border-color: #4ecdc4;
+  }
+
+  /* Location Dropdown Styling */
+  .location-dropdown {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.3rem 0.8rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+  }
+
+  .location-dropdown:hover {
+    border-color: #4a90e2;
+  }
+
+  .location-dropdown:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
   }
 
   @media (max-width: 768px) {
