@@ -322,35 +322,7 @@ function setupEventListeners() {
     });
   }
   
-  // Print preview modal
-  const closePrintBtn = document.getElementById('close-print-preview');
-  const cancelPrintBtn = document.getElementById('cancel-print');
-  const confirmPrintBtn = document.getElementById('confirm-print');
-  
-  console.log('🔧 Print Modal Buttons:', { closePrintBtn, cancelPrintBtn, confirmPrintBtn });
-  
-  if (closePrintBtn) {
-    closePrintBtn.addEventListener('click', () => {
-      console.log('❌ Close Print Button geklickt');
-      document.getElementById('print-preview-modal').style.display = 'none';
-    });
-  }
-  
-  if (cancelPrintBtn) {
-    cancelPrintBtn.addEventListener('click', () => {
-      console.log('❌ Cancel Print Button geklickt');
-      document.getElementById('print-preview-modal').style.display = 'none';
-    });
-  }
-  
-  if (confirmPrintBtn) {
-    confirmPrintBtn.addEventListener('click', () => {
-      console.log('✅ Confirm Print Button geklickt - rufe printLabel() auf');
-      printLabel();
-    });
-  } else {
-    console.error('❌ Confirm Print Button nicht gefunden!');
-  }
+  // Print preview modal event listeners werden dynamisch in setupModalEventListeners() eingerichtet
 }
 
 // Load dropdown data
@@ -600,6 +572,9 @@ function showPrintPreview(data) {
   modal.style.display = 'block';
   console.log('📦 Modal angezeigt und Daten gespeichert');
   
+  // Setup modal button event listeners now that modal is visible
+  setupModalEventListeners();
+  
   // Generate barcode after element is in DOM
   setTimeout(() => {
     try {
@@ -616,6 +591,44 @@ function showPrintPreview(data) {
       console.error('❌ Barcode-Fehler:', error);
     }
   }, 100);
+}
+
+function setupModalEventListeners() {
+  console.log('🔧 Richte Modal Event Listeners ein...');
+  
+  const closePrintBtn = document.getElementById('close-print-preview');
+  const cancelPrintBtn = document.getElementById('cancel-print');
+  const confirmPrintBtn = document.getElementById('confirm-print');
+  
+  console.log('🔧 Modal Buttons gefunden:', { closePrintBtn, cancelPrintBtn, confirmPrintBtn });
+  
+  // Remove existing listeners to avoid duplicates
+  if (closePrintBtn) {
+    closePrintBtn.replaceWith(closePrintBtn.cloneNode(true));
+    document.getElementById('close-print-preview').addEventListener('click', () => {
+      console.log('❌ Close Print Button geklickt');
+      document.getElementById('print-preview-modal').style.display = 'none';
+    });
+  }
+  
+  if (cancelPrintBtn) {
+    cancelPrintBtn.replaceWith(cancelPrintBtn.cloneNode(true));
+    document.getElementById('cancel-print').addEventListener('click', () => {
+      console.log('❌ Cancel Print Button geklickt');
+      document.getElementById('print-preview-modal').style.display = 'none';
+    });
+  }
+  
+  if (confirmPrintBtn) {
+    confirmPrintBtn.replaceWith(confirmPrintBtn.cloneNode(true));
+    document.getElementById('confirm-print').addEventListener('click', () => {
+      console.log('✅ Confirm Print Button geklickt - rufe printLabel() auf');
+      printLabel();
+    });
+    console.log('✅ Modal Event Listeners erfolgreich eingerichtet');
+  } else {
+    console.error('❌ Confirm Print Button nicht gefunden!');
+  }
 }
 
 async function printLabel() {
