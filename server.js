@@ -219,16 +219,50 @@ async function setupEmployeesProjectsAPI() {
   console.log('📋 Initialisiere Employees & Projects API...');
   
   try {
-    // Tabellen erstellen falls sie nicht existieren
+    // Tabellen erstellen falls sie nicht existieren oder migrieren
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS employees (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        nachname VARCHAR(50) NOT NULL,
-        vorname VARCHAR(50) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE KEY unique_name (nachname, vorname)
+        name VARCHAR(100),
+        nachname VARCHAR(50),
+        vorname VARCHAR(50),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
+    
+    // Migration: Spalten hinzufügen falls sie nicht existieren
+    try {
+      await pool.execute(`ALTER TABLE employees ADD COLUMN nachname VARCHAR(50)`);
+      await pool.execute(`ALTER TABLE employees ADD COLUMN vorname VARCHAR(50)`);
+    } catch (error) {
+      // Spalten existieren bereits, das ist ok
+    }
+    
+    // Migration: Daten von name zu nachname/vorname konvertieren
+    const [existingEmployees] = await pool.execute(`
+      SELECT id, name FROM employees WHERE name IS NOT NULL AND (nachname IS NULL OR vorname IS NULL)
+    `);
+    
+    for (const employee of existingEmployees) {
+      const nameParts = employee.name.split(',').map(part => part.trim());
+      if (nameParts.length === 2) {
+        await pool.execute(`
+          UPDATE employees SET nachname = ?, vorname = ? WHERE id = ?
+        `, [nameParts[0], nameParts[1], employee.id]);
+      } else {
+        // Fallback: ganzer Name als Nachname
+        await pool.execute(`
+          UPDATE employees SET nachname = ?, vorname = 'N/A' WHERE id = ?
+        `, [employee.name, employee.id]);
+      }
+    }
+    
+    // Unique constraint hinzufügen falls nicht vorhanden
+    try {
+      await pool.execute(`ALTER TABLE employees ADD UNIQUE KEY unique_name (nachname, vorname)`);
+    } catch (error) {
+      // Constraint existiert bereits
+    }
     
     await pool.execute(`
       CREATE TABLE IF NOT EXISTS projects (
@@ -250,13 +284,13 @@ app.get('/api/employees', async (req, res) => {
     console.log('📋 Lade alle Mitarbeiter...');
     
     const [rows] = await pool.execute(
-      'SELECT id, nachname, vorname, created_at FROM employees ORDER BY nachname ASC, vorname ASC'
+      'SELECT id, nachname, vorname, created_at FROM employees WHERE nachname IS NOT NULL AND vorname IS NOT NULL ORDER BY nachname ASC, vorname ASC'
     );
     
     // Format names as "Nachname, Vorname" for frontend
     const formattedRows = rows.map(row => ({
       ...row,
-      displayName: `${row.nachname}, ${row.vorname}`
+      displayName: `${row.nachname || ''}, ${row.vorname || ''}`.replace(/^,\s*|,\s*$/g, '') || 'Unbekannt'
     }));
     
     console.log(`✅ ${rows.length} Mitarbeiter geladen`);
