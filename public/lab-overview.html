@@ -317,16 +317,24 @@
     
     console.log(`📈 ${location}: ${data.temperature.length} Temperaturwerte, ${data.humidity?.length || 0} Feuchtigkeitswerte`);
     
-    // Prepare data (use all points, don't limit to 20)
-    const tempData = data.temperature
+    // Prepare data - limit points for better performance
+    const allTempData = data.temperature
       .map(d => ({ value: parseFloat(d.temperature), date: new Date(d.timedate) }))
       .filter(d => !isNaN(d.value));
     
-    const humidData = data.humidity
+    const allHumidData = data.humidity
       .map(d => ({ value: parseFloat(d.humidity), date: new Date(d.timedate) }))
       .filter(d => !isNaN(d.value));
     
-    console.log(`📊 ${location}: Verwende ${tempData.length} Temp-Punkte, ${humidData.length} Humid-Punkte für ${currentTimeRange}h`);
+    // Reduce data points for better performance - max 50 points for charts
+    const maxPoints = 50;
+    const tempStep = Math.max(1, Math.floor(allTempData.length / maxPoints));
+    const humidStep = Math.max(1, Math.floor(allHumidData.length / maxPoints));
+    
+    const tempData = allTempData.filter((_, index) => index % tempStep === 0);
+    const humidData = allHumidData.filter((_, index) => index % humidStep === 0);
+    
+    console.log(`📊 ${location}: ${allTempData.length}→${tempData.length} Temp, ${allHumidData.length}→${humidData.length} Humid für ${currentTimeRange}h`);
     
     // Render temperature chart
     renderSeparateChart(`${location}-temp-chart`, tempData, 'temperature', '#ff6b6b', '°C');
@@ -500,12 +508,15 @@
         if (tempChart) {
           const tempCanvas = await html2canvas(tempChart, {
             backgroundColor: 'white',
-            scale: 2,
-            logging: false
+            scale: 1,
+            logging: false,
+            width: 400,
+            height: 200,
+            useCORS: true
           });
           
-          const tempImgData = tempCanvas.toDataURL('image/png');
-          pdf.addImage(tempImgData, 'PNG', 20, yPosition, 80, 40);
+          const tempImgData = tempCanvas.toDataURL('image/jpeg', 0.8);
+          pdf.addImage(tempImgData, 'JPEG', 20, yPosition, 80, 40);
           
           pdf.setFontSize(10);
           pdf.text('🌡️ Temperatur', 20, yPosition + 45);
@@ -516,12 +527,15 @@
         if (humidChart) {
           const humidCanvas = await html2canvas(humidChart, {
             backgroundColor: 'white',
-            scale: 2,
-            logging: false
+            scale: 1,
+            logging: false,
+            width: 400,
+            height: 200,
+            useCORS: true
           });
           
-          const humidImgData = humidCanvas.toDataURL('image/png');
-          pdf.addImage(humidImgData, 'PNG', 110, yPosition, 80, 40);
+          const humidImgData = humidCanvas.toDataURL('image/jpeg', 0.8);
+          pdf.addImage(humidImgData, 'JPEG', 110, yPosition, 80, 40);
           
           pdf.setFontSize(10);
           pdf.text('💧 Feuchtigkeit', 110, yPosition + 45);
@@ -624,11 +638,17 @@
     color: #4a90e2;
   }
 
-  .time-btn.active {
+  .time-range-selector .time-btn.active {
     background: #4a90e2 !important;
     color: white !important;
     border-color: #4a90e2 !important;
-    font-weight: 600;
+    font-weight: 600 !important;
+  }
+  
+  .lab-controls .time-btn.active {
+    background: #4a90e2 !important;
+    color: white !important;
+    border-color: #4a90e2 !important;
   }
 
   .sensor-stations {
