@@ -1039,7 +1039,8 @@ function showInfoModal(component) {
     </div>
   `;
   
-  modal.classList.add('active');
+  modal.classList.add('active', 'show');
+  modal.style.display = 'flex';
   
   // Modal automatisch nach 6 Sekunden schließen
   setTimeout(() => {
@@ -1159,7 +1160,8 @@ async function showStorageModal(component) {
     `;
   }
   
-  modal.classList.add('active');
+  modal.classList.add('active', 'show');
+  modal.style.display = 'flex';
 }
 
 /**
@@ -1227,7 +1229,8 @@ function showUnknownBarcodeModal(barcode) {
     </div>
   `;
   
-  modal.classList.add('active');
+  modal.classList.add('active', 'show');
+  modal.style.display = 'flex';
 }
 
 /**
@@ -1282,7 +1285,8 @@ function showRemovalSuccessModal(component) {
     </div>
   `;
   
-  modal.classList.add('active');
+  modal.classList.add('active', 'show');
+  modal.style.display = 'flex';
   
   // Modal automatisch nach 2 Sekunden schließen (VERLÄNGERT)
   setTimeout(() => {
@@ -1436,12 +1440,36 @@ function updateLocalData() {
 }
 
 /**
- * Stellt sicher, dass das Scanner-Modal existiert (UNVERÄNDERT)
+ * Stellt sicher, dass das Scanner-Modal existiert (VERBESSERT)
  */
 function ensureScannerModalExists() {
   let modal = document.getElementById('scanner-modal');
   
-  if (!modal) {
+  if (modal) {
+    // Modal existiert bereits - stelle sicher dass es die richtigen Klassen hat
+    let modalContent = modal.querySelector('.modal-content, .modern-modal-content');
+    if (modalContent) {
+      // Füge beide Klassen hinzu für Kompatibilität
+      if (!modalContent.classList.contains('modal-content')) {
+        modalContent.classList.add('modal-content');
+      }
+      if (!modalContent.classList.contains('scanner-content')) {
+        modalContent.classList.add('scanner-content');
+      }
+      
+      // Stelle sicher dass Header und Body existieren
+      let header = modalContent.querySelector('.scanner-header, .modern-modal-header');
+      if (header && !header.classList.contains('scanner-header')) {
+        header.classList.add('scanner-header');
+      }
+      
+      let body = modalContent.querySelector('.scanner-body, .modern-modal-body');
+      if (body && !body.classList.contains('scanner-body')) {
+        body.classList.add('scanner-body');
+      }
+    }
+  } else {
+    // Modal existiert nicht - erstelle es neu
     const modalHTML = `
       <div id="scanner-modal" class="modal">
         <div class="modal-content scanner-content wide-modal">
@@ -1465,42 +1493,41 @@ function ensureScannerModalExists() {
       return null;
     }
     
-    // Verify modal content exists
-    const modalContent = modal.querySelector('.modal-content');
-    if (!modalContent) {
-      console.error('❌ Modal content not found after creation');
-      return null;
-    }
-    
     // Event Listeners hinzufügen
     const closeButton = modal.querySelector('#close-scanner');
-    if (closeButton) {
+    if (closeButton && !closeButton.hasAttribute('data-listener-added')) {
       closeButton.addEventListener('click', closeGlobalScanner);
-    } else {
-      console.error('❌ Close button not found in modal');
+      closeButton.setAttribute('data-listener-added', 'true');
     }
     
-    // Escape-Taste
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('active')) {
-        closeGlobalScanner();
-      }
-    });
+    // Escape-Taste (nur einmal hinzufügen)
+    if (!modal.hasAttribute('data-escape-listener')) {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('active')) {
+          closeGlobalScanner();
+        }
+      });
+      modal.setAttribute('data-escape-listener', 'true');
+    }
   }
   
   return modal;
 }
 
 /**
- * Schließt den globalen Scanner (REPARIERT V2)
+ * Schließt den globalen Scanner (VERBESSERT FÜR BEIDE MODAL-TYPEN)
  */
 function closeGlobalScanner() {
   console.log('❌ Schließe globalen Scanner');
   
   const modal = document.getElementById('scanner-modal');
   if (modal) {
-    modal.classList.remove('active');
-    const modalContent = modal.querySelector('.modal-content');
+    // Entferne beide mögliche Aktivierungsklassen
+    modal.classList.remove('active', 'show');
+    modal.style.display = ''; // Reset display style
+    
+    // Finde Modal-Content mit beiden möglichen Selektoren
+    const modalContent = modal.querySelector('.modal-content, .modern-modal-content');
     if (modalContent) {
       modalContent.classList.remove('removal-state', 'storage-state');
     }
