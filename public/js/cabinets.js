@@ -106,8 +106,11 @@ function createManagementCabinetCard(cabinet) {
   
   card.innerHTML = `
     <div class="cabinet-header">
-      <div class="cabinet-icon-container">
-        <img src="/images/cabinet-so-svgrepo-com.svg" alt="Schrank" class="cabinet-icon">
+      <div class="cabinet-image-container">
+        ${cabinet.image_url ? 
+          `<img class="cabinet-image" src="${cabinet.image_url}" alt="${cabinet.name}">` :
+          `<img src="/images/cabinet-so-svgrepo-com.svg" alt="Schrank" class="cabinet-icon">`
+        }
         <div class="component-count ${statusClass}">${cabinet.componentCount}</div>
       </div>
       <div class="cabinet-actions">
