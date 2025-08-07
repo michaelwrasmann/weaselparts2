@@ -1040,7 +1040,10 @@ function showInfoModal(component) {
   `;
   
   modal.classList.add('active', 'show');
-  modal.style.display = 'flex';
+  // Verwende setProperty mit !important um CSS zu überschreiben
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
   
   // Modal automatisch nach 6 Sekunden schließen
   setTimeout(() => {
@@ -1161,7 +1164,10 @@ async function showStorageModal(component) {
   }
   
   modal.classList.add('active', 'show');
-  modal.style.display = 'flex';
+  // Verwende setProperty mit !important um CSS zu überschreiben
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
 }
 
 /**
@@ -1230,7 +1236,10 @@ function showUnknownBarcodeModal(barcode) {
   `;
   
   modal.classList.add('active', 'show');
-  modal.style.display = 'flex';
+  // Verwende setProperty mit !important um CSS zu überschreiben
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
 }
 
 /**
@@ -1286,7 +1295,10 @@ function showRemovalSuccessModal(component) {
   `;
   
   modal.classList.add('active', 'show');
-  modal.style.display = 'flex';
+  // Verwende setProperty mit !important um CSS zu überschreiben
+  modal.style.setProperty('display', 'flex', 'important');
+  modal.style.setProperty('opacity', '1', 'important');
+  modal.style.setProperty('visibility', 'visible', 'important');
   
   // Modal automatisch nach 2 Sekunden schließen (VERLÄNGERT)
   setTimeout(() => {
@@ -1524,7 +1536,10 @@ function closeGlobalScanner() {
   if (modal) {
     // Entferne beide mögliche Aktivierungsklassen
     modal.classList.remove('active', 'show');
-    modal.style.display = ''; // Reset display style
+    // Reset inline styles mit !important
+    modal.style.setProperty('display', '', 'important');
+    modal.style.setProperty('opacity', '', 'important');
+    modal.style.setProperty('visibility', '', 'important');
     
     // Finde Modal-Content mit beiden möglichen Selektoren
     const modalContent = modal.querySelector('.modal-content, .modern-modal-content');
