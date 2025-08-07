@@ -1039,15 +1039,7 @@ function showInfoModal(component) {
     </div>
   `;
   
-  // Activate modal with both old and modern styles
   modal.classList.add('active');
-  modal.style.display = 'flex';
-  
-  // For modern modals, use the show class
-  if (modal.classList.contains('modern-modal')) {
-    modal.classList.add('show');
-    modal.style.display = 'flex';
-  }
   
   // Modal automatisch nach 6 Sekunden schließen
   setTimeout(() => {
@@ -1167,15 +1159,7 @@ async function showStorageModal(component) {
     `;
   }
   
-  // Activate modal with both old and modern styles
   modal.classList.add('active');
-  modal.style.display = 'flex';
-  
-  // For modern modals, use the show class
-  if (modal.classList.contains('modern-modal')) {
-    modal.classList.add('show');
-    modal.style.display = 'flex';
-  }
 }
 
 /**
@@ -1243,15 +1227,7 @@ function showUnknownBarcodeModal(barcode) {
     </div>
   `;
   
-  // Activate modal with both old and modern styles
   modal.classList.add('active');
-  modal.style.display = 'flex';
-  
-  // For modern modals, use the show class
-  if (modal.classList.contains('modern-modal')) {
-    modal.classList.add('show');
-    modal.style.display = 'flex';
-  }
 }
 
 /**
@@ -1306,15 +1282,7 @@ function showRemovalSuccessModal(component) {
     </div>
   `;
   
-  // Activate modal with both old and modern styles
   modal.classList.add('active');
-  modal.style.display = 'flex';
-  
-  // For modern modals, use the show class
-  if (modal.classList.contains('modern-modal')) {
-    modal.classList.add('show');
-    modal.style.display = 'flex';
-  }
   
   // Modal automatisch nach 2 Sekunden schließen (VERLÄNGERT)
   setTimeout(() => {
@@ -1468,60 +1436,20 @@ function updateLocalData() {
 }
 
 /**
- * Stellt sicher, dass das Scanner-Modal existiert (FIXED für modern-modal)
+ * Stellt sicher, dass das Scanner-Modal existiert (UNVERÄNDERT)
  */
 function ensureScannerModalExists() {
   let modal = document.getElementById('scanner-modal');
   
-  // Check if we can use existing modern modal structure
-  if (modal && modal.classList.contains('modern-modal')) {
-    console.log('✅ Using existing modern scanner modal');
-    
-    // Convert modern modal to scanner format
-    const modalContent = modal.querySelector('.modern-modal-content');
-    if (modalContent) {
-      modalContent.classList.add('scanner-content', 'wide-modal');
-      
-      // Create scanner header if it doesn't exist
-      let header = modal.querySelector('.scanner-header');
-      if (!header) {
-        const existingHeader = modal.querySelector('.modern-modal-header');
-        if (existingHeader) {
-          existingHeader.classList.add('scanner-header');
-          header = existingHeader;
-        } else {
-          const headerHTML = '<div class="scanner-header modern-modal-header"><h2>Bauteil scannen</h2><button class="modern-close-btn" id="close-scanner">&times;</button></div>';
-          modalContent.insertAdjacentHTML('afterbegin', headerHTML);
-          header = modal.querySelector('.scanner-header');
-        }
-      }
-      
-      // Create scanner body if it doesn't exist
-      let body = modal.querySelector('.scanner-body');
-      if (!body) {
-        const existingBody = modal.querySelector('.modern-modal-body');
-        if (existingBody) {
-          existingBody.classList.add('scanner-body');
-          body = existingBody;
-        } else {
-          const bodyHTML = '<div class="scanner-body modern-modal-body"><!-- Inhalt wird dynamisch gefüllt --></div>';
-          modalContent.insertAdjacentHTML('beforeend', bodyHTML);
-          body = modal.querySelector('.scanner-body');
-        }
-      }
-    }
-  }
-  
   if (!modal) {
-    // Create new scanner modal with modern structure
     const modalHTML = `
-      <div id="scanner-modal" class="modal modern-modal">
-        <div class="modal-content modern-modal-content scanner-content wide-modal">
-          <div class="scanner-header modern-modal-header">
+      <div id="scanner-modal" class="modal">
+        <div class="modal-content scanner-content wide-modal">
+          <div class="scanner-header">
             <h2>Bauteil scannen</h2>
-            <button class="modern-close-btn" id="close-scanner">&times;</button>
+            <button class="close-modal" id="close-scanner">&times;</button>
           </div>
-          <div class="scanner-body modern-modal-body">
+          <div class="scanner-body">
             <!-- Inhalt wird dynamisch gefüllt -->
           </div>
         </div>
@@ -1543,10 +1471,8 @@ function ensureScannerModalExists() {
       console.error('❌ Modal content not found after creation');
       return null;
     }
-  }
-  
-  // Setup event listeners if not already done
-  if (modal && !modal.dataset.listenersAdded) {
+    
+    // Event Listeners hinzufügen
     const closeButton = modal.querySelector('#close-scanner');
     if (closeButton) {
       closeButton.addEventListener('click', closeGlobalScanner);
@@ -1554,32 +1480,26 @@ function ensureScannerModalExists() {
       console.error('❌ Close button not found in modal');
     }
     
-    // Escape key handler
+    // Escape-Taste
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && (modal.classList.contains('active') || modal.style.display === 'flex')) {
+      if (e.key === 'Escape' && modal.classList.contains('active')) {
         closeGlobalScanner();
       }
     });
-    
-    modal.dataset.listenersAdded = 'true';
   }
   
   return modal;
 }
 
 /**
- * Schließt den globalen Scanner (FIXED für modern-modal)
+ * Schließt den globalen Scanner (REPARIERT V2)
  */
 function closeGlobalScanner() {
   console.log('❌ Schließe globalen Scanner');
   
   const modal = document.getElementById('scanner-modal');
   if (modal) {
-    // Support both old and modern modal activation
-    modal.classList.remove('active', 'show');
-    modal.style.display = 'none';
-    modal.style.visibility = 'hidden';
-    
+    modal.classList.remove('active');
     const modalContent = modal.querySelector('.modal-content');
     if (modalContent) {
       modalContent.classList.remove('removal-state', 'storage-state');
