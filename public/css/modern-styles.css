@@ -258,6 +258,7 @@ body.page-add-component { background-color: var(--bg-add-component); }
   box-shadow: var(--shadow-xl);
   overflow: hidden;
   position: relative;
+  padding-top: 20px;
   /* Hintergrundbild entfernt */
 }
 
