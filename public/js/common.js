@@ -972,18 +972,37 @@ function showInfoModal(component) {
   console.log('🔍 Zeige Info-Modal für eingelagertes Bauteil');
   
   const modal = ensureScannerModalExists();
+  if (!modal) {
+    console.error('❌ Failed to create or find scanner modal in showInfoModal');
+    return;
+  }
   
   // Modal Inhalt für eingelagertes Bauteil
   const modalContent = modal.querySelector('.modal-content');
+  if (!modalContent) {
+    console.error('❌ Modal content not found in showInfoModal');
+    return;
+  }
   modalContent.className = 'modal-content scanner-content wide-modal';
   
   // Header
   const header = modal.querySelector('.scanner-header');
+  if (!header) {
+    console.error('❌ Scanner header not found in showInfoModal');
+    return;
+  }
   header.style.background = 'var(--primary-green)';
-  header.querySelector('h2').textContent = 'Bauteil gefunden';
+  const headerTitle = header.querySelector('h2');
+  if (headerTitle) {
+    headerTitle.textContent = 'Bauteil gefunden';
+  }
   
   // Body mit Apple-Style Layout
   const body = modal.querySelector('.scanner-body');
+  if (!body) {
+    console.error('❌ Scanner body not found in showInfoModal');
+    return;
+  }
   body.innerHTML = `
     <div class="scanner-component-section">
       <div class="scanner-info-display">
@@ -1037,18 +1056,37 @@ async function showStorageModal(component) {
   console.log('📦 Zeige Schrank-Auswahl für nicht eingelagertes Bauteil');
   
   const modal = ensureScannerModalExists();
+  if (!modal) {
+    console.error('❌ Failed to create or find scanner modal in showStorageModal');
+    return;
+  }
   
   // Modal Inhalt für Schrank-Auswahl
   const modalContent = modal.querySelector('.modal-content');
+  if (!modalContent) {
+    console.error('❌ Modal content not found in showStorageModal');
+    return;
+  }
   modalContent.className = 'modal-content scanner-content storage-modal'; // NEUE KLASSE
   
   // Header
   const header = modal.querySelector('.scanner-header');
+  if (!header) {
+    console.error('❌ Scanner header not found in showStorageModal');
+    return;
+  }
   header.style.background = 'var(--primary-blue)';
-  header.querySelector('h2').textContent = 'Schrank auswählen';
+  const headerTitle = header.querySelector('h2');
+  if (headerTitle) {
+    headerTitle.textContent = 'Schrank auswählen';
+  }
   
   // Body mit Apple-Style Layout
   const body = modal.querySelector('.scanner-body');
+  if (!body) {
+    console.error('❌ Scanner body not found in showStorageModal');
+    return;
+  }
   
   try {
     const cabinets = await api.getCabinets();
@@ -1131,15 +1169,34 @@ function showUnknownBarcodeModal(barcode) {
   console.log('❓ Zeige Modal für unbekannten Barcode');
   
   const modal = ensureScannerModalExists();
+  if (!modal) {
+    console.error('❌ Failed to create or find scanner modal in showUnknownBarcodeModal');
+    return;
+  }
   
   const modalContent = modal.querySelector('.modal-content');
+  if (!modalContent) {
+    console.error('❌ Modal content not found in showUnknownBarcodeModal');
+    return;
+  }
   modalContent.className = 'modal-content scanner-content wide-modal';
   
   const header = modal.querySelector('.scanner-header');
+  if (!header) {
+    console.error('❌ Scanner header not found in showUnknownBarcodeModal');
+    return;
+  }
   header.style.background = '#ff9500';
-  header.querySelector('h2').textContent = 'Unbekanntes Bauteil';
+  const headerTitle = header.querySelector('h2');
+  if (headerTitle) {
+    headerTitle.textContent = 'Unbekanntes Bauteil';
+  }
   
   const body = modal.querySelector('.scanner-body');
+  if (!body) {
+    console.error('❌ Scanner body not found in showUnknownBarcodeModal');
+    return;
+  }
   body.innerHTML = `
     <div class="scanner-unknown-display">
       <div class="unknown-card">
@@ -1180,18 +1237,37 @@ function showRemovalSuccessModal(component) {
   console.log('✅ Zeige Auslagern-Erfolg Modal');
   
   const modal = ensureScannerModalExists();
+  if (!modal) {
+    console.error('❌ Failed to create or find scanner modal in showRemovalSuccessModal');
+    return;
+  }
   
   // Modal in Removal-State setzen
   const modalContent = modal.querySelector('.modal-content');
+  if (!modalContent) {
+    console.error('❌ Modal content not found in showRemovalSuccessModal');
+    return;
+  }
   modalContent.className = 'modal-content scanner-content wide-modal removal-state';
   
   // Header - rot
   const header = modal.querySelector('.scanner-header');
+  if (!header) {
+    console.error('❌ Scanner header not found in showRemovalSuccessModal');
+    return;
+  }
   header.style.background = 'var(--accent-red)';
-  header.querySelector('h2').textContent = 'Bauteil ausgelagert';
+  const headerTitle = header.querySelector('h2');
+  if (headerTitle) {
+    headerTitle.textContent = 'Bauteil ausgelagert';
+  }
   
   // Body mit roter Erfolgs-Nachricht
   const body = modal.querySelector('.scanner-body');
+  if (!body) {
+    console.error('❌ Scanner body not found in showRemovalSuccessModal');
+    return;
+  }
   body.innerHTML = `
     <div class="removal-confirmation">
       <div class="removal-icon">
@@ -1252,18 +1328,37 @@ function showStorageSuccessModal(component, cabinetName) {
   console.log('✅ Zeige Einlagern-Erfolg Modal');
   
   const modal = document.getElementById('scanner-modal');
+  if (!modal) {
+    console.error('❌ Scanner modal not found in showStorageSuccessModal');
+    return;
+  }
   
   // Modal-Content-Klasse zurücksetzen
   const modalContent = modal.querySelector('.modal-content');
+  if (!modalContent) {
+    console.error('❌ Modal content not found in showStorageSuccessModal');
+    return;
+  }
   modalContent.className = 'modal-content scanner-content wide-modal storage-state';
   
   // Header - grün
   const header = modal.querySelector('.scanner-header');
+  if (!header) {
+    console.error('❌ Scanner header not found in showStorageSuccessModal');
+    return;
+  }
   header.style.background = 'var(--primary-green)';
-  header.querySelector('h2').textContent = 'Bauteil eingelagert';
+  const headerTitle = header.querySelector('h2');
+  if (headerTitle) {
+    headerTitle.textContent = 'Bauteil eingelagert';
+  }
   
   // Body mit grüner Erfolgs-Nachricht
   const body = modal.querySelector('.scanner-body');
+  if (!body) {
+    console.error('❌ Scanner body not found in showStorageSuccessModal');
+    return;
+  }
   body.innerHTML = `
     <div class="storage-confirmation">
       <div class="storage-icon">
@@ -1364,8 +1459,26 @@ function ensureScannerModalExists() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     modal = document.getElementById('scanner-modal');
     
+    // Verify modal was created successfully
+    if (!modal) {
+      console.error('❌ Failed to create scanner modal');
+      return null;
+    }
+    
+    // Verify modal content exists
+    const modalContent = modal.querySelector('.modal-content');
+    if (!modalContent) {
+      console.error('❌ Modal content not found after creation');
+      return null;
+    }
+    
     // Event Listeners hinzufügen
-    modal.querySelector('#close-scanner').addEventListener('click', closeGlobalScanner);
+    const closeButton = modal.querySelector('#close-scanner');
+    if (closeButton) {
+      closeButton.addEventListener('click', closeGlobalScanner);
+    } else {
+      console.error('❌ Close button not found in modal');
+    }
     
     // Escape-Taste
     document.addEventListener('keydown', (e) => {
