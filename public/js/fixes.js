@@ -200,8 +200,13 @@ document.addEventListener('DOMContentLoaded', function() {
   setupEnhancedScanner();
 });
 
-// Enhanced Scanner Setup für bessere Barcode-Erkennung
+// Enhanced Scanner Setup für bessere Barcode-Erkennung (DEAKTIVIERT - Konflikte mit common.js)
 function setupEnhancedScanner() {
+  console.log('🔍 Enhanced Scanner Setup deaktiviert - wird von common.js übernommen');
+  // Diese Funktion ist deaktiviert, da der globale Scanner in common.js bereits
+  // die gesamte Scanner-Logik übernimmt und Konflikte entstehen können
+  
+  /* DEAKTIVIERTER CODE:
   let lastScanTime = 0;
   let scanBuffer = '';
   
@@ -238,6 +243,7 @@ function setupEnhancedScanner() {
       scanBuffer = '';
     }
   });
+  */
 }
 
 // Fix für Export-Funktion

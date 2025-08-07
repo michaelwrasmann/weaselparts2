@@ -4,319 +4,234 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeaselParts - Neues Bauteil</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/modern-styles.css">
+  <!-- Page Transitions -->
+  <script src="/js/page-transitions.js"></script>
+  <!-- Modal Animations -->
+  <script src="/js/modal-animations.js"></script>
 </head>
-<body>
-  <header>
-    <div class="header-content">
-      <a href="/" class="logo">
-        <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-          <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
-        </svg>
-        <h1>WeaselParts</h1>
+<body class="page-add-component">
+<div class="modern-container">
+  <!-- Modern Header -->
+  <header class="modern-header">
+    <nav class="modern-nav">
+      <a href="/" class="modern-logo">
+        <img src="/images/weasel-svgrepo-com.svg" alt="WeaselParts">
+        <span>WeaselParts</span>
       </a>
-      <nav class="top-nav">
-        <div class="nav-left">
-          <div class="lab-info">
-            <div class="location-selector">
-              <select id="sensor-location-select" class="location-dropdown">
-                <option value="ssa">Jarvis-Ecke</option>
-                <option value="int_up">Am Telefon</option>
-                <option value="int_low">Empore</option>
-              </select>
-            </div>
-            <div class="mini-sensors">
-              <span class="mini-sensor temp">
-                <span id="temperature-value">--°C</span>
-              </span>
-              <span class="mini-sensor humid">
-                <span id="humidity-value">--%</span>
-              </span>
-            </div>
-          </div>
-          <div class="search-container">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text" placeholder="Bauteile suchen" id="global-search">
-          </div>
-        </div>
-        <div class="nav-icons">
-          <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
-            </svg>
-          </button>
-          <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-          </button>
-          <a href="/ICD.html" class="nav-btn" title="ICD">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </a>
-          <a href="/lab-overview.html" class="nav-btn" title="Labor-Übersicht">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-            </svg>
-          </a>
-          <a href="/glue-protocol.html" class="nav-btn" title="Klebeprotokoll">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-5a2 2 0 00-2-2h-2.5"></path>
-            </svg>
-          </a>
-        <a href="/settings.html" class="nav-btn" title="Einstellungen">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
+      
+      <!-- Search Bar -->
+      <div class="modern-search">
+        <input type="text" placeholder="Bauteile suchen..." id="global-search">
+      </div>
+      
+      <!-- Sensor Data Display -->
+      <div class="modern-sensors">
+        <div class="modern-sensor temp" id="temperature-value">--°C</div>
+        <div class="modern-sensor humid" id="humidity-value">--%</div>
+        <select id="sensor-location-select" class="modern-select" style="font-size: 0.875rem; padding: 0.25rem 0.5rem;">
+          <option value="ssa">Jarvis-Ecke</option>
+          <option value="int_up">Am Telefon</option>
+          <option value="emp">Empore</option>
+        </select>
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="modern-nav-buttons">
+        <button class="modern-nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <img src="/images/button_add_component.png" alt="Neues Bauteil">
+        </button>
+        <button class="modern-nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <img src="/images/button_manage_cabinet.png" alt="Schränke">
+        </button>
+        <a href="/ICD.html" class="modern-nav-btn" title="ICD">
+          <img src="/images/button_icd.png" alt="ICD">
         </a>
-        </div>
-      </nav>
-    </div>
+        <a href="/lab-overview.html" class="modern-nav-btn" title="Labor-Übersicht">
+          <img src="/images/button_lab_overview.png" alt="Labor">
+        </a>
+        <a href="/glue-protocol.html" class="modern-nav-btn" title="Klebeprotokoll">
+          <img src="/images/button_glue_protocol.png" alt="Kleben">
+        </a>
+        <a href="/settings.html" class="modern-nav-btn" title="Einstellungen">
+          <img src="/images/button_settings.png" alt="Settings">
+        </a>
+      </div>
+    </nav>
   </header>
 
-  <main class="main-content">
-    <div class="page-header">
-      <h1 class="page-title">Neues Bauteil anlegen</h1>
-      <p class="page-subtitle">Erfasse ein neues elektronisches Bauteil in dein Inventar</p>
-    </div>
+  <!-- Split Screen Layout -->
+  <div class="modern-wrapper">
+    <!-- Content Panel - Left Side -->
+    <div class="content-panel">
+      <div class="modern-content">
+        
+        <!-- Page Header -->
+        <div class="modern-page-header">
+          <h1 class="modern-title">Neues Bauteil</h1>
+        </div>
 
-    <div class="form-container">
+        <div class="modern-panel">
       <form id="component-form" enctype="multipart/form-data">
         
         <!-- Barcode Section -->
-        <div class="form-group">
-          <label for="barcode">Barcode (automatisch generiert oder scannen)*:</label>
-          <div class="barcode-input-group">
-            <input type="text" id="barcode" name="barcode" required autocomplete="off" class="barcode-input">
-            <div class="barcode-actions">
-              <button type="button" id="scan-barcode-btn" class="btn secondary barcode-btn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-                </svg>
-                Scannen
-              </button>
-              <button type="button" id="generate-barcode-btn" class="btn secondary barcode-btn">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                </svg>
-                Generieren
-              </button>
-            </div>
+        <div class="modern-form-group">
+          <label for="barcode" class="modern-label">Barcode (automatisch generiert)*:</label>
+          <div class="barcode-input-row">
+            <input type="text" id="barcode" name="barcode" required autocomplete="off" class="modern-input barcode-input-half">
+            <button type="button" id="generate-barcode-btn" class="modern-btn modern-btn-secondary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              Neu generieren
+            </button>
           </div>
         </div>
 
-        <!-- Enhanced Image Upload Section with Camera Support -->
-        <div class="form-group">
-          <label>Bauteil-Foto:</label>
-          <div class="image-upload-container">
-            <!-- Tab Navigation -->
-            <div class="image-upload-tabs">
-              <button type="button" class="tab-button active" data-tab="upload">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                Datei hochladen
-              </button>
-              <button type="button" class="tab-button" data-tab="camera">
-                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Image Upload with Camera -->
+        <div class="modern-form-group" style="margin-bottom: 40px;">
+          <label class="modern-label">Bauteil-Foto (optional):</label>
+          <div class="photo-options">
+            <button type="button" class="modern-btn modern-btn-secondary" onclick="document.getElementById('component-image').click()">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 13v4a2 2 0 01-2 2H8a2 2 0 01-2-2V7a2 2 0 012-2h4l4 4v4z"></path>
+              </svg>
+              Datei wählen
+            </button>
+            <button type="button" class="modern-btn modern-btn-secondary" onclick="toggleCamera()" id="camera-toggle-btn">
+              <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              Kamera starten
+            </button>
+            <input type="file" id="component-image" name="image" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
+          </div>
+          
+          <!-- Inline Camera Section -->
+          <div id="camera-section" class="camera-section" style="display: none;">
+            <div class="inline-camera-container">
+              <video id="camera-video" width="320" height="240" autoplay playsinline></video>
+              <canvas id="camera-canvas" width="320" height="240" style="display: none;"></canvas>
+            </div>
+            <div class="inline-camera-controls">
+              <button type="button" class="modern-btn modern-btn-primary" onclick="capturePhoto()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <circle cx="12" cy="13" r="3"></circle>
                 </svg>
                 Foto aufnehmen
               </button>
-            </div>
-
-            <!-- Upload Tab Content -->
-            <div id="upload-tab" class="tab-content active">
-              <div class="image-upload-area" id="image-upload-area">
-                <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              <button type="button" class="modern-btn modern-btn-secondary" onclick="stopCamera()">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                 </svg>
-                <p>Bild hochladen</p>
-                <span>Klicken oder Datei hierher ziehen</span>
-              </div>
-              <input type="file" id="component-image" name="image" accept="image/*" style="display: none;">
-            </div>
-
-            <!-- Camera Tab Content -->
-            <div id="camera-tab" class="tab-content">
-              <div class="camera-container">
-                <div class="camera-preview">
-                  <video id="camera-video" class="camera-video" autoplay muted playsinline></video>
-                  <div class="camera-placeholder">
-                    <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <h4>Kamera bereit</h4>
-                    <p>Klicke auf "Kamera starten" um ein Foto aufzunehmen</p>
-                  </div>
-                  <div class="camera-status">
-                    <div class="camera-status-dot"></div>
-                    Kamera gestoppt
-                  </div>
-                </div>
-                <div class="camera-controls">
-                  <button type="button" class="camera-btn start" data-action="start">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    Kamera starten
-                  </button>
-                  <button type="button" class="camera-btn capture" data-action="capture" disabled>
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    Foto aufnehmen
-                  </button>
-                  <button type="button" class="camera-btn stop" data-action="stop" disabled>
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10h6v4H9z"></path>
-                    </svg>
-                    Kamera stoppen
-                  </button>
-                  <button type="button" class="camera-btn switch" data-action="switch" disabled>
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
-                    </svg>
-                    Kamera wechseln
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <!-- Image Preview (shared) -->
-            <div class="image-preview" id="image-preview"></div>
-          </div>
-        </div>
-
-        <!-- Form Grid -->
-        <div class="form-grid">
-          <!-- Linke Spalte -->
-          <div class="form-column">
-            <div class="form-group">
-              <label for="project">PROJECT*:</label>
-              <select id="project" name="project" required class="highlight-field">
-                <option value="">Projekt auswählen...</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="identification_number">IDENTIFICATION NUMBER:</label>
-              <input type="text" id="identification_number" name="identification_number" class="highlight-field">
+                Kamera stoppen
+              </button>
             </div>
           </div>
           
-          <!-- Rechte Spalte -->
-          <div class="form-column">
-            <div class="form-group">
-              <label for="responsible_engineer">RESPONSIBLE ENGINEER*:</label>
-              <select id="responsible_engineer" name="responsible_engineer" required class="highlight-field">
-                <option value="">Mitarbeiter auswählen...</option>
-              </select>
-            </div>
-            
-            <div class="form-group">
-              <label for="equipment_name">EQUIPMENT NAME*:</label>
-              <input type="text" id="equipment_name" name="equipment_name" required class="highlight-field">
-            </div>
-          </div>
+          <div class="image-preview" id="image-preview"></div>
         </div>
 
-        <!-- Additional Fields -->
-        <div class="form-group">
-          <label for="name">Bauteil-Name:</label>
-          <input type="text" id="name" name="name" placeholder="Wird automatisch aus Equipment Name übernommen">
+        <!-- Compact Form Fields -->
+        <div class="modern-form-group">
+          <label for="project" class="modern-label">Projekt*:</label>
+          <select id="project" name="project" required class="modern-select">
+            <option value="">Projekt auswählen...</option>
+          </select>
+        </div>
+        
+        <div class="modern-form-group">
+          <label for="responsible_engineer" class="modern-label">Verantwortlicher*:</label>
+          <select id="responsible_engineer" name="responsible_engineer" required class="modern-select">
+            <option value="">Mitarbeiter auswählen...</option>
+          </select>
+        </div>
+        
+        <div class="modern-form-group">
+          <label for="equipment_name" class="modern-label">Equipment Name*:</label>
+          <input type="text" id="equipment_name" name="equipment_name" required class="modern-input">
         </div>
 
-        <div class="form-group">
-          <label for="beschreibung">Beschreibung:</label>
-          <textarea id="beschreibung" name="beschreibung" rows="3" placeholder="Optional: Zusätzliche Informationen zum Bauteil"></textarea>
+        <div class="modern-form-group">
+          <label for="identification_number" class="modern-label">ID-Nummer:</label>
+          <input type="text" id="identification_number" name="identification_number" class="modern-input">
+        </div>
+
+        <div class="modern-form-group">
+          <label for="beschreibung" class="modern-label">Beschreibung:</label>
+          <textarea id="beschreibung" name="beschreibung" rows="2" placeholder="Optional" class="modern-textarea"></textarea>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn primary">
+          <button type="submit" class="modern-btn modern-btn-primary">
             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
             </svg>
             Speichern
           </button>
-          <button type="reset" class="btn secondary">Zurücksetzen</button>
-          <button type="button" class="btn secondary" onclick="window.location.href='/'">Abbrechen</button>
+          <button type="reset" class="modern-btn modern-btn-secondary">Zurücksetzen</button>
+          <button type="button" class="modern-btn modern-btn-secondary" onclick="window.location.href='/'">Abbrechen</button>
         </div>
-      </form>
-    </div>
-  </main>
-
-  <!-- KRITISCH: Modals nur einmal definieren und initial versteckt -->
-  <!-- Barcode Print Modal -->
-  <div id="barcode-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
-    <div class="modal-content barcode-print-content">
-      <div class="modal-header">
-        <h3>Barcode erstellt!</h3>
-        <button class="close-modal" id="close-barcode-modal">&times;</button>
+        </form>
       </div>
-      
-      <div class="barcode-display">
-        <div class="barcode-info">
-          <h4 id="barcode-component-name"></h4>
-          <p><strong>Projekt:</strong> <span id="barcode-project"></span></p>
-          <p><strong>Equipment:</strong> <span id="barcode-equipment"></span></p>
-          <p><strong>Barcode:</strong> <span id="barcode-value"></span></p>
-        </div>
-        
-        <div class="barcode-image-container">
-          <img id="barcode-image" alt="Barcode" style="max-width: 100%; height: auto;">
-        </div>
-        
-        <div class="barcode-actions">
-          <button class="btn primary" id="print-barcode">
-            🖨️ Barcode drucken
-          </button>
-          <button class="btn secondary" id="download-barcode">
-            💾 Barcode herunterladen
-          </button>
-          <button class="btn secondary" id="close-modal-btn">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-            Schließen
-          </button>
-        </div>
+      </div>
+    </div>
+    
+    <!-- Background Panel - Right Side -->
+    <div class="background-panel">
+      <img src="/images/background_icon_add_component.png" alt="Background Icon" class="background-icon">
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div id="barcode-modal" class="modern-modal" style="display: none;">
+  <div class="modern-modal-content">
+    <div class="modal-titlebar">
+      <h3>Barcode erstellt!</h3>
+      <button class="modal-close-btn" id="close-barcode-modal">&times;</button>
+    </div>
+    <div class="modern-modal-body">
+      <div class="barcode-info">
+        <h4 id="barcode-component-name"></h4>
+        <p><strong>Projekt:</strong> <span id="barcode-project"></span></p>
+        <p><strong>Equipment:</strong> <span id="barcode-equipment"></span></p>
+        <p><strong>Barcode:</strong> <span id="barcode-value"></span></p>
+      </div>
+      <div class="barcode-image-container">
+        <img id="barcode-image" alt="Barcode" style="max-width: 100%; height: auto;">
+      </div>
+      <div class="modern-modal-footer">
+        <button class="modern-btn modern-btn-primary" id="print-barcode">🖨️ Drucken</button>
+        <button class="modern-btn modern-btn-secondary" id="download-barcode">💾 Download</button>
+        <button class="modern-btn modern-btn-secondary" id="close-modal-btn">Schließen</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Scanner Modal -->
-  <div id="scanner-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
-    <div class="modal-content scanner-content">
-      <div class="scanner-header">
-        <h2>Barcode scannen</h2>
-        <button class="close-modal" id="close-scanner">&times;</button>
-      </div>
-      
+<div id="scanner-modal" class="modern-modal" style="display: none;">
+  <div class="modern-modal-content">
+    <div class="modal-titlebar">
+      <h3>Barcode scannen</h3>
+      <button class="modal-close-btn" id="close-scanner">&times;</button>
+    </div>
+    <div class="modern-modal-body">
       <div class="scanner-area">
-        <div class="scanner-icon-container">
-          <svg class="scanner-icon blinking" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
-          </svg>
-          <p>Barcode mit Scanner erfassen</p>
-        </div>
-        
-        <div class="manual-input">
-          <input type="text" id="scanner-input" placeholder="Oder Barcode hier eingeben..." autocomplete="off">
-        </div>
+        <svg class="scanner-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path>
+        </svg>
+        <p>Barcode mit Scanner erfassen</p>
+        <input type="text" id="scanner-input" placeholder="Oder Barcode hier eingeben..." autocomplete="off" class="modern-input">
       </div>
     </div>
   </div>
+</div>
 
-  <div id="toast-container"></div>
+<div id="toast-container"></div>
 
   <!-- SCRIPTS: Richtige Reihenfolge -->
   <script src="/js/api.js"></script>
@@ -377,20 +292,7 @@
     function setupEventListeners() {
       console.log('🔧 Event Listeners werden eingerichtet...');
       
-      // Navigation Buttons
-      const addBtn = document.getElementById('add-component-nav-btn');
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          window.location.href = '/add-component.html';
-        });
-      }
-
-      const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
-      if (manageCabinetsBtn) {
-        manageCabinetsBtn.addEventListener('click', () => {
-          window.location.href = '/manage-cabinets.html';
-        });
-      }
+      // Navigation Buttons - Let page-transitions.js handle these
       
       // Global Search
       const globalSearch = document.getElementById('global-search');
@@ -783,6 +685,26 @@ function autoFillName() {
         handleFile(e.target.files[0]);
       }
     }
+    
+    // Simplified version for inline use
+    window.handleFileSelect = function(e) {
+      if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        if (!file.type.startsWith('image/')) {
+          showMessage('Bitte wähle eine Bilddatei aus.', 'warning');
+          return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const preview = document.getElementById('image-preview');
+          if (preview) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Vorschau" style="max-width: 200px; max-height: 150px; border-radius: 8px;">`;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
 
     function handleFile(file) {
       if (!file.type.startsWith('image/')) {
@@ -882,6 +804,95 @@ function autoFillName() {
 
     // Globale Funktionen verfügbar machen
     window.removeImage = removeImage;
+    
+    // Camera Functions
+    let cameraStream = null;
+    let cameraActive = false;
+    
+    window.toggleCamera = async function() {
+      if (!cameraActive) {
+        await startCamera();
+      } else {
+        stopCamera();
+      }
+    };
+    
+    async function startCamera() {
+      try {
+        const cameraSection = document.getElementById('camera-section');
+        const video = document.getElementById('camera-video');
+        const toggleBtn = document.getElementById('camera-toggle-btn');
+        
+        // Request camera access
+        cameraStream = await navigator.mediaDevices.getUserMedia({ 
+          video: { 
+            facingMode: 'environment', // Try back camera first
+            width: 320,
+            height: 240
+          } 
+        });
+        
+        video.srcObject = cameraStream;
+        cameraSection.style.display = 'block';
+        toggleBtn.textContent = '📷 Kamera läuft';
+        toggleBtn.classList.add('active');
+        cameraActive = true;
+        
+        showMessage('Kamera gestartet!', 'success');
+      } catch (error) {
+        console.error('Kamera-Zugriff fehlgeschlagen:', error);
+        showMessage('Kamera-Zugriff fehlgeschlagen. Bitte Berechtigung erteilen.', 'error');
+      }
+    }
+    
+    window.stopCamera = function() {
+      const cameraSection = document.getElementById('camera-section');
+      const video = document.getElementById('camera-video');
+      const toggleBtn = document.getElementById('camera-toggle-btn');
+      
+      // Stop camera stream
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      
+      video.srcObject = null;
+      cameraSection.style.display = 'none';
+      toggleBtn.textContent = '📷 Kamera starten';
+      toggleBtn.classList.remove('active');
+      cameraActive = false;
+      
+      showMessage('Kamera gestoppt', 'info');
+    };
+    
+    window.capturePhoto = function() {
+      const video = document.getElementById('camera-video');
+      const canvas = document.getElementById('camera-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Draw video frame to canvas
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Convert to blob and create file
+      canvas.toBlob((blob) => {
+        const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+        
+        // Update file input
+        const fileInput = document.getElementById('component-image');
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        
+        // Show preview
+        const preview = document.getElementById('image-preview');
+        const imgUrl = canvas.toDataURL();
+        preview.innerHTML = `<img src="${imgUrl}" alt="Kamera-Foto" style="max-width: 200px; max-height: 150px; border-radius: 8px;">`;
+        
+        // Close camera
+        closeCamera();
+        showMessage('Foto erfolgreich aufgenommen!', 'success');
+      }, 'image/jpeg', 0.8);
+    };
 
     // Sensordaten-Funktionen
     function updateSensorData() {
@@ -1004,6 +1015,125 @@ function autoFillName() {
   </script>
   
   <style>
+    /* Background Icon Anpassung für Add Component */
+    .page-add-component .background-icon {
+      width: 120% !important;
+      max-width: 600px !important;
+      opacity: 1 !important;
+      filter: none !important;
+      transform: translateX(-10%) translateY(-200px) !important;
+    }
+
+    /* Barcode Input Row Layout */
+    .barcode-input-row {
+      display: flex;
+      gap: var(--space-md);
+      align-items: stretch;
+    }
+
+    .barcode-input-half {
+      flex: 1;
+      max-width: 50%;
+    }
+
+    /* Compact Form Styling */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: var(--text-comic);
+      font-family: var(--font-comic);
+    }
+    
+    .photo-options {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .photo-options .comic-btn {
+      flex: 1;
+      min-width: 140px;
+      max-width: 160px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .camera-section {
+      margin: 20px 0;
+      padding: 20px;
+      border: var(--border-thick);
+      border-radius: 15px;
+      background: var(--bg-panel);
+      text-align: center;
+    }
+    
+    .inline-camera-container {
+      margin-bottom: 15px;
+    }
+    
+    .inline-camera-container video {
+      border: var(--border-medium);
+      border-radius: 10px;
+      background: #000;
+      box-shadow: var(--shadow-comic);
+    }
+    
+    .inline-camera-controls {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+    }
+    
+    .inline-camera-controls .comic-btn {
+      min-width: 140px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .comic-btn.active {
+      background: var(--comic-primary);
+      color: white;
+      transform: scale(1.05);
+    }
+    
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 30px;
+    }
+    
+    .action-btn-uniform {
+      min-width: 120px;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .image-preview {
+      margin-top: 10px;
+    }
+    
+    .image-preview img {
+      max-width: 200px;
+      max-height: 150px;
+      border: var(--border-thin);
+      border-radius: 8px;
+    }
+
     /* Barcode Input Group Styling */
     .barcode-input-group {
       display: flex;
@@ -1037,8 +1167,9 @@ function autoFillName() {
 
     .barcode-btn {
       flex: 1;
-      max-width: 150px;
-      padding: 10px 16px !important;
+      min-width: 140px;
+      max-width: 160px;
+      padding: 12px 16px !important;
       font-size: 14px !important;
       display: flex;
       align-items: center;

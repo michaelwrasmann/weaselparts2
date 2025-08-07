@@ -540,8 +540,8 @@ function initializeGlobalScanner() {
   // Zusätzliche Scanner-Events
   document.addEventListener('paste', handlePasteEvent);
   
-  // Scanner-Modal in alle Seiten einfügen falls nicht vorhanden
-  ensureScannerModalExists();
+  // Scanner-Modal wird nur bei Bedarf erstellt (nicht automatisch)
+  // ensureScannerModalExists(); // DEAKTIVIERT - Modal wird nur bei Bedarf erstellt
 }
 
 /**
@@ -553,9 +553,9 @@ function initializeGlobalScanner() {
  */
 
 /**
- * Initialisiert den globalen Barcode-Scanner
+ * Initialisiert den globalen Barcode-Scanner (V2-FIXED)
  */
-function initializeGlobalScanner() {
+function initializeGlobalScanner_V2() {
   console.log('🔍 Globaler Barcode-Scanner initialisiert (V2-FIXED)');
   
   // Globaler Keydown-Listener für Scanner-Erkennung
@@ -564,8 +564,8 @@ function initializeGlobalScanner() {
   // Zusätzliche Scanner-Events
   document.addEventListener('paste', handlePasteEvent);
   
-  // Scanner-Modal in alle Seiten einfügen falls nicht vorhanden
-  ensureScannerModalExists();
+  // Scanner-Modal wird nur bei Bedarf erstellt (nicht automatisch)
+  // ensureScannerModalExists(); // DEAKTIVIERT - Modal wird nur bei Bedarf erstellt
 }
 
 /**
@@ -1406,15 +1406,18 @@ function closeGlobalScanner() {
 }
 
 /**
- * Öffnet Scanner-Modal mit optionalem Barcode (UNVERÄNDERT)
+ * Öffnet Scanner-Modal mit optionalem Barcode (FIX: Kein automatisches Öffnen)
  */
 function openGlobalScannerModal(barcode = '') {
   if (barcode) {
+    // Nur wenn explizit ein Barcode übergeben wird
     scannerBuffer = barcode;
     processScannerInput();
   } else {
+    // Modal wird nur noch manuell geöffnet, nicht automatisch
+    console.log('🔍 Scanner-Modal-Öffnung angefordert, aber automatisches Öffnen ist deaktiviert');
     const modal = ensureScannerModalExists();
-    modal.classList.add('active');
+    // modal.classList.add('active'); // DEAKTIVIERT - Kein automatisches Öffnen
   }
 }
 
@@ -1447,12 +1450,13 @@ function resetScanner() {
   clearTimeout(scannerTimeout);
 }
 
-// URL-Parameter verarbeiten für direkten Scan
+// URL-Parameter verarbeiten für direkten Scan (FIX: Nur bei gültigem Barcode)
 document.addEventListener('DOMContentLoaded', function() {
   const urlParams = new URLSearchParams(window.location.search);
   const scanBarcode = urlParams.get('scan');
   
-  if (scanBarcode) {
+  if (scanBarcode && isValidBarcodeFormat(scanBarcode)) {
+    console.log('🔍 URL-Parameter-Scan erkannt:', scanBarcode);
     setTimeout(() => {
       openGlobalScannerModal(scanBarcode);
     }, 1000);

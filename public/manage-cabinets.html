@@ -4,166 +4,191 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeaselParts - Schränke verwalten</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="/css/modern-styles.css">
+  <!-- Page Transitions -->
+  <script src="/js/page-transitions.js"></script>
+  <!-- Modal Animations -->
+  <script src="/js/modal-animations.js"></script>
 </head>
-<body>
-  <header>
-    <div class="header-content">
-      <a href="/" class="logo">
-        <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-          <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
-        </svg>
-        <h1>WeaselParts</h1>
+<body class="page-cabinets">
+
+<div class="modern-container">
+  <!-- Modern Header -->
+  <header class="modern-header">
+    <nav class="modern-nav">
+      <a href="/" class="modern-logo">
+        <img src="/images/weasel-svgrepo-com.svg" alt="WeaselParts">
+        <span>WeaselParts</span>
       </a>
-      <nav class="top-nav">
-        <div class="nav-left">
-          <div class="lab-info">
-            <div class="location-selector">
-              <select id="sensor-location-select" class="location-dropdown">
-                <option value="ssa">Jarvis-Ecke</option>
-                <option value="int_up">Am Telefon</option>
-                <option value="int_low">Empore</option>
-              </select>
-            </div>
-            <div class="mini-sensors">
-              <span class="mini-sensor temp">
-                <span id="temperature-value">--°C</span>
-              </span>
-              <span class="mini-sensor humid">
-                <span id="humidity-value">--%</span>
-              </span>
-            </div>
-          </div>
-          <div class="search-container">
-            <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-            <input type="text" placeholder="Bauteile suchen" id="global-search">
-          </div>
-        </div>
-        <div class="nav-icons">
-          <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
-            </svg>
-          </button>
-          <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-            </svg>
-          </button>
-          <a href="/ICD.html" class="nav-btn" title="ICD">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-          </a>
-          <a href="/lab-overview.html" class="nav-btn" title="Labor-Übersicht">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-            </svg>
-          </a>
-          <a href="/glue-protocol.html" class="nav-btn" title="Klebeprotokoll">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-5a2 2 0 00-2-2h-2.5"></path>
-            </svg>
-          </a>
-        <a href="/settings.html" class="nav-btn" title="Einstellungen">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
+      
+      <!-- Search Bar -->
+      <div class="modern-search">
+        <input type="text" placeholder="Bauteile suchen..." id="global-search">
+      </div>
+      
+      <!-- Sensor Data -->
+      <div class="modern-sensors">
+        <div class="modern-sensor temp" id="temperature-value">--°C</div>
+        <div class="modern-sensor humid" id="humidity-value">--%</div>
+        <select class="modern-select" id="sensor-location-select" style="width: auto; padding: 4px 8px;">
+          <option value="ssa">Jarvis-Ecke</option>
+          <option value="int_up">Am Telefon</option>
+          <option value="emp">Empore</option>
+        </select>
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="modern-nav-buttons">
+        <button class="modern-nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <img src="/images/button_add_component.png" alt="Neues Bauteil">
+        </button>
+        <button class="modern-nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <img src="/images/button_manage_cabinet.png" alt="Schränke">
+        </button>
+        <a href="/ICD.html" class="modern-nav-btn" title="ICD">
+          <img src="/images/button_icd.png" alt="ICD">
         </a>
-        </div>
-      </nav>
-    </div>
+        <a href="/lab-overview.html" class="modern-nav-btn" title="Labor-Übersicht">
+          <img src="/images/button_lab_overview.png" alt="Labor">
+        </a>
+        <a href="/glue-protocol.html" class="modern-nav-btn" title="Klebeprotokoll">
+          <img src="/images/button_glue_protocol.png" alt="Kleben">
+        </a>
+        <a href="/settings.html" class="modern-nav-btn" title="Einstellungen">
+          <img src="/images/button_settings.png" alt="Settings">
+        </a>
+      </div>
+    </nav>
   </header>
 
-  <main class="main-content">
-    <div class="page-header">
-      <h1 class="page-title">Schränke verwalten</h1>
-      <p class="page-subtitle">Organisiere deine Lagerplätze und verwalte Schrankinhalte - Einfach scannen zum Ein-/Auslagern</p>
-    </div>
+  <!-- Split Screen Layout -->
+  <div class="modern-wrapper">
+    <!-- Content Panel - Left Side 70% -->
+    <div class="content-panel">
+      <div class="modern-content">
+        
+        <!-- Page Header -->
+        <div class="modern-page-header">
+          <h1 class="modern-title">Schränke verwalten</h1>
+        </div>
 
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">Gesamte Schränke</div>
-        <div class="stat-value" id="total-cabinets">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Eingelagerte Bauteile</div>
-        <div class="stat-value" id="total-components">0</div>
-      </div>
-    </div>
-
-    <div class="components-section">
-      <div class="section-header">
-        <h2 class="section-title">
-          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
-          Neuen Schrank hinzufügen
-        </h2>
-      </div>
-
-      <div class="add-cabinet-container">
-        <form id="new-cabinet-form" class="add-cabinet-form">
-          <div class="form-group">
-            <label for="cabinet-name">Schrankname:</label>
-            <input 
-              type="text" 
-              id="cabinet-name" 
-              name="name" 
-              placeholder="Gib einen Namen für den neuen Schrank ein" 
-              required
-              class="cabinet-name-input">
+        <!-- Statistics -->
+        <div class="modern-panel stats-container">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="total-cabinets">0</div>
+                <div class="stat-label">Schränke</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">
+                <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="total-components">0</div>
+                <div class="stat-label">Bauteile eingelagert</div>
+              </div>
+            </div>
           </div>
-          <button type="submit" class="btn primary">
-            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
+        </div>
+
+        <!-- Add New Cabinet -->
+        <div class="modern-panel">
+          <div class="section-header">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: var(--space-sm);">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Neuen Schrank hinzufügen
+            </h2>
+          </div>
+          
+          <form id="new-cabinet-form" class="add-cabinet-form" style="display: flex; gap: var(--space-lg); align-items: end;">
+            <div class="modern-form-group" style="flex: 1; margin-bottom: 0;">
+              <label class="modern-label" for="cabinet-name">Schrankname:</label>
+              <input 
+                type="text" 
+                id="cabinet-name" 
+                name="name" 
+                placeholder="Gib einen Namen für den neuen Schrank ein" 
+                required
+                class="modern-input">
+            </div>
+            <button type="submit" class="modern-btn modern-btn-primary">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Schrank erstellen
+            </button>
+          </form>
+        </div>
+
+        <!-- Existing Cabinets -->
+        <div class="modern-panel">
+          <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl);">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0; display: flex; align-items: center; gap: var(--space-sm);">
+              <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+              </svg>
+              Vorhandene Schränke
+            </h2>
+            <button class="modern-btn modern-btn-secondary" onclick="exportAllCabinets()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+              </svg>
+              Alle exportieren
+            </button>
+          </div>
+          
+          <div class="cabinets-grid modern-grid modern-grid-2" id="cabinets-grid">
+            <!-- Schränke werden dynamisch geladen -->
+          </div>
+          
+          <div id="no-cabinets" class="modern-empty-state" style="display: none;">
+            <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
             </svg>
-            Schrank erstellen
-          </button>
-        </form>
+            <h3>Keine Schränke gefunden</h3>
+            <p>Füge zuerst einen Schrank hinzu, um Bauteile einzulagern.</p>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <div class="components-section">
-      <div class="section-header">
-        <h2 class="section-title">Vorhandene Schränke</h2>
-        <button class="add-btn" onclick="exportAllCabinets()">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
-          Alle exportieren
-        </button>
-      </div>
-      
-      <div class="cabinets-grid" id="cabinets-grid">
-        <!-- Schränke werden dynamisch geladen -->
-      </div>
-      
-      <div id="no-cabinets" class="no-components hidden">
-        <svg width="80" height="80" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="opacity: 0.3; margin-bottom: 20px;">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-        </svg>
-        <h3>Keine Schränke gefunden</h3>
-        <p>Füge zuerst einen Schrank hinzu, um Bauteile einzulagern.</p>
-      </div>
+    
+    <!-- Background Panel - Right Side 30% -->
+    <div class="background-panel">
+      <img src="/images/background_icon_manage_cabinet.png" alt="Manage Cabinets Icon" class="background-icon cabinet-bg-icon" onerror="this.src='/images/background_icon_lab_overview.png'">
     </div>
-  </main>
+  </div>
+</div>
 
-  <!-- Cabinet Details Modal -->
-  <div id="cabinet-details-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
-    <div class="modal-content cabinet-details-content">
-      <div class="modal-header">
-        <h3 id="cabinet-modal-title">Schrank Details</h3>
-        <button class="close-modal" id="close-cabinet-details">&times;</button>
-      </div>
-      
+<!-- Cabinet Details Modal -->
+<div id="cabinet-details-modal" class="modal modern-modal">
+  <div class="modal-content modern-modal-content" style="max-width: 900px;">
+    <div class="modal-header modern-modal-header modal-titlebar">
+      <h3 id="cabinet-modal-title">Schrank Details</h3>
+      <button class="modal-close-btn close-modal" id="close-cabinet-details">✕</button>
+    </div>
+    
+    <div class="modal-body modern-modal-body">
       <div class="cabinet-contents-section">
-        <div class="contents-header">
-          <h4>Inhalt (<span id="contents-count">0</span> Bauteile)</h4>
-          <button class="btn secondary" id="export-contents">
+        <div class="contents-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+          <h4 style="font-size: 1.25rem; font-weight: 600; margin: 0; display: flex; align-items: center; gap: var(--space-sm);">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v11a2 2 0 002 2h2M9 5a2 2 0 012 2v11a2 2 0 01-2 2M9 5a2 2 0 012-2h2a2 2 0 012 2M15 19h2a2 2 0 002-2V7a2 2 0 00-2-2h-2m-6 0h6"></path>
+            </svg>
+            Inhalt (<span id="contents-count">0</span> Bauteile)
+          </h4>
+          <button class="modern-btn modern-btn-secondary" id="export-contents">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
             </svg>
@@ -172,7 +197,7 @@
         </div>
         
         <div class="contents-table-container">
-          <table class="data-table" id="contents-table">
+          <table class="modern-table" id="contents-table">
             <thead>
               <tr>
                 <th>Bild</th>
@@ -188,1598 +213,1224 @@
           </table>
         </div>
         
-        <div id="empty-cabinet" class="no-components hidden">
+        <div id="empty-cabinet" class="modern-empty-state" style="display: none;">
           <p>Dieser Schrank ist leer.</p>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- Edit Cabinet Modal -->
-  <div id="edit-cabinet-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>Schrank bearbeiten</h3>
-        <button class="close-modal" id="close-edit-cabinet">&times;</button>
-      </div>
-      
-      <div class="edit-cabinet-body">
-        <form id="edit-cabinet-form">
-          <div class="form-group">
-            <label for="edit-cabinet-name">Schrankname:</label>
-            <input 
-              type="text" 
-              id="edit-cabinet-name" 
-              name="name" 
-              placeholder="Neuer Schrankname" 
-              required
-              class="cabinet-name-input">
-          </div>
-          
-          <div class="form-group">
-            <label for="cabinet-image">Schrank-Foto:</label>
-            <div class="image-upload-container">
-              <div class="current-image-section">
-                <div id="current-cabinet-image">
-                  <p class="no-current-image">Kein Foto vorhanden</p>
-                </div>
+<!-- Edit Cabinet Modal -->
+<div id="edit-cabinet-modal" class="modal modern-modal">
+  <div class="modal-content modern-modal-content">
+    <div class="modal-header modern-modal-header modal-titlebar">
+      <h3>Schrank bearbeiten</h3>
+      <button class="modal-close-btn close-modal" id="close-edit-cabinet">✕</button>
+    </div>
+    
+    <div class="modal-body modern-modal-body">
+      <form id="edit-cabinet-form">
+        <div class="modern-form-group">
+          <label class="modern-label" for="edit-cabinet-name">Schrankname:</label>
+          <input 
+            type="text" 
+            id="edit-cabinet-name" 
+            name="name" 
+            placeholder="Neuer Schrankname" 
+            required
+            class="modern-input">
+        </div>
+        
+        <div class="modern-form-group">
+          <label class="modern-label" for="cabinet-image">Schrank-Foto:</label>
+          <div class="image-upload-container">
+            <div class="current-image-section">
+              <div id="current-cabinet-image">
+                <p class="no-current-image">Kein Foto vorhanden</p>
               </div>
-              
-              <div class="image-upload-area" onclick="document.getElementById('cabinet-image-input').click()">
-                <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                </svg>
-                <h4>Foto hochladen</h4>
-                <p>Klicke hier oder ziehe ein Foto hinein</p>
-                <p class="file-info">JPG, PNG oder GIF (max. 5MB)</p>
-              </div>
-              
-              <input 
-                type="file" 
-                id="cabinet-image-input" 
-                accept="image/*" 
-                style="display: none;"
-                onchange="handleCabinetImageSelect(event)">
-              
-              <div id="cabinet-image-preview" class="image-preview"></div>
             </div>
-          </div>
-          
-          <div class="form-actions">
-            <button type="button" class="btn secondary" onclick="closeEditCabinet()">Abbrechen</button>
-            <button type="submit" class="btn primary">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            
+            <div class="modern-image-container" onclick="document.getElementById('cabinet-image-input').click()" style="cursor: pointer; margin-top: var(--space-md);">
+              <svg class="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" width="60" height="60">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
               </svg>
-              Speichern
-            </button>
+              <p style="margin: var(--space-md) 0;">Foto hochladen</p>
+              <span style="font-size: 0.875rem; color: var(--gray-500);">JPG, PNG oder GIF (max. 5MB)</span>
+            </div>
+            
+            <input 
+              type="file" 
+              id="cabinet-image-input" 
+              accept="image/*" 
+              style="display: none;"
+              onchange="handleCabinetImageSelect(event)">
+            
+            <div id="cabinet-image-preview" class="image-preview"></div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modal-footer modern-modal-footer">
+      <button type="button" class="modern-btn modern-btn-secondary" onclick="closeEditCabinet()">Abbrechen</button>
+      <button type="submit" class="modern-btn modern-btn-primary" form="edit-cabinet-form">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Speichern
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- Delete Confirmation Modal -->
-  <div id="delete-confirmation-modal" class="modal" style="display: none; opacity: 0; visibility: hidden;">
-    <div class="modal-content confirmation-content">
-      <div class="modal-header danger">
-        <h3>Schrank löschen</h3>
-        <button class="close-modal" id="close-delete-confirmation">&times;</button>
+<!-- Delete Confirmation Modal -->
+<div id="delete-confirmation-modal" class="modal modern-modal">
+  <div class="modal-content modern-modal-content" style="max-width: 500px;">
+    <div class="modal-header modern-modal-header modal-titlebar">
+      <h3>Schrank löschen</h3>
+      <button class="modal-close-btn close-modal" id="close-delete-confirmation">✕</button>
+    </div>
+    
+    <div class="modern-modal-body" style="text-align: center;">
+      <div style="margin-bottom: var(--space-lg);">
+        <svg width="60" height="60" fill="none" stroke="#FF6B6B" viewBox="0 0 24 24" style="margin: 0 auto;">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
       </div>
       
-      <div class="confirmation-body">
-        <div class="warning-icon">
-          <svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-          </svg>
+      <div style="margin-bottom: var(--space-xl);">
+        <p style="margin-bottom: var(--space-md); font-size: 1.125rem;" id="delete-confirmation-message">Möchten Sie diesen Schrank wirklich löschen?</p>
+        <div style="background: #FFF3F3; border: 1px solid #FFB3B3; border-radius: var(--radius-md); padding: var(--space-md);">
+          <strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.
         </div>
-        
-        <div class="confirmation-text">
-          <p id="delete-confirmation-message"></p>
-          <div class="warning-note">
-            <strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.
-          </div>
-        </div>
-        
-        <div class="confirmation-actions">
-          <button class="btn danger" id="confirm-delete">
+      </div>
+    </div>
+      
+    <div class="modal-footer modern-modal-footer">
+      <button class="modern-btn modern-btn-secondary" id="cancel-delete">Abbrechen</button>
+      <button class="modern-btn modern-btn-primary" id="confirm-delete" style="background: #FF6B6B; border-color: #FF6B6B;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        Löschen
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/api.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+let cabinets = [];
+let currentViewingCabinetId = null;
+let currentCabinetToDelete = null;
+let currentEditingCabinet = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  console.log('🏢 Manage Cabinets wird initialisiert...');
+  
+  forceCloseAllModals();
+
+  try {
+    await initializePage();
+    await loadSensorData();
+    startSensorRefresh();
+    console.log('✅ Manage Cabinets erfolgreich initialisiert');
+  } catch (error) {
+    console.error('❌ Initialisierungsfehler:', error);
+    showMessage('Fehler beim Laden der Seite', 'error');
+  }
+});
+
+function forceCloseAllModals() {
+  console.log('🔧 Zwinge alle Modals zum Schließen...');
+  
+  const modalSelectors = [
+    '#cabinet-details-modal',
+    '#edit-cabinet-modal',
+    '#delete-confirmation-modal',
+    '#scanner-modal',
+    '.modal'
+  ];
+  
+  modalSelectors.forEach(selector => {
+    document.querySelectorAll(selector).forEach(modal => {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+      modal.style.opacity = '0';
+      modal.style.visibility = 'hidden';
+    });
+  });
+  
+  console.log('✅ Alle Modals geschlossen');
+}
+
+async function initializePage() {
+  setupEventListeners();
+  await loadCabinets();
+  await updateStats();
+}
+
+function setupEventListeners() {
+  console.log('🔧 Event Listeners werden eingerichtet...');
+  
+  // Navigation Buttons - Let page-transitions.js handle these
+  
+  // Global Search
+  const globalSearch = document.getElementById('global-search');
+  if (globalSearch) {
+    globalSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        window.location.href = `/?search=${encodeURIComponent(e.target.value)}`;
+      }
+    });
+  }
+  
+  // Sensor Location Dropdown
+  const locationSelect = document.getElementById('sensor-location-select');
+  if (locationSelect) {
+    locationSelect.addEventListener('change', async () => {
+      await loadSensorData();
+    });
+  }
+  
+  // Formular für neuen Schrank
+  const form = document.getElementById('new-cabinet-form');
+  if (form) {
+    form.addEventListener('submit', handleAddCabinet);
+  }
+
+  // Edit Cabinet Form
+  const editForm = document.getElementById('edit-cabinet-form');
+  if (editForm) {
+    editForm.addEventListener('submit', handleEditCabinet);
+  }
+  
+  // Modal Event Listeners
+  setupModalEventListeners();
+  
+  console.log('✅ Event Listeners eingerichtet');
+}
+
+
+function setupModalEventListeners() {
+  // Cabinet Details Modal
+  const closeCabinetBtn = document.getElementById('close-cabinet-details');
+  if (closeCabinetBtn) {
+    closeCabinetBtn.addEventListener('click', closeCabinetDetails);
+  }
+
+  // Edit Cabinet Modal
+  const closeEditBtn = document.getElementById('close-edit-cabinet');
+  if (closeEditBtn) {
+    closeEditBtn.addEventListener('click', closeEditCabinet);
+  }
+
+  // Delete Confirmation Modal
+  const closeDeleteBtn = document.getElementById('close-delete-confirmation');
+  if (closeDeleteBtn) {
+    closeDeleteBtn.addEventListener('click', closeDeleteConfirmation);
+  }
+
+  const confirmDeleteBtn = document.getElementById('confirm-delete');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
+  }
+
+  const cancelDeleteBtn = document.getElementById('cancel-delete');
+  if (cancelDeleteBtn) {
+    cancelDeleteBtn.addEventListener('click', closeDeleteConfirmation);
+  }
+  
+  // Export Button
+  const exportBtn = document.getElementById('export-contents');
+  if (exportBtn) {
+    exportBtn.addEventListener('click', () => {
+      if (currentViewingCabinetId) {
+        exportCabinetContents(currentViewingCabinetId);
+      } else {
+        showMessage('Fehler: Kein Schrank ausgewählt', 'error');
+      }
+    });
+  }
+
+  // Escape key to close modals
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeCabinetDetails();
+      closeEditCabinet();
+      closeDeleteConfirmation();
+    }
+  });
+
+  // Click outside to close modals
+  document.querySelectorAll('.modern-modal').forEach(modal => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeCabinetDetails();
+        closeEditCabinet();
+        closeDeleteConfirmation();
+      }
+    });
+  });
+}
+
+async function loadCabinets() {
+  try {
+    console.log('📊 Lade Schränke...');
+    cabinets = await api.getCabinets();
+    
+    // Für jeden Schrank die Anzahl der Bauteile laden
+    for (let cabinet of cabinets) {
+      try {
+        const contents = await api.getCabinetContents(cabinet.id);
+        cabinet.componentCount = contents.length;
+        cabinet.components = contents;
+      } catch (error) {
+        console.warn(`⚠️ Fehler beim Laden von Schrank ${cabinet.id}:`, error);
+        cabinet.componentCount = 0;
+        cabinet.components = [];
+      }
+    }
+    
+    renderCabinets();
+    console.log(`✅ ${cabinets.length} Schränke geladen`);
+  } catch (error) {
+    console.error('❌ Fehler beim Laden der Schränke:', error);
+    showMessage(`Fehler beim Laden der Schränke: ${error.message}`, 'error');
+    
+    cabinets = [];
+    renderCabinets();
+  }
+}
+
+function renderCabinets() {
+  const grid = document.getElementById('cabinets-grid');
+  const noCabinets = document.getElementById('no-cabinets');
+  
+  if (!grid) {
+    console.error('❌ Cabinets Grid nicht gefunden');
+    return;
+  }
+
+  grid.innerHTML = '';
+  
+  if (cabinets.length === 0) {
+    if (noCabinets) noCabinets.style.display = 'block';
+    return;
+  }
+  
+  if (noCabinets) noCabinets.style.display = 'none';
+  
+  cabinets.forEach(cabinet => {
+    try {
+      const cabinetCard = createCabinetCard(cabinet);
+      grid.appendChild(cabinetCard);
+    } catch (error) {
+      console.error('Fehler beim Erstellen der Schrank-Karte:', error);
+    }
+  });
+}
+
+function createCabinetCard(cabinet) {
+  const card = document.createElement('div');
+  card.className = 'modern-card component-card';
+  card.dataset.cabinetId = cabinet.id;
+  card.style.position = 'relative';
+  card.style.paddingTop = '200px';
+  
+  const isEmpty = cabinet.componentCount === 0;
+  
+  // Image section (larger for better cabinet visibility)
+  let imageSection;
+  if (cabinet.image_url && cabinet.image_url.trim() !== '') {
+    imageSection = `
+      <div style="position: absolute; top: 0; left: 0; right: 0; height: 200px; overflow: hidden;">
+        <img src="${cabinet.image_url}" 
+             alt="${cabinet.name || 'Schrank'}" 
+             style="width: 100%; height: 200px; object-fit: cover;"
+             loading="lazy">
+      </div>
+    `;
+  } else {
+    imageSection = `<div style="position: absolute; top: 0; left: 0; right: 0; height: 200px; display: flex; align-items: center; justify-content: center; color: var(--gray-400); background: var(--gray-50);">Kein Bild</div>`;
+  }
+  
+  card.innerHTML = `
+    ${imageSection}
+    <div class="modern-card-content">
+      <h3 class="modern-card-title">${cabinet.name}</h3>
+      <p class="modern-card-subtitle">Status: ${isEmpty ? 'Leer' : `${cabinet.componentCount} Bauteile`}</p>
+      <div class="modern-card-details">
+        <div class="modern-actions">
+          <button class="modern-action-btn" onclick="window.viewCabinetDetails(${cabinet.id})" title="Details anzeigen">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+            </svg>
+          </button>
+          <button class="modern-action-btn edit" onclick="window.editCabinet(${cabinet.id})" title="Bearbeiten">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+            </svg>
+          </button>
+          <button class="modern-action-btn delete" onclick="window.showCabinetDeleteConfirmation(${cabinet.id})" title="Löschen">
             <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
-            Ja, löschen
           </button>
-          <button class="btn secondary" id="cancel-delete">Abbrechen</button>
         </div>
       </div>
     </div>
-  </div>
-
-  <div id="toast-container"></div>
-
-  <!-- SCRIPTS: Richtige Reihenfolge -->
-  <script src="/js/api.js"></script>
-  <script src="/js/common.js"></script>
-  <script src="/js/fixes.js"></script>
+  `;
   
-  <script>
-    let cabinets = [];
-    let currentViewingCabinetId = null;
-    let currentCabinetToDelete = null;
-    let currentEditingCabinet = null;
+  return card;
+}
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      console.log('🏢 Manage Cabinets wird initialisiert...');
-      
-      forceCloseAllModals();
-
-      try {
-        await initializePage();
-        await loadSensorData();
-        startSensorRefresh();
-        console.log('✅ Manage Cabinets erfolgreich initialisiert');
-      } catch (error) {
-        console.error('❌ Initialisierungsfehler:', error);
-        showMessage('Fehler beim Laden der Seite', 'error');
-      }
-    });
-
-    function forceCloseAllModals() {
-      console.log('🔧 Zwinge alle Modals zum Schließen...');
-      
-      const modalSelectors = [
-        '#cabinet-details-modal',
-        '#edit-cabinet-modal',
-        '#delete-confirmation-modal',
-        '#scanner-modal',
-        '.modal'
-      ];
-      
-      modalSelectors.forEach(selector => {
-        document.querySelectorAll(selector).forEach(modal => {
-          modal.classList.remove('active');
-          modal.style.display = 'none';
-          modal.style.opacity = '0';
-          modal.style.visibility = 'hidden';
-        });
-      });
-      
-      console.log('✅ Alle Modals geschlossen');
+async function handleAddCabinet(e) {
+  e.preventDefault();
+  
+  const form = e.target;
+  const nameInput = form.querySelector('#cabinet-name');
+  if (!nameInput) {
+    showMessage('Formular-Fehler: Name-Eingabe nicht gefunden', 'error');
+    return;
+  }
+  
+  const name = nameInput.value.trim();
+  
+  if (!name) {
+    showMessage('Bitte gib einen Namen für den Schrank ein.', 'warning');
+    nameInput.focus();
+    return;
+  }
+  
+  if (name.length < 2) {
+    showMessage('Der Schrankname muss mindestens 2 Zeichen lang sein.', 'warning');
+    nameInput.focus();
+    return;
+  }
+  
+  try {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.innerHTML : '';
+    
+    if (submitBtn) {
+      submitBtn.innerHTML = '<div class="modern-loading"></div> Erstellt...';
+      submitBtn.disabled = true;
     }
-
-    async function initializePage() {
-      setupEventListeners();
-      await loadCabinets();
-      await updateStats();
+    
+    const newCabinet = await api.createCabinet({ name });
+    newCabinet.componentCount = 0;
+    newCabinet.components = [];
+    
+    cabinets.push(newCabinet);
+    
+    showMessage(`Schrank "${name}" wurde erfolgreich erstellt.`, 'success');
+    
+    nameInput.value = '';
+    renderCabinets();
+    await updateStats();
+    
+    if (submitBtn) {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     }
-
-    function setupEventListeners() {
-      console.log('🔧 Event Listeners werden eingerichtet...');
-      
-      // Navigation Buttons
-      const addBtn = document.getElementById('add-component-nav-btn');
-      if (addBtn) {
-        addBtn.addEventListener('click', () => {
-          window.location.href = '/add-component.html';
-        });
-      }
-
-      const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
-      if (manageCabinetsBtn) {
-        manageCabinetsBtn.addEventListener('click', () => {
-          window.location.href = '/manage-cabinets.html';
-        });
-      }
-      
-      // Global Search
-      const globalSearch = document.getElementById('global-search');
-      if (globalSearch) {
-        globalSearch.addEventListener('input', handleGlobalSearch);
-      }
-      
-      // Sensor Location Dropdown
-      const locationSelect = document.getElementById('sensor-location-select');
-      if (locationSelect) {
-        locationSelect.addEventListener('change', async () => {
-          await loadSensorData();
-        });
-      }
-      
-      // Formular für neuen Schrank
-      const form = document.getElementById('new-cabinet-form');
-      if (form) {
-        form.addEventListener('submit', handleAddCabinet);
-      }
-
-      // Edit Cabinet Form
-      const editForm = document.getElementById('edit-cabinet-form');
-      if (editForm) {
-        editForm.addEventListener('submit', handleEditCabinet);
-      }
-      
-      // Modal Event Listeners
-      setupModalEventListeners();
-      
-      console.log('✅ Event Listeners eingerichtet');
+    
+  } catch (error) {
+    console.error('Fehler beim Erstellen des Schranks:', error);
+    
+    if (error.message.includes('existiert bereits')) {
+      showMessage(`Ein Schrank mit dem Namen "${name}" existiert bereits.`, 'warning');
+    } else {
+      showMessage(`Fehler beim Erstellen des Schranks: ${error.message}`, 'error');
     }
-
-    function setupModalEventListeners() {
-      // Cabinet Details Modal
-      const closeCabinetBtn = document.getElementById('close-cabinet-details');
-      if (closeCabinetBtn) {
-        closeCabinetBtn.addEventListener('click', closeCabinetDetails);
-      }
-
-      // Edit Cabinet Modal
-      const closeEditBtn = document.getElementById('close-edit-cabinet');
-      if (closeEditBtn) {
-        closeEditBtn.addEventListener('click', closeEditCabinet);
-      }
-
-      // Delete Confirmation Modal
-      const closeDeleteBtn = document.getElementById('close-delete-confirmation');
-      if (closeDeleteBtn) {
-        closeDeleteBtn.addEventListener('click', closeDeleteConfirmation);
-      }
-
-      const confirmDeleteBtn = document.getElementById('confirm-delete');
-      if (confirmDeleteBtn) {
-        confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
-      }
-
-      const cancelDeleteBtn = document.getElementById('cancel-delete');
-      if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener('click', closeDeleteConfirmation);
-      }
-      
-      // Export Button
-      const exportBtn = document.getElementById('export-contents');
-      if (exportBtn) {
-        exportBtn.addEventListener('click', () => {
-          if (currentViewingCabinetId) {
-            exportCabinetContents(currentViewingCabinetId);
-          } else {
-            showMessage('Fehler: Kein Schrank ausgewählt', 'error');
-          }
-        });
-      }
-
-      // Escape key to close modals
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeCabinetDetails();
-          closeEditCabinet();
-          closeDeleteConfirmation();
-        }
-      });
-
-      // Click outside to close modals
-      document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('click', (e) => {
-          if (e.target === modal) {
-            closeCabinetDetails();
-            closeEditCabinet();
-            closeDeleteConfirmation();
-          }
-        });
-      });
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
     }
+  }
+}
 
-    async function loadCabinets() {
-      try {
-        console.log('📊 Lade Schränke...');
-        cabinets = await api.getCabinets();
-        
-        // Für jeden Schrank die Anzahl der Bauteile laden
-        for (let cabinet of cabinets) {
-          try {
-            const contents = await api.getCabinetContents(cabinet.id);
-            cabinet.componentCount = contents.length;
-            cabinet.components = contents;
-          } catch (error) {
-            console.warn(`⚠️ Fehler beim Laden von Schrank ${cabinet.id}:`, error);
-            cabinet.componentCount = 0;
-            cabinet.components = [];
-          }
-        }
-        
-        renderCabinets();
-        console.log(`✅ ${cabinets.length} Schränke geladen`);
-      } catch (error) {
-        console.error('❌ Fehler beim Laden der Schränke:', error);
-        showMessage(`Fehler beim Laden der Schränke: ${error.message}`, 'error');
-        
-        cabinets = [];
-        renderCabinets();
-      }
-    }
-
-    function renderCabinets() {
-      const grid = document.getElementById('cabinets-grid');
-      const noCabinets = document.getElementById('no-cabinets');
-      
-      if (!grid) {
-        console.error('❌ Cabinets Grid nicht gefunden');
-        return;
-      }
-
-      grid.innerHTML = '';
-      
-      if (cabinets.length === 0) {
-        if (noCabinets) noCabinets.classList.remove('hidden');
-        return;
-      }
-      
-      if (noCabinets) noCabinets.classList.add('hidden');
-      
-      cabinets.forEach(cabinet => {
-        try {
-          const cabinetCard = createCabinetCard(cabinet);
-          grid.appendChild(cabinetCard);
-        } catch (error) {
-          console.error('Fehler beim Erstellen der Schrank-Karte:', error);
-        }
-      });
-    }
-
-    function createCabinetCard(cabinet) {
-      const card = document.createElement('div');
-      card.className = 'component-card cabinet-card';
-      card.dataset.cabinetId = cabinet.id;
-      
-      const isEmpty = cabinet.componentCount === 0;
-      const fillPercentage = Math.min((cabinet.componentCount / 50) * 100, 100);
-      
-      // Cabinet image or placeholder
-      const imageContent = cabinet.image_url ? 
-        `<img src="${cabinet.image_url}" alt="${cabinet.name}" loading="lazy">` :
-        `<svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-        </svg>`;
-      
-      card.innerHTML = `
-        <div class="component-image cabinet-header">
-          ${imageContent}
-          <div class="component-count ${isEmpty ? 'empty' : 'filled'}">${cabinet.componentCount}</div>
-        </div>
-        <div class="component-info">
-          <h3 class="component-name">${cabinet.name}</h3>
-          <p class="component-details"><strong>ID:</strong> ${cabinet.id}</p>
-          <p class="component-details">
-            <strong>Status:</strong> 
-            <span class="${isEmpty ? 'text-warning' : 'text-success'}">
-              ${isEmpty ? 'Leer' : `${cabinet.componentCount} Bauteile`}
-            </span>
-          </p>
-          <div class="fill-indicator">
-            <div class="fill-bar">
-              <div class="fill-progress" style="width: ${fillPercentage}%"></div>
-            </div>
-            <span class="fill-text">${cabinet.componentCount}/50</span>
-          </div>
-          <div class="component-meta">
-            <span class="component-location">
-              <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-              </svg>
-              Auslastung: ${Math.round(fillPercentage)}%
-            </span>
-            <div class="component-actions">
-              <button class="action-btn edit" onclick="viewCabinetDetails(${cabinet.id})" title="Details anzeigen">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                </svg>
-              </button>
-              <button class="action-btn edit" onclick="editCabinet(${cabinet.id})" title="Bearbeiten">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                </svg>
-              </button>
-              <button class="action-btn delete" onclick="showCabinetDeleteConfirmation(${cabinet.id})" title="Löschen">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
+// EDIT CABINET FUNCTIONALITY
+function editCabinet(cabinetId) {
+  const cabinet = cabinets.find(c => c.id === cabinetId);
+  if (!cabinet) {
+    showMessage('Schrank nicht gefunden', 'error');
+    return;
+  }
+  
+  currentEditingCabinet = cabinet;
+  
+  // Fill form with current data
+  const nameInput = document.getElementById('edit-cabinet-name');
+  if (nameInput) {
+    nameInput.value = cabinet.name;
+  }
+  
+  // Show current image
+  const currentImageContainer = document.getElementById('current-cabinet-image');
+  if (currentImageContainer) {
+    if (cabinet.image_url) {
+      currentImageContainer.innerHTML = `
+        <div style="position: relative; display: inline-block;">
+          <img src="${cabinet.image_url}" alt="${cabinet.name}" style="max-width: 200px; max-height: 150px; border-radius: var(--radius-md);">
+          <button type="button" onclick="removeCabinetImage()" style="position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; background: rgba(255, 107, 107, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
         </div>
       `;
-      
-      return card;
+    } else {
+      currentImageContainer.innerHTML = '<p style="color: var(--gray-500); font-style: italic;">Kein Foto vorhanden</p>';
     }
+  }
+  
+  openModal('edit-cabinet-modal');
+}
 
-    async function handleAddCabinet(e) {
-      e.preventDefault();
-      
-      const form = e.target;
-      const nameInput = form.querySelector('#cabinet-name');
-      if (!nameInput) {
-        showMessage('Formular-Fehler: Name-Eingabe nicht gefunden', 'error');
-        return;
-      }
-      
-      const name = nameInput.value.trim();
-      
-      if (!name) {
-        showMessage('Bitte gib einen Namen für den Schrank ein.', 'warning');
-        nameInput.focus();
-        return;
-      }
-      
-      if (name.length < 2) {
-        showMessage('Der Schrankname muss mindestens 2 Zeichen lang sein.', 'warning');
-        nameInput.focus();
-        return;
-      }
-      
-      try {
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn ? submitBtn.innerHTML : '';
-        
-        if (submitBtn) {
-          submitBtn.innerHTML = '<span class="spinner"></span> Erstellt...';
-          submitBtn.disabled = true;
-        }
-        
-        const newCabinet = await api.createCabinet({ name });
-        newCabinet.componentCount = 0;
-        newCabinet.components = [];
-        
-        cabinets.push(newCabinet);
-        
-        showMessage(`Schrank "${name}" wurde erfolgreich erstellt.`, 'success');
-        
-        nameInput.value = '';
-        renderCabinets();
-        await updateStats();
-        
-        if (submitBtn) {
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        }
-        
-      } catch (error) {
-        console.error('Fehler beim Erstellen des Schranks:', error);
-        
-        if (error.message.includes('existiert bereits')) {
-          showMessage(`Ein Schrank mit dem Namen "${name}" existiert bereits.`, 'warning');
-        } else {
-          showMessage(`Fehler beim Erstellen des Schranks: ${error.message}`, 'error');
-        }
-        
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) {
-          submitBtn.innerHTML = originalText;
-          submitBtn.disabled = false;
-        }
-      }
+async function handleEditCabinet(e) {
+  e.preventDefault();
+  
+  if (!currentEditingCabinet) {
+    showMessage('Fehler: Kein Schrank ausgewählt', 'error');
+    return;
+  }
+  
+  const form = e.target;
+  const nameInput = form.querySelector('#edit-cabinet-name');
+  const name = nameInput.value.trim();
+  
+  if (!name) {
+    showMessage('Bitte gib einen Namen ein.', 'warning');
+    nameInput.focus();
+    return;
+  }
+  
+  if (name.length < 2) {
+    showMessage('Der Name muss mindestens 2 Zeichen lang sein.', 'warning');
+    nameInput.focus();
+    return;
+  }
+  
+  try {
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<div class="modern-loading"></div> Speichert...';
+    submitBtn.disabled = true;
+    
+    // Update cabinet name via API (you'll need to implement this endpoint)
+    await updateCabinetName(currentEditingCabinet.id, name);
+    
+    // Handle image upload if selected
+    const imageInput = document.getElementById('cabinet-image-input');
+    if (imageInput.files.length > 0) {
+      await uploadCabinetImage(currentEditingCabinet.id, imageInput.files[0]);
     }
+    
+    showMessage('Schrank erfolgreich aktualisiert!', 'success');
+    
+    await loadCabinets();
+    closeEditCabinet();
+    
+    submitBtn.innerHTML = originalText;
+    submitBtn.disabled = false;
+    
+  } catch (error) {
+    console.error('Fehler beim Aktualisieren:', error);
+    showMessage(`Fehler beim Aktualisieren: ${error.message}`, 'error');
+    
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.innerHTML = originalText;
+      submitBtn.disabled = false;
+    }
+  }
+}
 
-    // EDIT CABINET FUNCTIONALITY
-    function editCabinet(cabinetId) {
-      const cabinet = cabinets.find(c => c.id === cabinetId);
-      if (!cabinet) {
-        showMessage('Schrank nicht gefunden', 'error');
-        return;
-      }
+// IMAGE HANDLING
+function handleCabinetImageSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  if (!file.type.startsWith('image/')) {
+    showMessage('Bitte wähle eine Bilddatei aus.', 'warning');
+    return;
+  }
+  
+  if (file.size > 5 * 1024 * 1024) {
+    showMessage('Die Datei ist zu groß. Maximum: 5MB', 'warning');
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const preview = document.getElementById('cabinet-image-preview');
+    if (preview) {
+      preview.innerHTML = `
+        <div style="position: relative; display: inline-block; margin-top: var(--space-md);">
+          <img src="${e.target.result}" alt="Vorschau" style="max-width: 300px; max-height: 200px; border-radius: var(--radius-md);">
+          <button type="button" onclick="removeCabinetImagePreview()" style="position: absolute; top: 8px; right: 8px; width: 32px; height: 32px; background: rgba(255, 107, 107, 0.9); border: none; border-radius: 50%; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
+          <div style="margin-top: var(--space-sm); font-size: 0.875rem; color: var(--gray-600);">${file.name}</div>
+        </div>
+      `;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeCabinetImagePreview() {
+  const preview = document.getElementById('cabinet-image-preview');
+  const input = document.getElementById('cabinet-image-input');
+  
+  if (preview) preview.innerHTML = '';
+  if (input) input.value = '';
+}
+
+function removeCabinetImage() {
+  if (currentEditingCabinet) {
+    currentEditingCabinet.removeImage = true;
+    const container = document.getElementById('current-cabinet-image');
+    if (container) {
+      container.innerHTML = '<p style="color: var(--gray-500); font-style: italic;">Foto wird beim Speichern entfernt</p>';
+    }
+  }
+}
+
+// API HELPER FUNCTIONS
+async function updateCabinetName(cabinetId, newName) {
+  // This would need to be implemented in your API
+  const response = await fetch(`/api/schraenke/${cabinetId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: newName })
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Fehler beim Aktualisieren des Namens');
+  }
+  
+  return response.json();
+}
+
+async function uploadCabinetImage(cabinetId, imageFile) {
+  // This would need to be implemented in your API
+  const formData = new FormData();
+  formData.append('image', imageFile);
+  
+  const response = await fetch(`/api/schraenke/${cabinetId}/bild`, {
+    method: 'POST',
+    body: formData
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'Fehler beim Hochladen des Bildes');
+  }
+  
+  return response.json();
+}
+
+// MODAL FUNCTIONS
+function openModal(modalId) {
+  console.log('📖 Öffne Modal:', modalId);
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    // Original working code FIRST
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
+    modal.style.zIndex = '2000';
+    modal.classList.add('active');
+    
+    // THEN add animation
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+    
+    console.log('✅ Modal geöffnet:', modalId, modal);
+  } else {
+    console.error('❌ Modal nicht gefunden:', modalId);
+  }
+}
+
+function closeModal(modalId) {
+  console.log('📕 Schließe Modal:', modalId);
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    // Remove animation classes first
+    modal.classList.remove('show');
+    
+    // Then original working code
+    setTimeout(() => {
+      modal.classList.remove('active');
+      modal.style.display = 'none';
+    }, 400);
+  }
+}
+
+function closeEditCabinet() {
+  closeModal('edit-cabinet-modal');
+  currentEditingCabinet = null;
+  
+  // Clear form
+  const form = document.getElementById('edit-cabinet-form');
+  if (form) form.reset();
+  
+  const preview = document.getElementById('cabinet-image-preview');
+  if (preview) preview.innerHTML = '';
+}
+
+// Globale Funktionen für Schrank-Karten
+window.editCabinet = editCabinet;
+window.viewCabinetDetails = async function(cabinetId) {
+  console.log('👁️ Öffne Schrank-Details für ID:', cabinetId);
+  currentViewingCabinetId = cabinetId;
+  
+  const cabinet = cabinets.find(c => c.id === cabinetId);
+  if (!cabinet) {
+    showMessage('Schrank nicht gefunden', 'error');
+    return;
+  }
+  
+  const modalTitle = document.getElementById('cabinet-modal-title');
+  if (modalTitle) {
+    modalTitle.textContent = `Schrank: ${cabinet.name}`;
+  }
+
+  const contentsCount = document.getElementById('contents-count');
+  if (contentsCount) {
+    contentsCount.textContent = cabinet.componentCount;
+  }
+  
+  const tbody = document.getElementById('contents-tbody');
+  const emptyState = document.getElementById('empty-cabinet');
+  const tableContainer = document.querySelector('.contents-table-container');
+  
+  if (tbody) {
+    tbody.innerHTML = '';
+    
+    if (cabinet.components.length === 0) {
+      if (emptyState) emptyState.style.display = 'block';
+      if (tableContainer) tableContainer.style.display = 'none';
+    } else {
+      if (emptyState) emptyState.style.display = 'none';
+      if (tableContainer) tableContainer.style.display = 'block';
       
-      currentEditingCabinet = cabinet;
-      
-      // Fill form with current data
-      const nameInput = document.getElementById('edit-cabinet-name');
-      if (nameInput) {
-        nameInput.value = cabinet.name;
-      }
-      
-      // Show current image
-      const currentImageContainer = document.getElementById('current-cabinet-image');
-      if (currentImageContainer) {
-        if (cabinet.image_url) {
-          currentImageContainer.innerHTML = `
-            <div class="current-image-display">
-              <img src="${cabinet.image_url}" alt="${cabinet.name}" class="current-image">
-              <button type="button" class="remove-current-image" onclick="removeCabinetImage()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
+      cabinet.components.forEach(component => {
+        const row = document.createElement('tr');
+        const safeName = (component.name || 'Unbenannt').replace(/'/g, '&apos;');
+        const safeBarcode = (component.barcode || '').replace(/'/g, '&apos;');
+        
+        row.innerHTML = `
+          <td style="width: 60px;">
+            ${component.image_url ? 
+              `<img src="${component.image_url}" alt="${component.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: var(--radius-sm);" loading="lazy">` :
+              '<div style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: var(--gray-50); border-radius: var(--radius-sm); font-size: 1.25rem;">📦</div>'
+            }
+          </td>
+          <td style="font-family: var(--font-mono);">${component.barcode}</td>
+          <td>${component.name || 'Unbenannt'}</td>
+          <td>${component.project || '-'}</td>
+          <td>
+            <div style="display: flex; gap: var(--space-xs);">
+              <button class="modern-btn modern-btn-secondary" style="padding: var(--space-xs) var(--space-sm); font-size: 0.875rem;" onclick="window.open('/edit-component.html?barcode=${encodeURIComponent(component.barcode)}', '_blank')">
+                Bearbeiten
+              </button>
+              <button class="modern-btn" style="background: #FF6B6B; border-color: #FF6B6B; color: white; padding: var(--space-xs) var(--space-sm); font-size: 0.875rem;" onclick="removeComponentFromCabinet('${safeBarcode}', ${cabinetId})">
+                Auslagern
               </button>
             </div>
-          `;
-        } else {
-          currentImageContainer.innerHTML = '<p class="no-current-image">Kein Foto vorhanden</p>';
-        }
-      }
-      
-      openModal('edit-cabinet-modal');
-    }
-
-    async function handleEditCabinet(e) {
-      e.preventDefault();
-      
-      if (!currentEditingCabinet) {
-        showMessage('Fehler: Kein Schrank ausgewählt', 'error');
-        return;
-      }
-      
-      const form = e.target;
-      const nameInput = form.querySelector('#edit-cabinet-name');
-      const name = nameInput.value.trim();
-      
-      if (!name) {
-        showMessage('Bitte gib einen Namen ein.', 'warning');
-        nameInput.focus();
-        return;
-      }
-      
-      if (name.length < 2) {
-        showMessage('Der Name muss mindestens 2 Zeichen lang sein.', 'warning');
-        nameInput.focus();
-        return;
-      }
-      
-      try {
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
-        submitBtn.innerHTML = '<span class="spinner"></span> Speichert...';
-        submitBtn.disabled = true;
-        
-        // Update cabinet name via API (you'll need to implement this endpoint)
-        await updateCabinetName(currentEditingCabinet.id, name);
-        
-        // Handle image upload if selected
-        const imageInput = document.getElementById('cabinet-image-input');
-        if (imageInput.files.length > 0) {
-          await uploadCabinetImage(currentEditingCabinet.id, imageInput.files[0]);
-        }
-        
-        showMessage('Schrank erfolgreich aktualisiert!', 'success');
-        
-        await loadCabinets();
-        closeEditCabinet();
-        
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-        
-      } catch (error) {
-        console.error('Fehler beim Aktualisieren:', error);
-        showMessage(`Fehler beim Aktualisieren: ${error.message}`, 'error');
-        
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-      }
-    }
-
-    // IMAGE HANDLING
-    function handleCabinetImageSelect(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      if (!file.type.startsWith('image/')) {
-        showMessage('Bitte wähle eine Bilddatei aus.', 'warning');
-        return;
-      }
-      
-      if (file.size > 5 * 1024 * 1024) {
-        showMessage('Die Datei ist zu groß. Maximum: 5MB', 'warning');
-        return;
-      }
-      
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = document.getElementById('cabinet-image-preview');
-        if (preview) {
-          preview.innerHTML = `
-            <div class="preview-container">
-              <img src="${e.target.result}" alt="Vorschau" class="preview-image">
-              <button type="button" class="remove-image" onclick="removeCabinetImagePreview()">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                </svg>
-              </button>
-            </div>
-            <div class="preview-info">
-              <div class="file-name">${file.name}</div>
-            </div>
-          `;
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeCabinetImagePreview() {
-      const preview = document.getElementById('cabinet-image-preview');
-      const input = document.getElementById('cabinet-image-input');
-      
-      if (preview) preview.innerHTML = '';
-      if (input) input.value = '';
-    }
-
-    function removeCabinetImage() {
-      if (currentEditingCabinet) {
-        currentEditingCabinet.removeImage = true;
-        const container = document.getElementById('current-cabinet-image');
-        if (container) {
-          container.innerHTML = '<p class="no-current-image">Foto wird beim Speichern entfernt</p>';
-        }
-      }
-    }
-
-    // API HELPER FUNCTIONS
-    async function updateCabinetName(cabinetId, newName) {
-      // This would need to be implemented in your API
-      const response = await fetch(`/api/schraenke/${cabinetId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newName })
+          </td>
+        `;
+        tbody.appendChild(row);
       });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Fehler beim Aktualisieren des Namens');
-      }
-      
-      return response.json();
     }
+  }
+  
+  openModal('cabinet-details-modal');
+};
 
-    async function uploadCabinetImage(cabinetId, imageFile) {
-      // This would need to be implemented in your API
-      const formData = new FormData();
-      formData.append('image', imageFile);
-      
-      const response = await fetch(`/api/schraenke/${cabinetId}/bild`, {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Fehler beim Hochladen des Bildes');
-      }
-      
-      return response.json();
+function closeCabinetDetails() {
+  closeModal('cabinet-details-modal');
+  currentViewingCabinetId = null;
+}
+
+window.removeComponentFromCabinet = async function(barcode, cabinetId) {
+  if (!barcode) {
+    showMessage('Fehler: Kein Barcode angegeben', 'error');
+    return;
+  }
+  
+  try {
+    await api.removeComponent(barcode);
+    showMessage('Bauteil erfolgreich ausgelagert!', 'success');
+    
+    await loadCabinets();
+    await updateStats();
+    
+    if (currentViewingCabinetId === cabinetId) {
+      window.viewCabinetDetails(cabinetId);
     }
+    
+  } catch (error) {
+    console.error('Fehler beim Auslagern:', error);
+    showMessage(`Fehler beim Auslagern: ${error.message}`, 'error');
+  }
+};
 
-    // MODAL FUNCTIONS
-    function openModal(modalId) {
-      console.log('📖 Öffne Modal:', modalId);
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.style.display = 'flex';
-        modal.classList.add('active');
-        setTimeout(() => {
-          modal.style.opacity = '1';
-          modal.style.visibility = 'visible';
-        }, 10);
-      }
-    }
+function closeDeleteConfirmation() {
+  closeModal('delete-confirmation-modal');
+  currentCabinetToDelete = null;
+}
 
-    function closeModal(modalId) {
-      console.log('📕 Schließe Modal:', modalId);
-      const modal = document.getElementById(modalId);
-      if (modal) {
-        modal.classList.remove('active');
-        modal.style.opacity = '0';
-        modal.style.visibility = 'hidden';
-        setTimeout(() => {
-          modal.style.display = 'none';
-        }, 300);
-      }
-    }
+async function handleConfirmDelete() {
+  if (!currentCabinetToDelete) return;
+  
+  try {
+    await api.deleteCabinet(currentCabinetToDelete.id);
+    
+    showMessage(`Schrank "${currentCabinetToDelete.name}" wurde erfolgreich gelöscht.`, 'success');
+    
+    cabinets = cabinets.filter(c => c.id !== currentCabinetToDelete.id);
+    
+    renderCabinets();
+    await updateStats();
+    
+    closeDeleteConfirmation();
+    
+  } catch (error) {
+    console.error('Fehler beim Löschen:', error);
+    showMessage(`Fehler beim Löschen: ${error.message}`, 'error');
+  }
+}
 
-    function closeEditCabinet() {
-      closeModal('edit-cabinet-modal');
-      currentEditingCabinet = null;
-      
-      // Clear form
-      const form = document.getElementById('edit-cabinet-form');
-      if (form) form.reset();
-      
-      const preview = document.getElementById('cabinet-image-preview');
-      if (preview) preview.innerHTML = '';
-    }
+window.showCabinetDeleteConfirmation = function(cabinetId) {
+  const cabinet = cabinets.find(c => c.id === cabinetId);
+  if (!cabinet) {
+    showMessage('Schrank nicht gefunden', 'error');
+    return;
+  }
+  
+  currentCabinetToDelete = cabinet;
+  
+  const message = cabinet.componentCount > 0 ?
+    `Möchten Sie den Schrank "${cabinet.name}" wirklich löschen?\n\nEr enthält noch ${cabinet.componentCount} Bauteile. Diese werden automatisch ausgelagert.` :
+    `Möchten Sie den leeren Schrank "${cabinet.name}" wirklich löschen?`;
+  
+  const confirmationMessage = document.getElementById('delete-confirmation-message');
+  if (confirmationMessage) {
+    confirmationMessage.textContent = message;
+  }
+  
+  openModal('delete-confirmation-modal');
+};
 
-    // Globale Funktionen für Schrank-Karten
-    window.editCabinet = editCabinet;
-    window.viewCabinetDetails = async function(cabinetId) {
-      console.log('👁️ Öffne Schrank-Details für ID:', cabinetId);
-      currentViewingCabinetId = cabinetId;
-      
-      const cabinet = cabinets.find(c => c.id === cabinetId);
-      if (!cabinet) {
-        showMessage('Schrank nicht gefunden', 'error');
-        return;
-      }
-      
-      const modalTitle = document.getElementById('cabinet-modal-title');
-      if (modalTitle) {
-        modalTitle.textContent = `Schrank: ${cabinet.name}`;
-      }
-
-      const contentsCount = document.getElementById('contents-count');
-      if (contentsCount) {
-        contentsCount.textContent = cabinet.componentCount;
-      }
-      
-      const tbody = document.getElementById('contents-tbody');
-      const emptyState = document.getElementById('empty-cabinet');
-      const tableContainer = document.querySelector('.contents-table-container');
-      
-      if (tbody) {
-        tbody.innerHTML = '';
-        
-        if (cabinet.components.length === 0) {
-          if (emptyState) emptyState.classList.remove('hidden');
-          if (tableContainer) tableContainer.classList.add('hidden');
-        } else {
-          if (emptyState) emptyState.classList.add('hidden');
-          if (tableContainer) tableContainer.classList.remove('hidden');
-          
-          cabinet.components.forEach(component => {
-            const row = document.createElement('tr');
-            const safeName = (component.name || 'Unbenannt').replace(/'/g, '&apos;');
-            const safeBarcode = (component.barcode || '').replace(/'/g, '&apos;');
-            
-            row.innerHTML = `
-              <td class="image-cell">
-                ${component.image_url ? 
-                  `<img src="${component.image_url}" alt="${component.name}" class="thumbnail" loading="lazy">` :
-                  '<div class="no-image">📦</div>'
-                }
-              </td>
-              <td>${component.barcode}</td>
-              <td>${component.name || 'Unbenannt'}</td>
-              <td>${component.project || '-'}</td>
-              <td>
-                <button class="btn small" onclick="window.open('/edit-component.html?barcode=${encodeURIComponent(component.barcode)}', '_blank')">
-                  Bearbeiten
-                </button>
-                <button class="btn small danger" onclick="removeComponentFromCabinet('${safeBarcode}', ${cabinetId})">
-                  Auslagern
-                </button>
-              </td>
-            `;
-            tbody.appendChild(row);
-          });
-        }
-      }
-      
-      openModal('cabinet-details-modal');
+async function updateStats() {
+  try {
+    const totalCabinets = cabinets.length;
+    const totalComponents = cabinets.reduce((sum, cabinet) => sum + cabinet.componentCount, 0);
+    
+    const updateElement = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
     };
+    
+    updateElement('total-cabinets', totalCabinets);
+    updateElement('total-components', totalComponents);
+    
+    console.log('📊 Statistiken aktualisiert:', { totalCabinets, totalComponents });
+  } catch (error) {
+    console.error('❌ Fehler beim Aktualisieren der Statistiken:', error);
+  }
+}
 
-    function closeCabinetDetails() {
-      closeModal('cabinet-details-modal');
-      currentViewingCabinetId = null;
-    }
-
-    window.removeComponentFromCabinet = async function(barcode, cabinetId) {
-      if (!barcode) {
-        showMessage('Fehler: Kein Barcode angegeben', 'error');
-        return;
-      }
-      
-      try {
-        await api.removeComponent(barcode);
-        showMessage('Bauteil erfolgreich ausgelagert!', 'success');
-        
-        await loadCabinets();
-        await updateStats();
-        
-        if (currentViewingCabinetId === cabinetId) {
-          window.viewCabinetDetails(cabinetId);
-        }
-        
-      } catch (error) {
-        console.error('Fehler beim Auslagern:', error);
-        showMessage(`Fehler beim Auslagern: ${error.message}`, 'error');
-      }
-    };
-
-    function closeDeleteConfirmation() {
-      closeModal('delete-confirmation-modal');
-      currentCabinetToDelete = null;
-    }
-
-    async function handleConfirmDelete() {
-      if (!currentCabinetToDelete) return;
-      
-      try {
-        await api.deleteCabinet(currentCabinetToDelete.id);
-        
-        showMessage(`Schrank "${currentCabinetToDelete.name}" wurde erfolgreich gelöscht.`, 'success');
-        
-        cabinets = cabinets.filter(c => c.id !== currentCabinetToDelete.id);
-        
-        renderCabinets();
-        await updateStats();
-        
-        closeDeleteConfirmation();
-        
-      } catch (error) {
-        console.error('Fehler beim Löschen:', error);
-        showMessage(`Fehler beim Löschen: ${error.message}`, 'error');
-      }
-    }
-
-    window.showCabinetDeleteConfirmation = function(cabinetId) {
-      const cabinet = cabinets.find(c => c.id === cabinetId);
-      if (!cabinet) {
-        showMessage('Schrank nicht gefunden', 'error');
-        return;
-      }
-      
-      currentCabinetToDelete = cabinet;
-      
-      const message = cabinet.componentCount > 0 ?
-        `Möchtest du den Schrank "${cabinet.name}" wirklich löschen?\n\nEr enthält noch ${cabinet.componentCount} Bauteile. Diese werden automatisch ausgelagert.` :
-        `Möchtest du den leeren Schrank "${cabinet.name}" wirklich löschen?`;
-      
-      const confirmationMessage = document.getElementById('delete-confirmation-message');
-      if (confirmationMessage) {
-        confirmationMessage.textContent = message;
-      }
-      
-      openModal('delete-confirmation-modal');
-    };
-
-    async function updateStats() {
-      try {
-        const totalCabinets = cabinets.length;
-        const totalComponents = cabinets.reduce((sum, cabinet) => sum + cabinet.componentCount, 0);
-        
-        const updateElement = (id, value) => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = value;
-        };
-        
-        updateElement('total-cabinets', totalCabinets);
-        updateElement('total-components', totalComponents);
-        
-        console.log('📊 Statistiken aktualisiert:', { totalCabinets, totalComponents });
-      } catch (error) {
-        console.error('❌ Fehler beim Aktualisieren der Statistiken:', error);
-      }
-    }
-
-    window.exportAllCabinets = async function() {
-      try {
-        const allData = [];
-        
-        for (const cabinet of cabinets) {
-          for (const component of cabinet.components) {
-            allData.push({
-              'Schrank': cabinet.name,
-              'Schrank-ID': cabinet.id,
-              'Barcode': component.barcode,
-              'Name': component.name || 'Unbenannt',
-              'Projekt': component.project || '-',
-              'Verantwortlicher': component.responsible_engineer || '-',
-              'Gerätebezeichnung': component.equipment_name || '-',
-              'ID-Nummer': component.identification_number || '-'
-            });
-          }
-        }
-        
-        if (allData.length === 0) {
-          showMessage('Keine Bauteile zum Exportieren vorhanden.', 'warning');
-          return;
-        }
-        
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        
-        if (typeof exportToCSV === 'function') {
-          exportToCSV(allData, `weaselparts_alle_schraenke_${timestamp}.csv`);
-        } else {
-          console.error('❌ exportToCSV Funktion nicht verfügbar');
-          showMessage('Export-Funktion nicht verfügbar', 'error');
-        }
-        
-      } catch (error) {
-        console.error('Fehler beim Exportieren:', error);
-        showMessage(`Fehler beim Exportieren: ${error.message}`, 'error');
-      }
-    };
-
-    async function exportCabinetContents(cabinetId) {
-      try {
-        const cabinet = cabinets.find(c => c.id === cabinetId);
-        if (!cabinet) {
-          showMessage('Schrank nicht gefunden', 'error');
-          return;
-        }
-
-        if (cabinet.components.length === 0) {
-          showMessage('Dieser Schrank ist leer - nichts zu exportieren.', 'warning');
-          return;
-        }
-        
-        const exportData = cabinet.components.map(component => ({
+window.exportAllCabinets = async function() {
+  try {
+    const allData = [];
+    
+    for (const cabinet of cabinets) {
+      for (const component of cabinet.components) {
+        allData.push({
+          'Schrank': cabinet.name,
+          'Schrank-ID': cabinet.id,
           'Barcode': component.barcode,
           'Name': component.name || 'Unbenannt',
           'Projekt': component.project || '-',
           'Verantwortlicher': component.responsible_engineer || '-',
           'Gerätebezeichnung': component.equipment_name || '-',
           'ID-Nummer': component.identification_number || '-'
-        }));
-        
-        const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-        
-        if (typeof exportToCSV === 'function') {
-          exportToCSV(exportData, `weaselparts_${cabinet.name}_${timestamp}.csv`);
-        } else {
-          console.error('❌ exportToCSV Funktion nicht verfügbar');
-          showMessage('Export-Funktion nicht verfügbar', 'error');
+        });
+      }
+    }
+    
+    if (allData.length === 0) {
+      showMessage('Keine Bauteile zum Exportieren vorhanden.', 'warning');
+      return;
+    }
+    
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    
+    // Convert to CSV
+    const headers = Object.keys(allData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...allData.map(row => headers.map(header => {
+        const value = row[header] || '';
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+          return `"${value.replace(/"/g, '""')}"`;
         }
-        
-      } catch (error) {
-        console.error('Fehler beim Exportieren:', error);
-        showMessage(`Fehler beim Exportieren: ${error.message}`, 'error');
-      }
+        return value;
+      }).join(','))
+    ].join('\n');
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `weaselparts_alle_schraenke_${timestamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    
+    showMessage('CSV Export erfolgreich heruntergeladen', 'success');
+    
+  } catch (error) {
+    console.error('Fehler beim Exportieren:', error);
+    showMessage(`Fehler beim Exportieren: ${error.message}`, 'error');
+  }
+};
+
+async function exportCabinetContents(cabinetId) {
+  try {
+    const cabinet = cabinets.find(c => c.id === cabinetId);
+    if (!cabinet) {
+      showMessage('Schrank nicht gefunden', 'error');
+      return;
     }
 
-    // Global search handler
-    function handleGlobalSearch() {
-      const searchInput = document.getElementById('global-search');
-      if (!searchInput) return;
-      
-      const query = searchInput.value.toLowerCase().trim();
-      
-      if (query) {
-        // Redirect to index with search query
-        window.location.href = `/?search=${encodeURIComponent(query)}`;
-      }
-    }
-
-    // Global functions
-    window.handleCabinetImageSelect = handleCabinetImageSelect;
-    window.removeCabinetImagePreview = removeCabinetImagePreview;
-    window.removeCabinetImage = removeCabinetImage;
-    window.closeEditCabinet = closeEditCabinet;
-
-    // Sensordaten-Funktionen
-    function updateSensorData() {
-      // Simulierte Sensordaten - in der Praxis würden diese von einem API-Endpoint kommen
-      const temperature = (Math.random() * 5 + 22).toFixed(1); // 22-27°C
-      const humidity = (Math.random() * 10 + 45).toFixed(0); // 45-55%
-      
-      const tempElement = document.getElementById('temperature-value');
-      const humidElement = document.getElementById('humidity-value');
-      
-      if (tempElement) tempElement.textContent = `${temperature}°C`;
-      if (humidElement) humidElement.textContent = `${humidity}%`;
-    }
-
-    // Sensordaten alle 30 Sekunden aktualisieren
-    setInterval(updateSensorData, 30000);
-    // Initial einmal laden
-    updateSensorData();
-
-    // Error Handling
-    window.addEventListener('error', function(e) {
-      console.error('❌ Globaler Fehler:', e);
-      if (e.message && e.message.includes('null')) {
-        showMessage('Ein Element konnte nicht gefunden werden. Bitte lade die Seite neu.', 'warning');
-      }
-    });
-
-    // Sensor Data Functions
-    async function loadSensorData() {
-      try {
-        const locationSelect = document.getElementById('sensor-location-select');
-        const location = locationSelect ? locationSelect.value : 'ssa';
-        
-        const response = await fetch(`/api/sensors/current/${location}`);
-        if (!response.ok) return;
-        
-        const sensorData = await response.json();
-        updateSensorDisplay(sensorData);
-      } catch (error) {
-        console.error('❌ Sensordaten Fehler:', error);
-      }
+    if (cabinet.components.length === 0) {
+      showMessage('Dieser Schrank ist leer - nichts zu exportieren.', 'warning');
+      return;
     }
     
-    function updateSensorDisplay(data) {
-      try {
-        // Temperature
-        const tempValue = document.getElementById('temperature-value');
-        if (tempValue) {
-          if (data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
-            tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
-          } else {
-            tempValue.textContent = '--°C';
-          }
+    const exportData = cabinet.components.map(component => ({
+      'Barcode': component.barcode,
+      'Name': component.name || 'Unbenannt',
+      'Projekt': component.project || '-',
+      'Verantwortlicher': component.responsible_engineer || '-',
+      'Gerätebezeichnung': component.equipment_name || '-',
+      'ID-Nummer': component.identification_number || '-'
+    }));
+    
+    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+    
+    // Convert to CSV
+    const headers = Object.keys(exportData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...exportData.map(row => headers.map(header => {
+        const value = row[header] || '';
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"') || value.includes('\n'))) {
+          return `"${value.replace(/"/g, '""')}"`;
         }
-        
-        // Humidity
-        const humValue = document.getElementById('humidity-value');
-        if (humValue) {
-          if (data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
-            humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
-          } else {
-            humValue.textContent = '--%';
-          }
-        }
-        
-        // Debug-Info bei Fehler
-        if (data.error || data.warning) {
-          console.warn('⚠️ Sensordaten-Warnung:', data.errorMessage || data.warning);
-        }
-      } catch (error) {
-        console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+        return value;
+      }).join(','))
+    ].join('\n');
+    
+    // Download CSV
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `weaselparts_${cabinet.name}_${timestamp}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    
+    showMessage('CSV Export erfolgreich heruntergeladen', 'success');
+    
+  } catch (error) {
+    console.error('Fehler beim Exportieren:', error);
+    showMessage(`Fehler beim Exportieren: ${error.message}`, 'error');
+  }
+}
+
+// Global functions
+window.handleCabinetImageSelect = handleCabinetImageSelect;
+window.removeCabinetImagePreview = removeCabinetImagePreview;
+window.removeCabinetImage = removeCabinetImage;
+window.closeEditCabinet = closeEditCabinet;
+
+// Sensor Data Functions
+async function loadSensorData() {
+  try {
+    const locationSelect = document.getElementById('sensor-location-select');
+    const location = locationSelect ? locationSelect.value : 'ssa';
+    
+    const response = await fetch(`/api/sensors/current/${location}`);
+    if (!response.ok) return;
+    
+    const sensorData = await response.json();
+    updateSensorDisplay(sensorData);
+  } catch (error) {
+    console.error('❌ Sensordaten Fehler:', error);
+  }
+}
+
+function updateSensorDisplay(data) {
+  try {
+    // Temperature
+    const tempValue = document.getElementById('temperature-value');
+    if (tempValue) {
+      if (data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
+        tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
+      } else {
+        tempValue.textContent = '--°C';
       }
     }
     
-    function startSensorRefresh() {
-      setInterval(async () => {
-        await loadSensorData();
-      }, 30000);
-    }
-  </script>
-
-  <style>
-    /* Cabinet-specific styles */
-    .add-cabinet-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 24px;
-      margin-bottom: 16px;
-    }
-
-    .add-cabinet-form {
-      display: flex;
-      gap: 16px;
-      align-items: end;
-    }
-
-    .add-cabinet-form .form-group {
-      flex: 1;
-      margin-bottom: 0;
-    }
-
-    .cabinet-name-input {
-      background: var(--bg-card);
-      border: 2px solid var(--primary-green) !important;
-      font-weight: 600 !important;
-    }
-
-    .cabinet-name-input:focus {
-      border-color: var(--primary-blue) !important;
-      box-shadow: 0 0 0 3px rgba(196, 214, 0, 0.2) !important;
-    }
-
-    .cabinet-card {
-      position: relative;
-    }
-
-    .cabinet-header {
-      position: relative;
-      background: linear-gradient(135deg, var(--primary-green), var(--primary-blue));
-      color: white;
-    }
-
-    .component-count {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 255, 255, 0.9);
-      color: var(--text-primary);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .component-count.empty {
-      background: rgba(255, 69, 58, 0.9);
-      color: white;
-    }
-
-    .component-count.filled {
-      background: rgba(48, 209, 88, 0.9);
-      color: white;
-    }
-
-    .fill-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 8px 0;
-    }
-
-    .fill-bar {
-      flex: 1;
-      height: 6px;
-      background: var(--border-color);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .fill-progress {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary-green), var(--primary-blue));
-      transition: width 0.3s ease;
-    }
-
-    .fill-text {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      min-width: 40px;
-      text-align: right;
-    }
-
-    .text-warning {
-      color: var(--accent-yellow);
-    }
-
-    .text-success {
-      color: var(--primary-green);
-    }
-
-    /* Edit Cabinet Modal Styles */
-    .edit-cabinet-body {
-      padding: 24px;
-    }
-
-    .image-upload-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .current-image-section {
-      margin-bottom: 20px;
-    }
-
-    .current-image-display {
-      position: relative;
-      display: inline-block;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .current-image {
-      max-width: 200px;
-      max-height: 150px;
-      display: block;
-    }
-
-    .remove-current-image {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 59, 48, 0.9);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--smooth-transition);
-    }
-
-    .remove-current-image:hover {
-      background: var(--accent-red);
-      transform: scale(1.1);
-    }
-
-    .no-current-image {
-      color: var(--text-secondary);
-      font-style: italic;
-      margin: 0;
-      padding: 20px;
-      background: var(--bg-card);
-      border-radius: 8px;
-      text-align: center;
-    }
-
-    .image-upload-area {
-      border: 2px dashed var(--border-color);
-      border-radius: 12px;
-      padding: 40px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: var(--smooth-transition);
-      background: var(--bg-card);
-    }
-
-    .image-upload-area:hover {
-      border-color: var(--primary-blue);
-      background: var(--bg-card-hover);
-    }
-
-    .upload-icon {
-      width: 60px;
-      height: 60px;
-      margin: 0 auto 15px;
-      opacity: 0.5;
-    }
-
-    .image-upload-area h4 {
-      margin-bottom: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
-
-    .image-upload-area p {
-      margin-bottom: 4px;
-      color: var(--text-secondary);
-      font-size: 14px;
-    }
-
-    .file-info {
-      font-size: 12px !important;
-      color: var(--text-tertiary) !important;
-    }
-
-    .image-preview {
-      margin-top: 20px;
-    }
-
-    .preview-container {
-      position: relative;
-      display: inline-block;
-      background: var(--bg-secondary);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: var(--shadow-md);
-    }
-
-    .preview-image {
-      max-width: 300px;
-      max-height: 200px;
-      display: block;
-    }
-
-    .remove-image {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(255, 59, 48, 0.9);
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: var(--smooth-transition);
-    }
-
-    .remove-image:hover {
-      background: var(--accent-red);
-      transform: scale(1.1);
-    }
-
-    .preview-info {
-      padding: 16px;
-      background: var(--bg-card);
-      border-top: 1px solid var(--border-color);
-    }
-
-    .file-name {
-      font-size: 14px;
-      color: var(--text-secondary);
-      font-weight: 500;
-    }
-
-    .cabinet-details-content {
-      max-width: 900px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .contents-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 24px;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    .contents-table-container {
-      max-height: 400px;
-      overflow-y: auto;
-    }
-
-    .confirmation-content {
-      max-width: 500px;
-    }
-
-    .modal-header.danger {
-      background: var(--accent-red);
-      color: white;
-    }
-
-    .confirmation-body {
-      padding: 32px;
-      text-align: center;
-    }
-
-    .warning-icon {
-      margin-bottom: 24px;
-    }
-
-    .warning-icon svg {
-      stroke: var(--accent-red);
-      opacity: 0.7;
-    }
-
-    .confirmation-text p {
-      margin-bottom: 16px;
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    .warning-note {
-      background: rgba(255, 69, 58, 0.1);
-      border: 1px solid rgba(255, 69, 58, 0.2);
-      border-radius: 8px;
-      padding: 16px;
-      margin: 20px 0;
-      color: var(--accent-red);
-      font-size: 14px;
-    }
-
-    .confirmation-actions {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      margin-top: 32px;
-    }
-
-    /* KRITISCH: Modal-Fixes */
-    .modal {
-      display: none !important;
-      opacity: 0 !important;
-      visibility: hidden !important;
-    }
-
-    .modal.active {
-      display: flex !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-
-    /* Spinner Animation */
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid transparent;
-      border-top: 2px solid currentColor;
-      border-radius: 50%;
-      display: inline-block;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      .add-cabinet-form {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .add-cabinet-form .form-group {
-        margin-bottom: 16px;
-      }
-
-      .contents-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-      }
-
-      .confirmation-actions {
-        flex-direction: column;
-      }
-
-      .image-upload-area {
-        padding: 30px 15px;
-      }
-
-      .stats-grid {
-        grid-template-columns: 1fr 1fr;
+    // Humidity
+    const humValue = document.getElementById('humidity-value');
+    if (humValue) {
+      if (data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
+        humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
+      } else {
+        humValue.textContent = '--%';
       }
     }
+    
+    // Debug-Info bei Fehler
+    if (data.error || data.warning) {
+      console.warn('⚠️ Sensordaten-Warnung:', data.errorMessage || data.warning);
+    }
+  } catch (error) {
+    console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
+  }
+}
 
-    @media (max-width: 480px) {
-      .stats-grid {
-        grid-template-columns: 1fr;
-      }
+function startSensorRefresh() {
+  setInterval(async () => {
+    await loadSensorData();
+  }, 30000);
+}
 
-      .image-upload-area {
-        padding: 20px 10px;
-      }
+// Message display function
+function showMessage(message, type = 'info') {
+  console.log(`${type.toUpperCase()}: ${message}`);
+  
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `modern-toast ${type}`;
+  toast.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' :
+          type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>' :
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'}
+      </svg>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Remove after 4 seconds
+  setTimeout(() => {
+    toast.remove();
+  }, 4000);
+}
+</script>
 
-      .preview-image,
-      .current-image {
-        max-width: 100%;
-        max-height: 120px;
-      }
-    }
+<style>
+/* Additional Styles for Cabinet Management */
+.stats-container {
+  padding: 0;
+  margin-bottom: var(--space-xl);
+}
 
-    /* Navigation Lab Info Styles */
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      flex: 1;
-    }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--space-lg);
+}
 
-    .lab-info {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-radius: 0;
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  transition: all 0.2s ease;
+}
 
-    .lab-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-    }
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
 
-    /* Navigation erweitert */
-    .nav-left {
-      display: flex !important;
-      align-items: center !important;
-      gap: 2rem !important;
-      flex-grow: 1 !important;
-    }
-    
-    .lab-info {
-      display: flex !important;
-      align-items: center !important;
-      gap: 1rem !important;
-    }
-    
-    .lab-name {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      white-space: nowrap;
-    }
-    
-    /* Mini Sensor Display in Header */
-    .mini-sensors {
-      display: flex;
-      gap: 0.5rem;
-    }
-    
-    .mini-sensor {
-      font-size: 0.8rem;
-      font-weight: 600;
-      padding: 0.2rem 0.6rem;
-      border-radius: 15px;
-      background: var(--bg-light);
-      border: 1px solid var(--border-color);
-    }
-    
-    .mini-sensor.temp {
-      color: #ff6b6b !important;
-      border-color: #ff6b6b !important;
-    }
-    
-    .mini-sensor.humid {
-      color: #4ecdc4 !important;
-      border-color: #4ecdc4 !important;
-    }
-    
-    /* Location Dropdown Styling */
-    .location-dropdown {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-secondary);
-      background: transparent;
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 0.3rem 0.8rem;
-      outline: none;
-      cursor: pointer;
-      transition: border-color 0.2s ease;
-    }
-    
-    .location-dropdown:hover {
-      border-color: var(--primary-color);
-    }
-    
-    .location-dropdown:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-    }
-    
-    @media (max-width: 768px) {
-      .nav-left {
-        gap: 1rem;
-      }
-      
-      .lab-name {
-        display: none;
-      }
-      
-      .mini-sensors {
-        gap: 0.25rem;
-      }
-      
-      .mini-sensor {
-        font-size: 0.75rem;
-        padding: 0.15rem 0.4rem;
-      }
-    }
-  </style>
+.stat-icon {
+  color: var(--table-header-primary);
+  flex-shrink: 0;
+}
 
-  <!-- SENSOR CSS FIX - HÖCHSTE PRIORITÄT -->
-  <style>
-    .nav-left {
-      display: flex !important;
-      align-items: center !important;
-      gap: 2rem !important;
-      flex-grow: 1 !important;
-      flex-direction: row !important;
-    }
-    
-    .lab-info {
-      display: flex !important;
-      align-items: center !important;
-      gap: 1rem !important;
-      flex-direction: row !important;
-      flex-wrap: nowrap !important;
-    }
-    
-    .lab-name {
-      font-size: 0.9rem !important;
-      font-weight: 600 !important;
-      color: var(--text-secondary) !important;
-      white-space: nowrap !important;
-      display: inline-block !important;
-      margin-right: 0 !important;
-    }
-    
-    .mini-sensors {
-      display: inline-flex !important;
-      gap: 0.5rem !important;
-      flex-direction: row !important;
-      align-items: center !important;
-    }
-    
-    .mini-sensor {
-      font-size: 0.8rem !important;
-      font-weight: 600 !important;
-      padding: 0.2rem 0.6rem !important;
-      border-radius: 15px !important;
-      background: var(--bg-light) !important;
-      border: 1px solid var(--border-color) !important;
-      display: inline-block !important;
-    }
-    
-    .mini-sensor.temp {
-      color: #ff6b6b !important;
-      border-color: #ff6b6b !important;
-    }
-    
-    .mini-sensor.humid {
-      color: #4ecdc4 !important;
-      border-color: #4ecdc4 !important;
-    }
-  </style>
+.stat-content {
+  flex: 1;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 0 0 var(--space-xs) 0;
+  color: var(--gray-900);
+  font-family: var(--font-mono);
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  font-weight: 600;
+  margin: 0;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-xl);
+}
+
+.add-cabinet-form {
+  display: flex;
+  gap: var(--space-lg);
+  align-items: end;
+}
+
+.cabinet-card {
+  overflow: hidden;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.cabinet-card:hover {
+  transform: translateY(-2px);
+}
+
+.cabinet-header {
+  position: relative;
+  overflow: hidden;
+}
+
+.component-count {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.125rem;
+  box-shadow: var(--shadow-md);
+}
+
+.image-upload-container {
+  margin-top: var(--space-md);
+}
+
+.current-image-section {
+  margin-bottom: var(--space-md);
+}
+
+.image-preview {
+  margin-top: var(--space-md);
+}
+
+
+
+/* Background-Icon rechts - Original Farbe und größer */
+.cabinet-bg-icon {
+  opacity: 1 !important;
+  filter: none !important;
+  width: 80% !important;
+  max-width: 400px !important;
+}
+
+/* Cabinet Action Buttons - FUNKTIONAL UND SCHÖN */
+
+/* Modal Styles - Original working code + Animation */
+.modern-modal {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 2000 !important;
+  display: none !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.modern-modal.active {
+  display: flex !important;
+}
+
+/* ADD slide-up animation on top */
+.modern-modal-content {
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modern-modal.show .modern-modal-content {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .add-cabinet-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .add-cabinet-form .modern-form-group {
+    margin-bottom: var(--space-md);
+  }
+  
+  .section-header {
+    flex-direction: column;
+    gap: var(--space-md);
+    align-items: stretch;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
 </body>
 </html>

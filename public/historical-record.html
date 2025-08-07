@@ -4,321 +4,319 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WeaselParts - Historical Record</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/modal-fixes.js"></script>
+  <link rel="stylesheet" href="/css/modern-styles.css">
+  <!-- Page Transitions -->
+  <script src="/js/page-transitions.js"></script>
+  <!-- Modal Animations -->
+  <script src="/js/modal-animations.js"></script>
 </head>
-<body>
-<header>
-  <div class="header-content">
-    <a href="/" class="logo">
-      <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-        <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
-      </svg>
-      <h1>WeaselParts</h1>
-    </a>
-    <nav class="top-nav">
-      <div class="nav-left">
-        <div class="lab-info">
-          <div class="location-selector">
-            <select id="sensor-location-select" class="location-dropdown">
-              <option value="ssa">Jarvis-Ecke</option>
-              <option value="int_up">Am Telefon</option>
-              <option value="int_low">Empore</option>
-            </select>
-          </div>
-          <div class="mini-sensors">
-            <span class="mini-sensor temp">
-              <span id="temperature-value">--°C</span>
-            </span>
-            <span class="mini-sensor humid">
-              <span id="humidity-value">--%</span>
-            </span>
-          </div>
-        </div>
-        <div class="search-container">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input type="text" placeholder="Bauteile suchen" id="global-search">
-        </div>
+<body class="page-historical">
+
+<div class="modern-container">
+  <!-- Modern Header -->
+  <header class="modern-header">
+    <nav class="modern-nav">
+      <a href="/" class="modern-logo">
+        <img src="/images/weasel-svgrepo-com.svg" alt="WeaselParts">
+        <span>WeaselParts</span>
+      </a>
+      
+      <!-- Search Bar -->
+      <div class="modern-search">
+        <input type="text" placeholder="Bauteile suchen..." id="global-search">
       </div>
-      <div class="nav-icons">
-        <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
-          </svg>
+      
+      <!-- Sensor Data -->
+      <div class="modern-sensors">
+        <div class="modern-sensor temp" id="temperature-value">--°C</div>
+        <div class="modern-sensor humid" id="humidity-value">--%</div>
+        <select class="modern-select" id="sensor-location-select" style="width: auto; padding: 4px 8px;">
+          <option value="ssa">Jarvis-Ecke</option>
+          <option value="int_up">Am Telefon</option>
+          <option value="emp">Empore</option>
+        </select>
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="modern-nav-buttons">
+        <button class="modern-nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <img src="/images/button_add_component.png" alt="Neues Bauteil">
         </button>
-        <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
+        <button class="modern-nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <img src="/images/button_manage_cabinet.png" alt="Schränke">
         </button>
-        <a href="/ICD.html" class="nav-btn" title="ICD">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
+        <a href="/ICD.html" class="modern-nav-btn" title="ICD">
+          <img src="/images/button_icd.png" alt="ICD">
         </a>
-        <a href="/lab-overview.html" class="nav-btn" title="Labor-Übersicht">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-          </svg>
+        <a href="/lab-overview.html" class="modern-nav-btn" title="Labor-Übersicht">
+          <img src="/images/button_lab_overview.png" alt="Labor">
         </a>
-        <a href="/glue-protocol.html" class="nav-btn" title="Klebeprotokoll">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-5a2 2 0 00-2-2h-2.5"></path>
-          </svg>
+        <a href="/glue-protocol.html" class="modern-nav-btn" title="Klebeprotokoll">
+          <img src="/images/button_glue_protocol.png" alt="Kleben">
         </a>
-        <a href="/settings.html" class="nav-btn" title="Einstellungen">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
+        <a href="/settings.html" class="modern-nav-btn" title="Einstellungen">
+          <img src="/images/button_settings.png" alt="Settings">
         </a>
       </div>
     </nav>
-  </div>
-</header>
+  </header>
 
-<main class="main-content">
-  <!-- Page Header -->
-  <div class="page-header">
-    <h1 class="page-title">Historical Record</h1>
-    <div class="component-info-header" id="component-info-header">
-      <p class="page-subtitle">Lade Bauteilinformationen...</p>
-    </div>
-  </div>
-
-  <!-- Activity Records Container -->
-  <div class="activity-records-container">
-    <div class="section-header">
-      <h2 class="section-title">Historical Records</h2>
-      <div class="header-actions">
-        <div class="export-buttons">
-          <button class="btn secondary export-btn" id="export-csv-btn">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-            </svg>
-            CSV Export
-          </button>
-          <button class="btn secondary export-btn" id="export-pdf-btn">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-            </svg>
-            PDF Export
-          </button>
+  <!-- Split Screen Layout -->
+  <div class="modern-wrapper">
+    <!-- Content Panel - Left Side 60% -->
+    <div class="content-panel">
+      <div class="modern-content">
+        
+        <!-- Page Header -->
+        <div class="modern-page-header">
+          <h1 class="modern-title">Historical Record</h1>
+          <div class="component-info-header" id="component-info-header">
+            <p class="modern-subtitle">Lade Bauteilinformationen...</p>
+          </div>
         </div>
-        <button class="add-btn" id="add-activity-btn">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-          Eintrag hinzufügen
-        </button>
+
+        <!-- Activity Records Container -->
+        <div class="activity-records-container">
+          <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-xl); flex-wrap: wrap; gap: var(--space-md);">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin: 0;">Historical Records</h2>
+            <div class="header-actions" style="display: flex; gap: var(--space-md); flex-wrap: wrap; align-items: center;">
+              <div class="export-buttons" style="display: flex; gap: var(--space-sm);">
+                <button class="modern-btn modern-btn-secondary" id="export-csv-btn">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                  </svg>
+                  CSV Export
+                </button>
+                <button class="modern-btn modern-btn-secondary" id="export-pdf-btn">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                  </svg>
+                  PDF Export
+                </button>
+              </div>
+              <button class="modern-btn modern-btn-primary" id="add-activity-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Eintrag hinzufügen
+              </button>
+            </div>
+          </div>
+
+          <!-- Activity Records Table -->
+          <div class="table-container">
+            <table class="modern-table" id="activity-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Datum</th>
+                  <th>Eingetragen von</th>
+                  <th>Organisation</th>
+                  <th>Ort</th>
+                  <th>Aktivitäten</th>
+                  <th>Prozedur Nr.</th>
+                  <th>Zeit</th>
+                  <th>rel.Luftf.</th>
+                  <th>Temp.</th>
+                  <th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody id="activity-table-body">
+                <!-- Activity records will be loaded here -->
+              </tbody>
+            </table>
+            
+            <div class="no-activities" id="no-activities" style="display: none; text-align: center; padding: var(--space-3xl); color: var(--gray-500);">
+              <p style="margin-bottom: var(--space-lg);">Noch keine Historical Records vorhanden.</p>
+              <button class="modern-btn modern-btn-primary" id="add-first-activity">Ersten Eintrag erstellen</button>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
-
-    <!-- Activity Records Table -->
-    <div class="activity-table-container">
-      <table class="activity-table" id="activity-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Datum</th>
-            <th>Eingetragen von</th>
-            <th>Organisation</th>
-            <th>Ort</th>
-            <th>Aktivitäten</th>
-            <th>Prozedur Nr.</th>
-            <th>Zeit</th>
-            <th>Luftfeuchtigkeit</th>
-            <th>Temperatur</th>
-            <th>Aktionen</th>
-          </tr>
-        </thead>
-        <tbody id="activity-table-body">
-          <!-- Activity records will be loaded here -->
-        </tbody>
-      </table>
-      
-      <div class="no-activities" id="no-activities" style="display: none;">
-        <p>Noch keine Historical Records vorhanden.</p>
-        <button class="btn primary" id="add-first-activity">Ersten Eintrag erstellen</button>
-      </div>
+    
+    <!-- Background Panel - Right Side 40% -->
+    <div class="background-panel">
+      <img src="/images/background_icon_historical_record.png" alt="Historical Record Icon" class="background-icon" onerror="this.src='/images/background_icon_lab_overview.png'">
     </div>
   </div>
-</main>
+</div>
 
 <!-- Activity Record Modal -->
-<div id="activity-modal" class="modal" style="display: none;">
-  <div class="modal-content activity-modal-content">
-    <div class="modal-header">
-      <h3 id="activity-modal-title">Neuer Historical Record</h3>
-      <button class="close-modal" id="close-activity-modal">&times;</button>
+<div id="activity-modal" class="modal modern-modal">
+  <div class="modal-content modern-modal-content" style="max-width: 800px;">
+    <div class="modern-modal-header modal-titlebar">
+      <h3 id="activity-modal-title">Historical Record hinzufügen</h3>
+      <button class="modal-close-btn" id="close-activity-modal">✕</button>
     </div>
     
-    <form id="activity-form" class="activity-form">
-      <!-- General Entry Data Section -->
-      <div class="form-section">
-        <h4>Allgemeine Eingabedaten</h4>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="entry-made-by">Eingetragen von (Nachname) *</label>
-            <select id="entry-made-by" name="entry_made_by" required>
-              <option value="">Mitarbeiter auswählen...</option>
-            </select>
+    <div class="modern-modal-body">
+      <form id="activity-form">
+        <!-- General Entry Data Section -->
+        <div style="margin-bottom: var(--space-xl);">
+          <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-lg); color: var(--table-header-primary);">Allgemeine Eingabedaten</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-lg);">
+            <div class="modern-form-group">
+              <label class="modern-label" for="entry-made-by">Eingetragen von (Nachname) *</label>
+              <select id="entry-made-by" name="entry_made_by" class="modern-select" required>
+                <option value="">Mitarbeiter auswählen...</option>
+              </select>
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="organisation">Organisation</label>
+              <input type="text" id="organisation" name="organisation" class="modern-input">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="organisation">Organisation</label>
-            <input type="text" id="organisation" name="organisation">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg);">
+            <div class="modern-form-group">
+              <label class="modern-label" for="location">Ort</label>
+              <input type="text" id="location" name="location" class="modern-input">
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="further-operators">Weitere Bearbeiter</label>
+              <select id="further-operators" name="further_operators" class="modern-select" multiple>
+                <option value="">Weitere Mitarbeiter auswählen...</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="location">Ort</label>
-            <input type="text" id="location" name="location">
-          </div>
-          <div class="form-group">
-            <label for="further-operators">Weitere Bearbeiter</label>
-            <select id="further-operators" name="further_operators" multiple>
-              <option value="">Weitere Mitarbeiter auswählen...</option>
-            </select>
-          </div>
-        </div>
-      </div>
 
-      <!-- Activity Type Section -->
-      <div class="form-section">
-        <h4>Aktivitätsart und Instanz</h4>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="activity-type">Aktivitätstyp *</label>
-            <select id="activity-type" name="activity_type" required>
-              <option value="">Bitte wählen...</option>
-              <option value="ASSY">ASSY</option>
-              <option value="DISASSY">DISASSY</option>
-              <option value="TEST">TEST</option>
-              <option value="SHPF">SHPF</option>
-              <option value="INSP">INSP</option>
-              <option value="CLN">CLN</option>
-              <option value="SMPL">SMPL</option>
-              <option value="CAL">CAL</option>
-              <option value="HNDL">HNDL</option>
-              <option value="STOR">STOR</option>
-              <option value="DE-STOR">DE-STOR</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="procedure-number">Prozedur Nr.</label>
-            <input type="text" id="procedure-number" name="procedure_number">
+        <!-- Activity Type Section -->
+        <div style="margin-bottom: var(--space-xl);">
+          <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-lg); color: var(--table-header-primary);">Aktivitätsart und Instanz</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg);">
+            <div class="modern-form-group">
+              <label class="modern-label" for="activity-type">Aktivitätstyp *</label>
+              <select id="activity-type" name="activity_type" class="modern-select" required>
+                <option value="">Bitte wählen...</option>
+                <option value="ASSY">ASSY</option>
+                <option value="DISASSY">DISASSY</option>
+                <option value="TEST">TEST</option>
+                <option value="SHPF">SHPF</option>
+                <option value="INSP">INSP</option>
+                <option value="CLN">CLN</option>
+                <option value="SMPL">SMPL</option>
+                <option value="CAL">CAL</option>
+                <option value="HNDL">HNDL</option>
+                <option value="STOR">STOR</option>
+                <option value="DE-STOR">DE-STOR</option>
+              </select>
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="procedure-number">Prozedur Nr.</label>
+              <input type="text" id="procedure-number" name="procedure_number" class="modern-input">
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Date and Time Section -->
-      <div class="form-section">
-        <h4>Datum und Zeit</h4>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="activity-date">Datum</label>
-            <input type="date" id="activity-date" name="date">
-          </div>
-          <div class="form-group">
-            <label for="start-time">Startzeit</label>
-            <input type="time" id="start-time" name="start_time">
-          </div>
-          <div class="form-group">
-            <label for="end-time">Endzeit</label>
-            <input type="time" id="end-time" name="end_time">
+        <!-- Date and Time Section -->
+        <div style="margin-bottom: var(--space-xl);">
+          <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-lg); color: var(--table-header-primary);">Datum und Zeit</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-lg);">
+            <div class="modern-form-group">
+              <label class="modern-label" for="activity-date">Datum</label>
+              <input type="date" id="activity-date" name="date" class="modern-input">
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="start-time">Startzeit</label>
+              <input type="time" id="start-time" name="start_time" class="modern-input">
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="end-time">Endzeit</label>
+              <input type="time" id="end-time" name="end_time" class="modern-input">
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Environmental Conditions Section -->
-      <div class="form-section">
-        <h4>Umgebungsbedingungen</h4>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="humidity-start">Luftfeuchtigkeit Start (%)</label>
-            <input type="number" id="humidity-start" name="humidity_start" min="0" max="100" step="0.1">
+        <!-- Environmental Conditions Section -->
+        <div style="margin-bottom: var(--space-xl);">
+          <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-lg); color: var(--table-header-primary);">Umgebungsbedingungen</h4>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-lg);">
+            <div class="modern-form-group">
+              <label class="modern-label" for="humidity-start">Luftfeuchtigkeit Start (%)</label>
+              <input type="number" id="humidity-start" name="humidity_start" min="0" max="100" step="0.1" class="modern-input">
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="humidity-end">Luftfeuchtigkeit Ende (%)</label>
+              <input type="number" id="humidity-end" name="humidity_end" min="0" max="100" step="0.1" class="modern-input">
+            </div>
           </div>
-          <div class="form-group">
-            <label for="humidity-end">Luftfeuchtigkeit Ende (%)</label>
-            <input type="number" id="humidity-end" name="humidity_end" min="0" max="100" step="0.1">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg);">
+            <div class="modern-form-group">
+              <label class="modern-label" for="temperature-start">Temperatur Start (°C)</label>
+              <input type="number" id="temperature-start" name="temperature_start" step="0.1" class="modern-input">
+            </div>
+            <div class="modern-form-group">
+              <label class="modern-label" for="temperature-end">Temperatur Ende (°C)</label>
+              <input type="number" id="temperature-end" name="temperature_end" step="0.1" class="modern-input">
+            </div>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="temperature-start">Temperatur Start (°C)</label>
-            <input type="number" id="temperature-start" name="temperature_start" step="0.1">
-          </div>
-          <div class="form-group">
-            <label for="temperature-end">Temperatur Ende (°C)</label>
-            <input type="number" id="temperature-end" name="temperature_end" step="0.1">
-          </div>
-        </div>
-      </div>
 
-      <!-- Remarks Section -->
-      <div class="form-section">
-        <h4>Bemerkungen, Aktivitätsbeschreibung, Berichte</h4>
-        <div class="form-group">
-          <label for="remarks">Bemerkungen</label>
-          <textarea id="remarks" name="remarks" rows="3"></textarea>
+        <!-- Remarks Section -->
+        <div style="margin-bottom: var(--space-xl);">
+          <h4 style="font-size: 1.125rem; font-weight: 600; margin-bottom: var(--space-lg); color: var(--table-header-primary);">Bemerkungen, Aktivitätsbeschreibung, Berichte</h4>
+          <div class="modern-form-group" style="margin-bottom: var(--space-lg);">
+            <label class="modern-label" for="remarks">Bemerkungen</label>
+            <textarea id="remarks" name="remarks" rows="3" class="modern-textarea"></textarea>
+          </div>
+          <div class="modern-form-group" style="margin-bottom: var(--space-lg);">
+            <label class="modern-label" for="activity-description">Aktivitätsbeschreibung</label>
+            <textarea id="activity-description" name="activity_description" rows="3" class="modern-textarea"></textarea>
+          </div>
+          <div class="modern-form-group">
+            <label class="modern-label" for="reports">Berichte</label>
+            <textarea id="reports" name="reports" rows="3" class="modern-textarea"></textarea>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="activity-description">Aktivitätsbeschreibung</label>
-          <textarea id="activity-description" name="activity_description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-          <label for="reports">Berichte</label>
-          <textarea id="reports" name="reports" rows="3"></textarea>
-        </div>
-      </div>
 
-    </form>
+      </form>
+    </div>
     
-    <div class="form-actions modal-footer">
-      <button type="submit" class="btn primary" id="save-activity" form="activity-form">
+    <div class="modern-modal-footer">
+      <button type="button" class="modern-btn modern-btn-secondary" id="cancel-activity">Abbrechen</button>
+      <button type="submit" class="modern-btn modern-btn-primary" id="save-activity" form="activity-form">
         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
         </svg>
         Speichern
       </button>
-      <button type="button" class="btn secondary" id="cancel-activity">Abbrechen</button>
     </div>
   </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="delete-activity-modal" class="modal" style="display: none;">
-  <div class="modal-content confirmation-content">
-    <div class="modal-header danger">
+<div id="delete-activity-modal" class="modal modern-modal">
+  <div class="modal-content modern-modal-content" style="max-width: 500px;">
+    <div class="modern-modal-header modal-titlebar">
       <h3>Historical Record löschen</h3>
-      <button class="close-modal" id="close-delete-modal">&times;</button>
+      <button class="modal-close-btn" id="close-delete-modal">✕</button>
     </div>
     
-    <div class="confirmation-body">
-      <div class="warning-icon">
-        <svg width="60" height="60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <div class="modern-modal-body" style="text-align: center;">
+      <div style="margin-bottom: var(--space-lg);">
+        <svg width="60" height="60" fill="none" stroke="#FF6B6B" viewBox="0 0 24 24" style="margin: 0 auto;">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
         </svg>
       </div>
       
-      <div class="confirmation-text">
-        <p>Möchten Sie diesen Historical Record wirklich löschen?</p>
-        <div class="warning-note">
+      <div style="margin-bottom: var(--space-xl);">
+        <p style="margin-bottom: var(--space-md); font-size: 1.125rem;">Möchten Sie diesen Historical Record wirklich löschen?</p>
+        <div style="background: #FFF3F3; border: 1px solid #FFB3B3; border-radius: var(--radius-md); padding: var(--space-md);">
           <strong>Achtung:</strong> Diese Aktion kann nicht rückgängig gemacht werden.
         </div>
       </div>
+    </div>
       
-      <div class="confirmation-actions">
-        <button class="btn danger" id="confirm-delete-activity">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-          </svg>
-          Ja, löschen
-        </button>
-        <button class="btn secondary" id="cancel-delete-activity">Abbrechen</button>
-      </div>
+    <div class="modern-modal-footer">
+      <button class="modern-btn modern-btn-secondary" id="cancel-delete-activity">Abbrechen</button>
+      <button class="modern-btn modern-btn-primary" id="confirm-delete-activity" style="background: #FF6B6B; border-color: #FF6B6B;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+        </svg>
+        Löschen
+      </button>
     </div>
   </div>
 </div>
@@ -327,211 +325,22 @@
 <div id="toast-container"></div>
 
 <!-- Scripts -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/common.js"></script>
 <script src="/js/historical-record.js"></script>
 
-<style>
-  /* SENSOR CSS FIX - HÖCHSTE PRIORITÄT */
-  .lab-info {
-    display: flex !important;
-    align-items: center !important;
-    gap: 1rem !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .nav-left {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    flex-grow: 1;
-  }
-
-  .lab-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    white-space: nowrap;
-  }
-
-  /* Mini Sensor Display in Header */
-  .mini-sensors {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .mini-sensor {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.2rem 0.6rem;
-    border-radius: 15px;
-    background: var(--bg-light);
-    border: 1px solid var(--border-color);
-  }
-
-  .mini-sensor.temp {
-    color: #ff6b6b;
-    border-color: #ff6b6b;
-  }
-
-  .mini-sensor.humid {
-    color: #4ecdc4;
-    border-color: #4ecdc4;
-  }
-  
-  /* Location Dropdown Styling */
-  .location-dropdown {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.3rem 0.8rem;
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-  }
-  
-  .location-dropdown:hover {
-    border-color: var(--primary-color);
-  }
-  
-  .location-dropdown:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
-  }
-
-  @media (max-width: 768px) {
-    .nav-left {
-      gap: 1rem;
-    }
-    
-    .lab-name {
-      display: none;
-    }
-    
-    .mini-sensors {
-      gap: 0.25rem;
-    }
-    
-    .mini-sensor {
-      font-size: 0.75rem;
-      padding: 0.15rem 0.4rem;
-    }
-  }
-</style>
-
 <script>
-  // Sensor Data Functions - PostgreSQL Integration
-  async function loadSensorData() {
-    try {
-      const locationSelect = document.getElementById('sensor-location-select');
-      const location = locationSelect ? locationSelect.value : 'ssa';
-      
-      const response = await fetch(`/api/sensors/current/${location}`);
-      if (!response.ok) return;
-      
-      const sensorData = await response.json();
-      updateSensorDisplay(sensorData);
-    } catch (error) {
-      console.error('❌ Sensordaten Fehler:', error);
-    }
-  }
-  
-  function updateSensorDisplay(data) {
-    try {
-      // Temperature
-      const tempValue = document.getElementById('temperature-value');
-      if (tempValue) {
-        if (data.temperature && data.temperature.temperature !== null && !isNaN(data.temperature.temperature)) {
-          tempValue.textContent = `${data.temperature.temperature.toFixed(1)}°C`;
-        } else {
-          tempValue.textContent = '--°C';
-        }
+// Setup Navigation - Let page-transitions.js handle these
+document.addEventListener('DOMContentLoaded', () => {
+  const globalSearch = document.getElementById('global-search');
+  if (globalSearch) {
+    globalSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        window.location.href = `/?search=${encodeURIComponent(e.target.value)}`;
       }
-      
-      // Humidity
-      const humValue = document.getElementById('humidity-value');
-      if (humValue) {
-        if (data.humidity && data.humidity.humidity !== null && !isNaN(data.humidity.humidity)) {
-          humValue.textContent = `${data.humidity.humidity.toFixed(1)}%`;
-        } else {
-          humValue.textContent = '--%';
-        }
-      }
-      
-      // Debug-Info bei Fehler
-      if (data.error || data.warning) {
-        console.warn('⚠️ Sensordaten-Warnung:', data.errorMessage || data.warning);
-      }
-      
-    } catch (error) {
-      console.error('❌ Fehler beim Aktualisieren der Sensoranzeige:', error);
-    }
+    });
   }
-  
-  function startSensorRefresh() {
-    // Refresh every 30 seconds
-    setInterval(async () => {
-      await loadSensorData();
-    }, 30000);
-  }
-
-  // Initialize sensor data on page load
-  document.addEventListener('DOMContentLoaded', async () => {
-    // Sensor Location Dropdown
-    const locationSelect = document.getElementById('sensor-location-select');
-    if (locationSelect) {
-      locationSelect.addEventListener('change', async () => {
-        await loadSensorData();
-      });
-    }
-    
-    await loadSensorData();
-    startSensorRefresh();
-
-    // Load employees for dropdowns
-    await loadEmployeesForDropdowns();
-  });
-
-  // Load employees for dropdowns
-  async function loadEmployeesForDropdowns() {
-    try {
-      const employeesResponse = await fetch('/api/employees');
-      if (employeesResponse.ok) {
-        const employees = await employeesResponse.json();
-        
-        // Single employee dropdown
-        const entryMadeBySelect = document.getElementById('entry-made-by');
-        if (entryMadeBySelect) {
-          entryMadeBySelect.innerHTML = '<option value="">Mitarbeiter auswählen...</option>';
-          employees.forEach(employee => {
-            const option = document.createElement('option');
-            option.value = employee.displayName;
-            option.textContent = employee.displayName;
-            entryMadeBySelect.appendChild(option);
-          });
-        }
-
-        // Multi-select dropdown for further operators
-        const furtherOperatorsSelect = document.getElementById('further-operators');
-        if (furtherOperatorsSelect) {
-          furtherOperatorsSelect.innerHTML = '';
-          employees.forEach(employee => {
-            const option = document.createElement('option');
-            option.value = employee.displayName;
-            option.textContent = employee.displayName;
-            furtherOperatorsSelect.appendChild(option);
-          });
-        }
-      }
-    } catch (error) {
-      console.error('❌ Fehler beim Laden der Mitarbeiter-Daten:', error);
-    }
-  }
+});
 </script>
 
 </body>

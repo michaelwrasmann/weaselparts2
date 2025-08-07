@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WeaselParts - Historical Record</title>
+  <link rel="stylesheet" href="/css/modern-styles.css">
+</head>
+<body class="page-historical">
+
+<div class="modern-container">
+  <!-- Modern Header -->
+  <header class="modern-header">
+    <nav class="modern-nav">
+      <a href="/" class="modern-logo">
+        <img src="/images/weasel-svgrepo-com.svg" alt="WeaselParts">
+        <span>WeaselParts</span>
+      </a>
+      
+      <!-- Search Bar -->
+      <div class="modern-search">
+        <input type="text" placeholder="Bauteile suchen..." id="global-search">
+      </div>
+      
+      <!-- Sensor Data -->
+      <div class="modern-sensors">
+        <div class="modern-sensor temp" id="temperature-value">--°C</div>
+        <div class="modern-sensor humid" id="humidity-value">--%</div>
+        <select class="modern-select" id="sensor-location-select" style="width: auto; padding: 4px 8px;">
+          <option value="ssa">Jarvis-Ecke</option>
+          <option value="int_up">Am Telefon</option>
+          <option value="emp">Empore</option>
+        </select>
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="modern-nav-buttons">
+        <button class="modern-nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <img src="/images/button_add_component.png" alt="Neues Bauteil">
+        </button>
+        <button class="modern-nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <img src="/images/button_manage_cabinet.png" alt="Schränke">
+        </button>
+        <a href="/ICD.html" class="modern-nav-btn" title="ICD">
+          <img src="/images/button_icd.png" alt="ICD">
+        </a>
+        <a href="/lab-overview.html" class="modern-nav-btn" title="Labor-Übersicht">
+          <img src="/images/button_lab_overview.png" alt="Labor">
+        </a>
+        <a href="/glue-protocol.html" class="modern-nav-btn" title="Klebeprotokoll">
+          <img src="/images/button_glue_protocol.png" alt="Kleben">
+        </a>
+        <a href="/settings.html" class="modern-nav-btn" title="Einstellungen">
+          <img src="/images/button_settings.png" alt="Settings">
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Simple Content Layout with Icon on Right -->
+  <div class="modern-wrapper">
+    <!-- Content Panel - Left Side 60% -->
+    <div class="content-panel">
+      <div class="modern-content">
+        
+        <!-- Page Header -->
+        <div class="modern-page-header">
+          <h1 class="modern-title">Road to Historical Record 2025 events</h1>
+          <p class="modern-subtitle">Explore the workshops and events that we're hosting around the world to help builders connect and prepare for Historical Record 2025.</p>
+        </div>
+
+        <!-- Simple Table -->
+        <div style="overflow-x: auto;">
+          <table class="modern-table" id="events-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Category</th>
+                <th style="width: 50px;"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>February 12, 2025</td>
+                <td>MTNHBAJB | CTP Dev Workshop w/ Sui</td>
+                <td>Holladay, UT</td>
+                <td>Workshop</td>
+                <td>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7l10 10M17 7l-10 10"></path>
+                  </svg>
+                </td>
+              </tr>
+              <tr>
+                <td>March 3, 2025</td>
+                <td>Sui Hacker House in Taipai</td>
+                <td>Taipei, Taiwan</td>
+                <td>Hacker House</td>
+                <td>
+                  <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7l10 10M17 7l-10 10"></path>
+                  </svg>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-md);">
+          <button class="modern-btn modern-btn-primary" id="add-activity-btn">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Add Event
+          </button>
+          <button class="modern-btn modern-btn-secondary">
+            Export CSV
+          </button>
+        </div>
+
+      </div>
+    </div>
+    
+    <!-- Background Panel - Right Side 40% -->
+    <div class="background-panel">
+      <img src="/images/background_icon_historical_record.png" alt="Historical Record Icon" class="background-icon" onerror="this.src='/images/background_icon_lab_overview.png'">
+    </div>
+  </div>
+</div>
+
+<!-- Activity Modal -->
+<div id="activity-modal" class="modern-modal">
+  <div class="modern-modal-content">
+    <div class="modern-modal-header">
+      <h3 id="activity-modal-title" style="font-size: 1.5rem; font-weight: 700; margin: 0;">New Event</h3>
+      <button class="modern-close-btn" id="close-activity-modal">&times;</button>
+    </div>
+    
+    <div class="modern-modal-body">
+      <form id="activity-form">
+        <div class="modern-form-group">
+          <label class="modern-label" for="event-date">Date</label>
+          <input type="date" id="event-date" name="date" class="modern-input" required>
+        </div>
+        <div class="modern-form-group">
+          <label class="modern-label" for="event-name">Event Name</label>
+          <input type="text" id="event-name" name="name" class="modern-input" required>
+        </div>
+        <div class="modern-form-group">
+          <label class="modern-label" for="event-location">Location</label>
+          <input type="text" id="event-location" name="location" class="modern-input" required>
+        </div>
+        <div class="modern-form-group">
+          <label class="modern-label" for="event-category">Category</label>
+          <select id="event-category" name="category" class="modern-select" required>
+            <option value="">Select category...</option>
+            <option value="Workshop">Workshop</option>
+            <option value="Hacker House">Hacker House</option>
+            <option value="Conference">Conference</option>
+            <option value="Meetup">Meetup</option>
+          </select>
+        </div>
+      </form>
+    </div>
+    
+    <div class="modern-modal-footer">
+      <button type="button" class="modern-btn modern-btn-secondary" id="cancel-activity">Cancel</button>
+      <button type="submit" class="modern-btn modern-btn-primary" id="save-activity" form="activity-form">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        Save Event
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/api.js"></script>
+<script src="/js/common.js"></script>
+
+<script>
+// Simple Modern JavaScript for demo
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('🚀 Historical Record Simple page initializing...');
+  
+  // Setup navigation
+  setupNavigation();
+  
+  // Setup modal
+  setupModalEventListeners();
+  
+  console.log('✅ Historical Record Simple page initialized');
+});
+
+// Setup Navigation
+function setupNavigation() {
+  const addBtn = document.getElementById('add-component-nav-btn');
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      window.location.href = '/add-component.html';
+    });
+  }
+
+  const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
+  if (manageCabinetsBtn) {
+    manageCabinetsBtn.addEventListener('click', () => {
+      window.location.href = '/manage-cabinets.html';
+    });
+  }
+  
+  const globalSearch = document.getElementById('global-search');
+  if (globalSearch) {
+    globalSearch.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        window.location.href = `/?search=${encodeURIComponent(e.target.value)}`;
+      }
+    });
+  }
+}
+
+// Setup Modal Event Listeners
+function setupModalEventListeners() {
+  const addActivityBtn = document.getElementById('add-activity-btn');
+  const closeModalBtn = document.getElementById('close-activity-modal');
+  const cancelBtn = document.getElementById('cancel-activity');
+  const saveBtn = document.getElementById('save-activity');
+  const modal = document.getElementById('activity-modal');
+  
+  if (addActivityBtn) {
+    addActivityBtn.addEventListener('click', () => {
+      openModal();
+    });
+  }
+  
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      closeModal();
+    });
+  }
+  
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', () => {
+      closeModal();
+    });
+  }
+  
+  if (saveBtn) {
+    saveBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      saveEvent();
+    });
+  }
+  
+  if (modal) {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+  }
+}
+
+function openModal() {
+  const modal = document.getElementById('activity-modal');
+  if (modal) {
+    modal.classList.add('active');
+    // Reset form
+    const form = document.getElementById('activity-form');
+    if (form) {
+      form.reset();
+    }
+  }
+}
+
+function closeModal() {
+  const modal = document.getElementById('activity-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+}
+
+function saveEvent() {
+  const form = document.getElementById('activity-form');
+  const formData = new FormData(form);
+  
+  const eventData = {
+    date: formData.get('date'),
+    name: formData.get('name'),
+    location: formData.get('location'),
+    category: formData.get('category')
+  };
+  
+  // Validate
+  if (!eventData.date || !eventData.name || !eventData.location) {
+    showMessage('Please fill in all required fields', 'error');
+    return;
+  }
+  
+  // Add to table
+  addEventToTable(eventData);
+  
+  // Close modal
+  closeModal();
+  
+  showMessage('Event added successfully!', 'success');
+}
+
+function addEventToTable(eventData) {
+  const tbody = document.querySelector('#events-table tbody');
+  if (!tbody) return;
+  
+  const row = document.createElement('tr');
+  const formattedDate = new Date(eventData.date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  
+  row.innerHTML = `
+    <td>${formattedDate}</td>
+    <td>${eventData.name}</td>
+    <td>${eventData.location}</td>
+    <td>${eventData.category}</td>
+    <td>
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2M7 7l10 10M17 7l-10 10"></path>
+      </svg>
+    </td>
+  `;
+  
+  tbody.appendChild(row);
+}
+
+// Message display function
+function showMessage(message, type = 'info') {
+  console.log(`${type.toUpperCase()}: ${message}`);
+  
+  // Create toast element
+  const toast = document.createElement('div');
+  toast.className = `modern-toast ${type}`;
+  toast.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        ${type === 'success' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>' :
+          type === 'error' ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>' :
+          '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>'}
+      </svg>
+      <span>${message}</span>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Remove after 4 seconds
+  setTimeout(() => {
+    toast.remove();
+  }, 4000);
+}
+</script>
+
+</body>
+</html>

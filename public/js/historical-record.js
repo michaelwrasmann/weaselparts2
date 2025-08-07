@@ -39,20 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Setup event listeners
 function setupEventListeners() {
-  // Navigation Buttons
-  const addBtn = document.getElementById('add-component-nav-btn');
-  if (addBtn) {
-    addBtn.addEventListener('click', () => {
-      window.location.href = '/add-component.html';
-    });
-  }
-
-  const manageCabinetsBtn = document.getElementById('manage-cabinets-nav-btn');
-  if (manageCabinetsBtn) {
-    manageCabinetsBtn.addEventListener('click', () => {
-      window.location.href = '/manage-cabinets.html';
-    });
-  }
+  // Navigation Buttons - Let page-transitions.js handle these
   
   // Global Search
   const globalSearch = document.getElementById('global-search');
@@ -205,11 +192,11 @@ function createActivityRow(record, rowNumber) {
   // Format time range
   const timeRange = formatTimeRange(record.start_time, record.end_time);
   
-  // Format humidity range
-  const humidityRange = formatRange(record.humidity_start, record.humidity_end, '%');
+  // Format humidity - only end value
+  const humidityValue = record.humidity_end ? `${record.humidity_end}%` : '-';
   
-  // Format temperature range
-  const temperatureRange = formatRange(record.temperature_start, record.temperature_end, '°C');
+  // Format temperature - only end value  
+  const temperatureValue = record.temperature_end ? `${record.temperature_end}°C` : '-';
   
   tr.innerHTML = `
     <td>${rowNumber}</td>
@@ -222,8 +209,8 @@ function createActivityRow(record, rowNumber) {
     </td>
     <td>${record.procedure_number || '-'}</td>
     <td>${timeRange}</td>
-    <td>${humidityRange}</td>
-    <td>${temperatureRange}</td>
+    <td>${humidityValue}</td>
+    <td>${temperatureValue}</td>
     <td class="actions-cell">
       <button class="action-btn edit" onclick="editActivityRecord(${record.id})" title="Bearbeiten">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -286,9 +273,20 @@ function formatActivitiesBadges(activities) {
 // Format time range
 function formatTimeRange(startTime, endTime) {
   if (!startTime && !endTime) return '-';
-  if (startTime && !endTime) return startTime;
-  if (!startTime && endTime) return endTime;
-  return `${startTime} - ${endTime}`;
+  
+  // Remove seconds from time format
+  const formatTime = (time) => {
+    if (!time) return '';
+    // If time has seconds (HH:MM:SS), remove them
+    return time.length > 5 ? time.substring(0, 5) : time;
+  };
+  
+  const start = formatTime(startTime);
+  const end = formatTime(endTime);
+  
+  if (start && !end) return start;
+  if (!start && end) return end;
+  return `${start} - ${end}`;
 }
 
 // Format numeric range
@@ -297,6 +295,33 @@ function formatRange(start, end, unit) {
   if (start != null && end == null) return `${start}${unit}`;
   if (start == null && end != null) return `${end}${unit}`;
   return `${start}${unit} - ${end}${unit}`;
+}
+
+// Modal helper functions
+function openModal(modalId) {
+  console.log('📖 Öffne Modal:', modalId);
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    // Original working code FIRST (like manage-cabinets)
+    modal.style.display = 'flex';
+    modal.style.opacity = '1';
+    modal.style.visibility = 'visible';
+    modal.style.zIndex = '2000';
+    modal.classList.add('active');
+    
+    // THEN add animation
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
 }
 
 // Show activity modal

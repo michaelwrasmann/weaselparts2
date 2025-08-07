@@ -4,154 +4,142 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Einstellungen - WeaselParts</title>
-  <link rel="stylesheet" href="/css/styles.css">
-  <script src="/js/modal-fixes.js"></script>
+  <link rel="stylesheet" href="/css/modern-styles.css">
+  <!-- Page Transitions -->
+  <script src="/js/page-transitions.js"></script>
+  <!-- Modal Animations -->
+  <script src="/js/modal-animations.js"></script>
 </head>
-<body>
-<header>
-  <div class="header-content">
-    <a href="/" class="logo">
-      <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-        <path fill="currentColor" d="M508.862,112.381c-4.797-3.806-47.682-37.184-75.929-37.184c-27.581,0-52.308,23.844-69.626,67.139c-10.743,26.856-24.697,26.856-38.192,26.856c-5.776,0-20.502-2.82-34.744-5.548c-20.389-3.905-43.49-8.33-57.625-8.275c-14.746,0.057-52.816,3.26-87.728,31.698c-31.702,25.822-51.001,65.459-56.011,114.89c-8.069,2.417-23.771,7.404-39.669,14.027C15.677,330.01,0,343.277,0,357.737c0,21.496,16.178,42.239,45.556,58.41c22.094,12.163,50.426,20.657,68.898,20.657c24.792,0,41.517-16.152,43.365-31.767c1.286-10.873-4.274-24.152-23.736-28.825c-19.624-4.71-34.346-10.988-44.13-16.064c11.112-2.083,23.886-2.809,31.072-2.94c4.073,2.64,14.61,9.738,24.149,16.231c1.376,0.938,3.002,1.439,4.668,1.439h70.773c3.118,0,5.973-1.748,7.389-4.526s1.156-6.115-0.677-8.639l-13.728-18.914c2.637-2.415,5.107-5.066,7.332-8.005c5.195-6.864,8.692-14.66,10.543-23.318c13.559-1.22,56.52-5.8,84.509-16.876c9.94,14.204,21.305,29.862,21.499,30.128c6.448,8.878,15.779,21.586,23.615,31.712c11.772,15.211,14.051,17.314,18.758,17.314h44.233c3.059,0,5.87-1.684,7.313-4.38c1.443-2.697,1.285-5.969-0.412-8.514l-14.236-21.355c-4.011-6.015-11.166-8.898-18.224-7.349l-2.914,0.64c-7.463-14.329-16.73-35.639-16.32-45.486c0.111-2.656,0.332-4.95,0.636-7.011c23.591-9.243,60.487-37.432,69.947-80.001c4.407-19.833,8.867-44.304,8.911-44.548c0.159-0.874,0.171-1.738,0.061-2.572c16.615-1.917,37.452-8.366,38.481-8.686c2.154-0.671,3.941-2.192,4.95-4.209l8.847-17.693C512.879,119.077,511.935,114.819,508.862,112.381z"/>
-      </svg>
-      <h1>WeaselParts</h1>
-    </a>
-    <nav class="top-nav">
-      <div class="nav-left">
-        <div class="lab-info">
-          <div class="location-selector">
-            <select id="sensor-location-select" class="location-dropdown">
-              <option value="ssa">Jarvis-Ecke</option>
-              <option value="int_up">Am Telefon</option>
-              <option value="int_low">Empore</option>
-            </select>
-          </div>
-          <div class="mini-sensors">
-            <span class="mini-sensor temp">
-              <span id="temperature-value">--°C</span>
-            </span>
-            <span class="mini-sensor humid">
-              <span id="humidity-value">--%</span>
-            </span>
-          </div>
-        </div>
-        <div class="search-container">
-          <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input type="text" placeholder="Bauteile suchen" id="global-search">
-        </div>
+<body class="page-settings">
+<div class="modern-container">
+  <!-- Modern Header -->
+  <header class="modern-header">
+    <nav class="modern-nav">
+      <a href="/" class="modern-logo">
+        <img src="/images/weasel-svgrepo-com.svg" alt="WeaselParts">
+        <span>WeaselParts</span>
+      </a>
+      
+      <!-- Search Bar -->
+      <div class="modern-search">
+        <input type="text" placeholder="Bauteile suchen..." id="global-search">
       </div>
-      <div class="nav-icons">
-        <button class="nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V18M18 12L6 12"></path>
-          </svg>
+      
+      <!-- Sensor Data Display -->
+      <div class="modern-sensors">
+        <div class="modern-sensor temp" id="temperature-value">--°C</div>
+        <div class="modern-sensor humid" id="humidity-value">--%</div>
+        <select id="sensor-location-select" class="modern-select" style="font-size: 0.875rem; padding: 0.25rem 0.5rem;">
+          <option value="ssa">Jarvis-Ecke</option>
+          <option value="int_up">Am Telefon</option>
+          <option value="emp">Empore</option>
+        </select>
+      </div>
+      
+      <!-- Navigation Buttons -->
+      <div class="modern-nav-buttons">
+        <button class="modern-nav-btn" id="add-component-nav-btn" title="Neues Bauteil">
+          <img src="/images/button_add_component.png" alt="Neues Bauteil">
         </button>
-        <button class="nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
+        <button class="modern-nav-btn" id="manage-cabinets-nav-btn" title="Schränke verwalten">
+          <img src="/images/button_manage_cabinet.png" alt="Schränke">
         </button>
-        <a href="/ICD.html" class="nav-btn" title="ICD">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-          </svg>
+        <a href="/ICD.html" class="modern-nav-btn" title="ICD">
+          <img src="/images/button_icd.png" alt="ICD">
         </a>
-        <a href="/lab-overview.html" class="nav-btn" title="Labor-Übersicht">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-          </svg>
+        <a href="/lab-overview.html" class="modern-nav-btn" title="Labor-Übersicht">
+          <img src="/images/button_lab_overview.png" alt="Labor">
         </a>
-        <a href="/glue-protocol.html" class="nav-btn" title="Klebeprotokoll">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-5a2 2 0 00-2-2h-2.5"></path>
-          </svg>
+        <a href="/glue-protocol.html" class="modern-nav-btn" title="Klebeprotokoll">
+          <img src="/images/button_glue_protocol.png" alt="Kleben">
         </a>
-        <a href="/settings.html" class="nav-btn active" title="Einstellungen">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-          </svg>
+        <a href="/settings.html" class="modern-nav-btn" title="Einstellungen">
+          <img src="/images/button_settings.png" alt="Settings">
         </a>
       </div>
     </nav>
-  </div>
-</header>
+  </header>
 
-<main class="main-content">
-  <div class="page-header">
-    <h1 class="page-title">Einstellungen</h1>
-    <p class="page-subtitle">Mitarbeiter und Projekte verwalten</p>
-  </div>
+  <!-- Split Screen Layout -->
+  <div class="modern-wrapper">
+    <!-- Content Panel - Left Side -->
+    <div class="content-panel">
+      <div class="modern-content">
+        
+        <!-- Page Header -->
+        <div class="modern-page-header">
+          <h1 class="modern-title">Einstellungen</h1>
+        </div>
 
-  <div class="settings-grid">
-    <!-- Mitarbeiter-Verwaltung -->
-    <div class="settings-section">
-      <div class="section-header">
-        <h2>
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-          </svg>
-          Mitarbeiter
-        </h2>
-        <button class="btn primary" id="add-employee-btn">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          Hinzufügen
-        </button>
-      </div>
-      
-      <div class="add-item-form" id="employee-form" style="display: none;">
-        <div class="name-inputs">
-          <input type="text" id="employee-nachname" placeholder="Nachname eingeben..." maxlength="50" required>
-          <input type="text" id="employee-vorname" placeholder="Vorname eingeben..." maxlength="50" required>
+        <!-- Settings Grid -->
+        <div class="settings-grid">
+          <!-- Mitarbeiter-Verwaltung -->
+          <div class="modern-panel settings-section">
+            <div class="section-header">
+              <h2 class="modern-title" style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0;">
+                Mitarbeiter
+              </h2>
+              <button class="modern-btn modern-btn-primary" id="add-employee-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Hinzufügen
+              </button>
+            </div>
+            
+            <div class="add-item-form modern-panel" id="employee-form" style="display: none;">
+              <div class="name-inputs">
+                <input type="text" id="employee-nachname" placeholder="Nachname eingeben..." maxlength="50" required class="modern-input">
+                <input type="text" id="employee-vorname" placeholder="Vorname eingeben..." maxlength="50" required class="modern-input">
+              </div>
+              <div class="form-actions">
+                <button class="modern-btn modern-btn-primary" id="save-employee-btn">Speichern</button>
+                <button class="modern-btn modern-btn-secondary" id="cancel-employee-btn">Abbrechen</button>
+              </div>
+            </div>
+            
+            <div class="items-list" id="employees-list">
+              <div class="loading-placeholder">Lade Mitarbeiter...</div>
+            </div>
+          </div>
+
+          <!-- Projekt-Verwaltung -->
+          <div class="modern-panel settings-section">
+            <div class="section-header">
+              <h2 class="modern-title" style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0;">
+                Projekte
+              </h2>
+              <button class="modern-btn modern-btn-primary" id="add-project-btn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Hinzufügen
+              </button>
+            </div>
+            
+            <div class="add-item-form modern-panel" id="project-form" style="display: none;">
+              <input type="text" id="project-name" placeholder="Projektname eingeben..." maxlength="100" class="modern-input">
+              <div class="form-actions">
+                <button class="modern-btn modern-btn-primary" id="save-project-btn">Speichern</button>
+                <button class="modern-btn modern-btn-secondary" id="cancel-project-btn">Abbrechen</button>
+              </div>
+            </div>
+            
+            <div class="items-list" id="projects-list">
+              <div class="loading-placeholder">Lade Projekte...</div>
+            </div>
+          </div>
         </div>
-        <div class="form-actions">
-          <button class="btn success" id="save-employee-btn">Speichern</button>
-          <button class="btn secondary" id="cancel-employee-btn">Abbrechen</button>
-        </div>
-      </div>
-      
-      <div class="items-list" id="employees-list">
-        <div class="loading-placeholder">Lade Mitarbeiter...</div>
       </div>
     </div>
-
-    <!-- Projekt-Verwaltung -->
-    <div class="settings-section">
-      <div class="section-header">
-        <h2>
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
-          Projekte
-        </h2>
-        <button class="btn primary" id="add-project-btn">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-          </svg>
-          Hinzufügen
-        </button>
-      </div>
-      
-      <div class="add-item-form" id="project-form" style="display: none;">
-        <input type="text" id="project-name" placeholder="Projektname eingeben..." maxlength="100">
-        <div class="form-actions">
-          <button class="btn success" id="save-project-btn">Speichern</button>
-          <button class="btn secondary" id="cancel-project-btn">Abbrechen</button>
-        </div>
-      </div>
-      
-      <div class="items-list" id="projects-list">
-        <div class="loading-placeholder">Lade Projekte...</div>
-      </div>
+    
+    <!-- Background Panel - Right Side -->
+    <div class="background-panel">
+      <img src="/images/background_icons_settings.png" alt="Background Icon" class="background-icon">
     </div>
   </div>
-</main>
+</div>
 
-<!-- Toast Container -->
 <div id="toast-container"></div>
 
 <script src="/js/api.js"></script>
@@ -199,7 +187,7 @@ function setupEventListeners() {
   if (globalSearch) {
     globalSearch.addEventListener('keypress', (e) => {
       if (e.key === 'Enter' && e.target.value.trim()) {
-        window.location.href = `/index.html?search=${encodeURIComponent(e.target.value)}`;
+        window.location.href = `/?search=${encodeURIComponent(e.target.value)}`;
       }
     });
   }
@@ -556,60 +544,42 @@ function startSensorRefresh() {
   .settings-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 2rem;
+    gap: 25px;
+    margin-bottom: 0;
   }
 
   .settings-section {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    padding: 2rem;
+    padding: 25px;
+    margin-bottom: 0;
   }
 
   .section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .section-header h2 {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-    font-size: 1.25rem;
-    color: var(--text-primary);
-  }
-
-  .section-header svg {
-    color: #4a90e2;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--gray-200);
   }
 
   .add-item-form {
-    background: var(--bg-light);
-    border-radius: 8px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    border: 1px solid var(--border-color);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: none;
   }
 
   .add-item-form input {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-size: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 15px;
   }
 
   .name-inputs {
     display: flex;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: 15px;
+    margin-bottom: 15px;
   }
 
   .name-inputs input {
@@ -619,34 +589,37 @@ function startSensorRefresh() {
 
   .form-actions {
     display: flex;
-    gap: 0.5rem;
+    gap: 10px;
   }
 
   .items-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 10px;
   }
 
   .item-card {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem;
-    background: var(--bg-light);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
+    padding: 15px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
     transition: all 0.2s ease;
+    box-shadow: none;
   }
 
   .item-card:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: none;
+    box-shadow: 0 0 0 1px var(--table-header-primary);
   }
 
   .item-name {
-    font-weight: 500;
-    color: var(--text-primary);
+    font-weight: 600;
+    font-family: var(--font-sans);
+    color: var(--gray-900);
+    font-size: 14px;
   }
 
   .item-delete {
@@ -655,112 +628,78 @@ function startSensorRefresh() {
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: none;
-    background: #fee2e2;
-    color: #dc2626;
-    border-radius: 6px;
+    border: 1px solid var(--gray-300);
+    background: var(--white);
+    color: var(--gray-600);
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
+    box-shadow: none;
   }
 
   .item-delete:hover {
-    background: #fecaca;
-    transform: scale(1.05);
+    background: var(--red-50);
+    color: var(--red-600);
+    border-color: var(--red-300);
+    transform: none;
+    box-shadow: none;
   }
 
   .no-items {
     text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
+    padding: 30px;
+    color: var(--gray-500);
     font-style: italic;
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    box-shadow: none;
   }
 
   .loading-placeholder {
     text-align: center;
-    padding: 2rem;
-    color: var(--text-secondary);
-  }
-
-  /* Navigation erweitert */
-  .nav-left {
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    flex-grow: 1;
-  }
-
-  .lab-info {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  /* Mini Sensor Display in Header */
-  .mini-sensors {
-    display: flex;
-    gap: 0.5rem;
-  }
-
-  .mini-sensor {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.2rem 0.6rem;
-    border-radius: 15px;
-    background: var(--bg-light);
-    border: 1px solid var(--border-color);
-  }
-
-  .mini-sensor.temp {
-    color: #ff6b6b;
-    border-color: #ff6b6b;
-  }
-
-  .mini-sensor.humid {
-    color: #4ecdc4;
-    border-color: #4ecdc4;
-  }
-
-  /* Location Dropdown Styling */
-  .location-dropdown {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.3rem 0.8rem;
-    outline: none;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-  }
-
-  .location-dropdown:hover {
-    border-color: #4a90e2;
-  }
-
-  .location-dropdown:focus {
-    border-color: #4a90e2;
-    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    padding: 30px;
+    color: var(--gray-500);
+    font-family: var(--font-sans);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 6px;
+    box-shadow: none;
   }
 
   @media (max-width: 768px) {
     .settings-grid {
       grid-template-columns: 1fr;
-      gap: 1rem;
+      gap: 20px;
     }
 
-    .nav-left {
-      gap: 1rem;
+    .name-inputs {
+      flex-direction: column;
+      gap: 10px;
     }
 
-    .mini-sensors {
-      gap: 0.25rem;
+    .form-actions {
+      flex-direction: column;
+      gap: 8px;
     }
+  }
 
-    .mini-sensor {
-      font-size: 0.75rem;
-      padding: 0.15rem 0.4rem;
-    }
+  /* Background Icon Optimierung für Settings */
+  .page-settings .background-panel {
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    padding-top: 50px !important;
+  }
+  
+  .page-settings .background-icon {
+    width: 120% !important;
+    max-width: 600px !important;
+    opacity: 1 !important;
+    filter: none !important;
+    transform: translateX(-10%) !important;
+    position: relative !important;
+    top: 0 !important;
   }
 </style>
 
