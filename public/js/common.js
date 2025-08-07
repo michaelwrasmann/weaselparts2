@@ -1510,7 +1510,7 @@ function ensureScannerModalExists() {
     // Modal existiert nicht - erstelle es neu im modernen Stil
     const modalHTML = `
       <div id="scanner-modal" class="modal modern-modal">
-        <div class="modal-content modern-modal-content scanner-content" style="max-width: 1100px;">
+        <div class="modal-content modern-modal-content scanner-content" style="max-width: 1300px;">
           <div class="modal-header modern-modal-header modal-titlebar scanner-header">
             <h3>Bauteil scannen</h3>
             <button class="modal-close-btn close-modal" id="close-scanner">✕</button>
