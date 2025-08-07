@@ -304,9 +304,9 @@ body::before {
 }
 
 .scanned-card .scanned-image {
-  width: 23px;
-  height: 23px;
-  border-radius: 6px;
+  width: 150px;
+  height: 150px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
   background: var(--bg-card);
@@ -323,8 +323,12 @@ body::before {
 }
 
 .scanned-card .scanned-image .placeholder {
-  font-size: 12px;
+  font-size: 48px;
   color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .scanned-card .scanned-info {
@@ -410,9 +414,9 @@ body::before {
   transition: transform 0.1s ease !important;
 }
 
-.cabinet-image-container {
-  width: 36px;
-  height: 36px;
+.cabinet-icon-container {
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -422,16 +426,9 @@ body::before {
   overflow: hidden;
 }
 
-.cabinet-card-optimized:hover .cabinet-image-container {
+.cabinet-card-optimized:hover .cabinet-icon-container {
   background: var(--primary-blue);
   transform: scale(1.05);
-}
-
-.cabinet-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 8px;
 }
 
 .cabinet-icon {
@@ -2696,7 +2693,7 @@ a.logo h1 {
     padding: 12px !important;
   }
 
-  .cabinet-image-container {
+  .cabinet-icon-container {
     width: 32px !important;
     height: 32px !important;
   }

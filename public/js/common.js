@@ -1137,9 +1137,9 @@ async function showStorageModal(component) {
               </div>` :
               cabinets.map(cabinet => `
                 <button class="cabinet-card-optimized" onclick="storeComponentInCabinet('${component.barcode}', ${cabinet.id}, '${cabinet.name.replace(/'/g, "&apos;")}')">
-                  <div class="cabinet-image-container">
+                  <div class="cabinet-icon-container">
                     ${cabinet.image_url ? 
-                      `<img class="cabinet-image" src="${cabinet.image_url}" alt="${cabinet.name}">` :
+                      `<img src="${cabinet.image_url}" alt="${cabinet.name}" class="cabinet-photo" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">` :
                       `<svg class="cabinet-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                       </svg>`
@@ -1503,7 +1503,7 @@ function ensureScannerModalExists() {
     // Modal existiert nicht - erstelle es neu im modernen Stil
     const modalHTML = `
       <div id="scanner-modal" class="modal modern-modal">
-        <div class="modal-content modern-modal-content scanner-content" style="max-width: 900px;">
+        <div class="modal-content modern-modal-content scanner-content" style="max-width: 700px;">
           <div class="modal-header modern-modal-header modal-titlebar scanner-header">
             <h3>Bauteil scannen</h3>
             <button class="modal-close-btn close-modal" id="close-scanner">✕</button>
