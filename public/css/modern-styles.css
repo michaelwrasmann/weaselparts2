@@ -258,10 +258,7 @@ body.page-add-component { background-color: var(--bg-add-component); }
   box-shadow: var(--shadow-xl);
   overflow: hidden;
   position: relative;
-  background-image: 
-    linear-gradient(rgba(226, 226, 226, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 226, 226, 0.2) 1px, transparent 1px);
-  background-size: 20px 20px;
+  /* Hintergrundbild entfernt */
 }
 
 /* Header spans full width */

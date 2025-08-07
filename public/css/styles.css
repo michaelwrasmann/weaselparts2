@@ -304,9 +304,9 @@ body::before {
 }
 
 .scanned-card .scanned-image {
-  width: 45px;
-  height: 45px;
-  border-radius: 8px;
+  width: 135px;
+  height: 135px;
+  border-radius: 12px;
   overflow: hidden;
   flex-shrink: 0;
   background: var(--bg-card);
@@ -323,7 +323,7 @@ body::before {
 }
 
 .scanned-card .scanned-image .placeholder {
-  font-size: 20px;
+  font-size: 60px;
   color: var(--text-tertiary);
   display: flex;
   align-items: center;
@@ -415,8 +415,8 @@ body::before {
 }
 
 .cabinet-icon-container {
-  width: 60px;
-  height: 60px;
+  width: 180px;
+  height: 180px;
   display: flex;
   align-items: center;
   justify-content: center;
