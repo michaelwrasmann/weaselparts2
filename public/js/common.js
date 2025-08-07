@@ -983,7 +983,7 @@ function showInfoModal(component) {
     console.error('❌ Modal content not found in showInfoModal');
     return;
   }
-  modalContent.className = 'modal-content scanner-content wide-modal';
+  modalContent.className = 'modal-content modern-modal-content scanner-content wide-modal';
   
   // Header
   const header = modal.querySelector('.scanner-header');
@@ -991,8 +991,8 @@ function showInfoModal(component) {
     console.error('❌ Scanner header not found in showInfoModal');
     return;
   }
-  header.style.background = 'var(--primary-green)';
-  const headerTitle = header.querySelector('h2');
+  // header.style.background = 'var(--primary-green)';
+  const headerTitle = header.querySelector('h2, h3');
   if (headerTitle) {
     headerTitle.textContent = 'Bauteil gefunden';
   }
@@ -1071,7 +1071,7 @@ async function showStorageModal(component) {
     console.error('❌ Modal content not found in showStorageModal');
     return;
   }
-  modalContent.className = 'modal-content scanner-content storage-modal'; // NEUE KLASSE
+  modalContent.className = 'modal-content modern-modal-content scanner-content storage-modal'; // NEUE KLASSE
   
   // Header
   const header = modal.querySelector('.scanner-header');
@@ -1079,8 +1079,8 @@ async function showStorageModal(component) {
     console.error('❌ Scanner header not found in showStorageModal');
     return;
   }
-  header.style.background = 'var(--primary-blue)';
-  const headerTitle = header.querySelector('h2');
+  // header.style.background = '';  // Verwende Standard-Styling
+  const headerTitle = header.querySelector('h2, h3');
   if (headerTitle) {
     headerTitle.textContent = 'Schrank auswählen';
   }
@@ -1187,15 +1187,15 @@ function showUnknownBarcodeModal(barcode) {
     console.error('❌ Modal content not found in showUnknownBarcodeModal');
     return;
   }
-  modalContent.className = 'modal-content scanner-content wide-modal';
+  modalContent.className = 'modal-content modern-modal-content scanner-content wide-modal';
   
   const header = modal.querySelector('.scanner-header');
   if (!header) {
     console.error('❌ Scanner header not found in showUnknownBarcodeModal');
     return;
   }
-  header.style.background = '#ff9500';
-  const headerTitle = header.querySelector('h2');
+  // header.style.background = '#ff9500';
+  const headerTitle = header.querySelector('h2, h3');
   if (headerTitle) {
     headerTitle.textContent = 'Unbekanntes Bauteil';
   }
@@ -1260,7 +1260,7 @@ function showRemovalSuccessModal(component) {
     console.error('❌ Modal content not found in showRemovalSuccessModal');
     return;
   }
-  modalContent.className = 'modal-content scanner-content wide-modal removal-state';
+  modalContent.className = 'modal-content modern-modal-content scanner-content wide-modal removal-state';
   
   // Header - rot
   const header = modal.querySelector('.scanner-header');
@@ -1268,8 +1268,8 @@ function showRemovalSuccessModal(component) {
     console.error('❌ Scanner header not found in showRemovalSuccessModal');
     return;
   }
-  header.style.background = 'var(--accent-red)';
-  const headerTitle = header.querySelector('h2');
+  // header.style.background = 'var(--accent-red)';
+  const headerTitle = header.querySelector('h2, h3');
   if (headerTitle) {
     headerTitle.textContent = 'Bauteil ausgelagert';
   }
@@ -1355,7 +1355,7 @@ function showStorageSuccessModal(component, cabinetName) {
     console.error('❌ Modal content not found in showStorageSuccessModal');
     return;
   }
-  modalContent.className = 'modal-content scanner-content wide-modal storage-state';
+  modalContent.className = 'modal-content modern-modal-content scanner-content wide-modal storage-state';
   
   // Header - grün
   const header = modal.querySelector('.scanner-header');
@@ -1363,8 +1363,8 @@ function showStorageSuccessModal(component, cabinetName) {
     console.error('❌ Scanner header not found in showStorageSuccessModal');
     return;
   }
-  header.style.background = 'var(--primary-green)';
-  const headerTitle = header.querySelector('h2');
+  // header.style.background = 'var(--primary-green)';
+  const headerTitle = header.querySelector('h2, h3');
   if (headerTitle) {
     headerTitle.textContent = 'Bauteil eingelagert';
   }
@@ -1465,31 +1465,47 @@ function ensureScannerModalExists() {
       if (!modalContent.classList.contains('modal-content')) {
         modalContent.classList.add('modal-content');
       }
+      if (!modalContent.classList.contains('modern-modal-content')) {
+        modalContent.classList.add('modern-modal-content');
+      }
       if (!modalContent.classList.contains('scanner-content')) {
         modalContent.classList.add('scanner-content');
       }
       
       // Stelle sicher dass Header und Body existieren
       let header = modalContent.querySelector('.scanner-header, .modern-modal-header');
-      if (header && !header.classList.contains('scanner-header')) {
-        header.classList.add('scanner-header');
+      if (header) {
+        if (!header.classList.contains('scanner-header')) {
+          header.classList.add('scanner-header');
+        }
+        if (!header.classList.contains('modern-modal-header')) {
+          header.classList.add('modern-modal-header');
+        }
+        if (!header.classList.contains('modal-titlebar')) {
+          header.classList.add('modal-titlebar');
+        }
       }
       
       let body = modalContent.querySelector('.scanner-body, .modern-modal-body');
-      if (body && !body.classList.contains('scanner-body')) {
-        body.classList.add('scanner-body');
+      if (body) {
+        if (!body.classList.contains('scanner-body')) {
+          body.classList.add('scanner-body');
+        }
+        if (!body.classList.contains('modern-modal-body')) {
+          body.classList.add('modern-modal-body');
+        }
       }
     }
   } else {
-    // Modal existiert nicht - erstelle es neu
+    // Modal existiert nicht - erstelle es neu im modernen Stil
     const modalHTML = `
-      <div id="scanner-modal" class="modal">
-        <div class="modal-content scanner-content wide-modal">
-          <div class="scanner-header">
-            <h2>Bauteil scannen</h2>
-            <button class="close-modal" id="close-scanner">&times;</button>
+      <div id="scanner-modal" class="modal modern-modal">
+        <div class="modal-content modern-modal-content scanner-content" style="max-width: 700px;">
+          <div class="modal-header modern-modal-header modal-titlebar scanner-header">
+            <h3>Bauteil scannen</h3>
+            <button class="modal-close-btn close-modal" id="close-scanner">✕</button>
           </div>
-          <div class="scanner-body">
+          <div class="modal-body modern-modal-body scanner-body">
             <!-- Inhalt wird dynamisch gefüllt -->
           </div>
         </div>
