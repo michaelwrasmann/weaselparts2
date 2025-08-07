@@ -97,12 +97,8 @@ body::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background: 
-    linear-gradient(135deg, rgba(196, 214, 0, 0.15) 0%, rgba(74, 144, 226, 0.15) 100%),
-    url('/images/background.png') center/cover no-repeat;
-  opacity: 0.3;
-  z-index: -1;
-  filter: blur(2px);
+  /* Hintergrundbild komplett entfernt */
+  display: none;
 }
 
 /* ==============================================
@@ -1007,7 +1003,7 @@ a.logo h1 {
 .main-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 140px 32px 48px;
+  padding: 200px 32px 48px;
 }
 
 .page-header {
@@ -2512,7 +2508,7 @@ a.logo h1 {
   }
   
   .main-content {
-    padding: 120px 20px 20px;
+    padding: 160px 20px 20px;
   }
   
   .components-grid,
@@ -2559,7 +2555,7 @@ a.logo h1 {
   }
 
   .main-content {
-    padding: 100px 16px 16px;
+    padding: 130px 16px 16px;
   }
 
   .components-grid,
