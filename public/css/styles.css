@@ -1007,7 +1007,7 @@ a.logo h1 {
 .main-content {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 96px 32px 48px;
+  padding: 140px 32px 48px;
 }
 
 .page-header {
@@ -2512,7 +2512,7 @@ a.logo h1 {
   }
   
   .main-content {
-    padding: 88px 20px 20px;
+    padding: 120px 20px 20px;
   }
   
   .components-grid,
@@ -2559,7 +2559,7 @@ a.logo h1 {
   }
 
   .main-content {
-    padding: 80px 16px 16px;
+    padding: 100px 16px 16px;
   }
 
   .components-grid,

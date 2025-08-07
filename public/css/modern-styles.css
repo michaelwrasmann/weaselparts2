@@ -806,10 +806,7 @@ a[href*="settings"].modern-nav-btn::before {
   padding: var(--space-xl);
   overflow-y: auto;
   flex: 1;
-  background-image: 
-    linear-gradient(rgba(226, 226, 226, 0.3) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(226, 226, 226, 0.3) 1px, transparent 1px);
-  background-size: 20px 20px;
+  /* Hintergrundbild entfernt */
 }
 
 .modern-modal-footer {
